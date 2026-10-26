@@ -46,7 +46,9 @@ export function parseSave(raw: string | null): Save {
     };
     const records: Record<string, number> = {};
     if (
-      value.rulesVersion === RULES_VERSION &&
+      Number.isInteger(value.rulesVersion) &&
+      value.rulesVersion >= 1 &&
+      value.rulesVersion <= RULES_VERSION &&
       value.records &&
       typeof value.records === "object"
     )

@@ -32,15 +32,15 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
  <div id="game" tabindex="0" role="application" aria-label="赛车区域，方向键或 WASD 驾驶"></div>
  <header class="hud"><div class="mode-note paper"><span class="flag">${icon("flag")}</span><div><span class="tiny">PAPERLAP / 纸上飞驰</span><h1 id="mode-label">自由试跑</h1></div></div>
  <div class="timing paper"><div class="current"><span>本圈</span><output id="timer">00:00.00</output></div><div class="best"><span>个人最佳</span><output id="best">--:--.--</output><span class="best-star">☆</span></div></div>
- <div class="editor-caption" hidden><strong>画一条你想开的路</strong><span>按住鼠标绘制 · 首尾相连</span></div>
+ <div class="editor-caption" hidden><strong>画一条你想开的路</strong><span>按住画一圈 · 起点附近松开 · 自动修圆</span></div>
  <div class="top-actions"><button id="sound" class="icon-button" aria-label="开启声音" title="开启声音">${icon("mute")}</button><button id="pause" class="paper" disabled>${icon("pause")}<span>暂停</span></button></div></header>
  <div id="lap-status" class="lap-status" role="status"></div><div id="toast" class="toast" role="status"></div>
  <section id="welcome" class="center-note paper"><span class="tiny">一张纸，一条路，一次好成绩。</span><h2>把这一圈，开成你的纪录。</h2><p>方向键或 WASD 驾驶。出发后，沿赛道绕行一圈。</p><button id="start" class="primary">${icon("play")}开始试跑</button><span class="start-hint">按住 ↑ 加速，弯前松油或刹车</span></section>
  <section id="pause-panel" class="center-note paper" hidden><span class="tiny">休息一下，赛道等你。</span><h2>已暂停</h2><p id="pause-reason">车辆和计时都已暂停</p><button id="resume" class="primary">${icon("play")}继续试跑</button></section>
- <div id="draw-intro" class="draw-intro" hidden><svg viewBox="0 0 230 100" fill="none" aria-hidden="true"><path d="M28 64C-4 16 96 2 109 35s108-37 103 18-133 44-179 16" stroke="currentColor" stroke-width="2" stroke-dasharray="6 6"/><circle cx="28" cy="64" r="6" fill="currentColor"/><path d="m30 49-2 15 16-3" stroke="currentColor" stroke-width="2"/></svg><strong>从这里，随手画一圈。</strong><span>画大一些，弯圆一些，给小车留点空间。</span></div>
+ <div id="draw-intro" class="draw-intro" hidden><svg viewBox="0 0 230 100" fill="none" aria-hidden="true"><path d="M28 64C-4 16 96 2 109 35s108-37 103 18-133 44-179 16" stroke="currentColor" stroke-width="2" stroke-dasharray="6 6"/><circle cx="28" cy="64" r="6" fill="currentColor"/><path d="m30 49-2 15 16-3" stroke="currentColor" stroke-width="2"/></svg><strong>从这里，随手画一圈。</strong><span>线条不用太工整，回到起点圆圈内松开就好。</span></div>
  <div id="editor-status" class="editor-status" role="status" hidden></div>
  <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 暂停</span></div><div class="bottom-actions"><button id="edit" class="paper accent">${icon("edit")}编辑赛道</button><button id="restart" class="paper">${icon("reset")}重新开始</button></div></footer>
- <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper">${icon("close")}取消编辑</button><span>一笔画完，不交叉，不挤在一起。</span><div><button id="redraw" class="paper">${icon("reset")}重新绘制</button><button id="drive-drawing" class="primary" disabled>开始试跑${icon("arrow")}</button></div></footer>
+ <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper" aria-keyshortcuts="Escape" title="取消编辑 (Esc)">${icon("close")}取消编辑<kbd aria-hidden="true">Esc</kbd></button><span>随手画，线条会自动修圆。</span><div><button id="redraw" class="paper" aria-keyshortcuts="R" title="重新绘制 (R)">${icon("reset")}重新绘制<kbd aria-hidden="true">R</kbd></button><button id="drive-drawing" class="primary" aria-keyshortcuts="Enter" title="开始试跑 (Enter)" disabled>开始试跑<kbd aria-hidden="true">Enter ↵</kbd></button></div></footer>
  <div class="page-signature">DRAW A LITTLE. DRIVE A LITTLE.</div>
 </main>`;
 const scene = new RaceScene();
@@ -166,7 +166,7 @@ function editUI(editing: boolean) {
 el("edit").onclick = () => {
   editor.enter();
   editUI(true);
-  el("redraw").focus();
+  editor.focus();
 };
 editor.onStatus = (message, valid, kind) => {
   el("editor-status").textContent = message;
@@ -174,13 +174,18 @@ editor.onStatus = (message, valid, kind) => {
   el<HTMLButtonElement>("drive-drawing").disabled = !valid;
   el("draw-intro").hidden = editor.raw.length > 0;
 };
-el("redraw").onclick = () => editor.redraw();
-el("cancel-edit").onclick = () => {
+el("redraw").onclick = () => {
+  editor.redraw();
+  editor.focus();
+};
+function cancelEdit() {
   editor.cancel();
   editUI(false);
   el("draw-intro").hidden = true;
-};
-el("drive-drawing").onclick = () => {
+  el(scene.mode === "ready" ? "start" : "resume").focus();
+}
+el("cancel-edit").onclick = cancelEdit;
+function driveDrawing() {
   if (!editor.accept()) return;
   editUI(false);
   el("draw-intro").hidden = true;
@@ -188,8 +193,32 @@ el("drive-drawing").onclick = () => {
   updateBest();
   start();
   toast("你的赛道，你来破纪录。");
-};
+}
+el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
+  if (e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (
+    e.target instanceof Element &&
+    e.target.closest("input,textarea,select,[contenteditable]")
+  )
+    return;
+  if (scene.mode === "editing") {
+    if (e.code === "Enter" || e.code === "NumpadEnter") {
+      if (e.target instanceof Element && e.target.closest("button,a")) return;
+      e.preventDefault();
+      if (!e.repeat) driveDrawing();
+    } else if (e.code === "KeyR") {
+      e.preventDefault();
+      if (!e.repeat) {
+        editor.redraw();
+        editor.focus();
+      }
+    } else if (e.code === "Escape") {
+      e.preventDefault();
+      if (!e.repeat) cancelEdit();
+    }
+    return;
+  }
   if (e.target !== area) return;
   if (e.code === "Escape" && scene.mode === "running") {
     e.preventDefault();
@@ -218,6 +247,7 @@ function keydown(e: KeyboardEvent) {
 }
 const keyup = (e: KeyboardEvent) => scene.keys.delete(e.code);
 function loseFocus() {
+  editor.interrupt();
   scene.keys.clear();
   scene.pause();
   uiClock = 0;
@@ -237,7 +267,7 @@ function areaBlur() {
 function pointerFocus() {
   if (scene.mode === "running") area.focus();
 }
-area.addEventListener("keydown", keydown);
+board.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
 window.addEventListener("blur", loseFocus);
 document.addEventListener("visibilitychange", visibility);
@@ -263,7 +293,7 @@ if (import.meta.hot)
     clearTimeout(toastTimer);
     editor.destroy();
     sound.destroy();
-    area.removeEventListener("keydown", keydown);
+    board.removeEventListener("keydown", keydown);
     window.removeEventListener("keyup", keyup);
     window.removeEventListener("blur", loseFocus);
     document.removeEventListener("visibilitychange", visibility);

@@ -10,6 +10,8 @@ export class TrackEditor {
   candidate: Track | null = null;
   drawing = false;
   overflow = false;
+  strokeLength = 0;
+  closureReady = false;
   pointer: number | null = null;
   previous: {
     track: Track;
@@ -32,7 +34,11 @@ export class TrackEditor {
     this.canvas.width = WORLD.width * 2;
     this.canvas.height = WORLD.height * 2;
     this.canvas.hidden = true;
-    this.canvas.setAttribute("aria-label", "按住鼠标绘制闭合赛道");
+    this.canvas.tabIndex = 0;
+    this.canvas.setAttribute(
+      "aria-label",
+      "绘制赛道，R 重画，Enter 试跑，Esc 取消",
+    );
     container.append(this.canvas);
     this.ctx = this.canvas.getContext("2d")!;
     this.ctx.scale(2, 2);
@@ -40,6 +46,8 @@ export class TrackEditor {
     this.canvas.addEventListener("pointermove", this.move);
     this.canvas.addEventListener("pointerup", this.up);
     this.canvas.addEventListener("pointercancel", this.cancelPointer);
+    this.canvas.addEventListener("lostpointercapture", this.cancelPointer);
+    window.addEventListener("resize", this.cancelPointer);
   }
   enter() {
     this.previous = {
@@ -58,10 +66,24 @@ export class TrackEditor {
   redraw() {
     this.release();
     this.raw = [];
+    this.strokeLength = 0;
     this.candidate = null;
     this.scene.preview(null);
     this.paint();
-    this.onStatus("按住鼠标画一圈，让终点回到起点附近", false, "hint");
+    this.onStatus("在虚线范围内画一个大圈，回到起点圆圈内松开", false, "hint");
+  }
+  focus() {
+    this.canvas.focus({ preventScroll: true });
+  }
+  interrupt() {
+    if (!this.drawing) return;
+    this.release();
+    this.paint();
+    this.onStatus(
+      "绘制已中断，可以重新按住鼠标画一圈，或按 R 清空",
+      false,
+      "hint",
+    );
   }
   cancel() {
     this.release();
@@ -96,23 +118,42 @@ export class TrackEditor {
   private down = (e: PointerEvent) => {
     if (e.button !== 0 || this.candidate || this.drawing) return;
     e.preventDefault();
+    this.focus();
     this.drawing = true;
     this.overflow = false;
+    this.strokeLength = 0;
+    this.closureReady = false;
     this.pointer = e.pointerId;
     this.canvas.setPointerCapture(e.pointerId);
     this.raw = [this.point(e)];
-    this.onStatus("慢慢画，不用太工整。回到橘色圆圈就能闭合。", false, "hint");
+    this.onStatus("线条不用太工整，画一圈后回到起点圆圈内松开", false, "hint");
     this.paint();
   };
   private move = (e: PointerEvent) => {
     if (!this.drawing || e.pointerId !== this.pointer) return;
     const p = this.point(e);
-    if (dist(p, this.raw.at(-1)!) < 4) return;
+    const distance = dist(p, this.raw.at(-1)!);
+    if (distance < 4) return;
     if (this.raw.length >= ROAD.maxRaw) {
       this.overflow = true;
       return;
     }
+    this.strokeLength += distance;
     this.raw.push(p);
+    const ready =
+      this.strokeLength >= ROAD.minLength &&
+      this.raw.length >= 12 &&
+      dist(p, this.raw[0]) <= ROAD.closeDistance;
+    if (ready !== this.closureReady) {
+      this.closureReady = ready;
+      this.onStatus(
+        ready
+          ? "已回到起点 · 松开鼠标，自动闭合并检查赛道"
+          : "继续画一圈，回到起点圆圈内松开",
+        false,
+        "hint",
+      );
+    }
     this.paint();
   };
   private up = (e: PointerEvent) => {
@@ -127,26 +168,44 @@ export class TrackEditor {
       this.candidate = result.track;
       this.scene.preview(result.track);
       this.ctx.clearRect(0, 0, WORLD.width, WORLD.height);
-      this.onStatus("赛道画好了！准备好就开始试跑。", true, "success");
+      this.onStatus(
+        "赛道画好了！按 Enter 试跑，或按 R 重新绘制。",
+        true,
+        "success",
+      );
     } else {
       this.paint(result.point);
       this.onStatus(result.reason, false, "error");
     }
   };
   private cancelPointer = () => {
-    this.release();
-    this.paint();
-    this.onStatus("绘制已中断，可以重新按住鼠标画一圈", false, "hint");
+    this.interrupt();
   };
   private release() {
-    if (this.pointer !== null && this.canvas.hasPointerCapture(this.pointer))
-      this.canvas.releasePointerCapture(this.pointer);
+    const pointer = this.pointer;
     this.pointer = null;
     this.drawing = false;
+    this.closureReady = false;
+    if (pointer !== null && this.canvas.hasPointerCapture(pointer))
+      this.canvas.releasePointerCapture(pointer);
   }
   private paint(error?: Point) {
     const c = this.ctx;
     c.clearRect(0, 0, WORLD.width, WORLD.height);
+    c.save();
+    c.strokeStyle = "rgba(81,107,120,.25)";
+    c.lineWidth = 1;
+    c.setLineDash([5, 9]);
+    c.beginPath();
+    c.roundRect(
+      ROAD.margin,
+      ROAD.minY,
+      WORLD.width - ROAD.margin * 2,
+      ROAD.maxY - ROAD.minY,
+      68,
+    );
+    c.stroke();
+    c.restore();
     if (!this.raw.length) return;
     const first = this.raw[0],
       last = this.raw.at(-1)!;
@@ -162,9 +221,13 @@ export class TrackEditor {
     c.stroke();
     c.setLineDash([5, 6]);
     c.lineWidth = 1.5;
-    c.strokeStyle = "rgba(214,89,50,.6)";
+    c.strokeStyle = this.closureReady ? "#567d62" : "rgba(214,89,50,.6)";
     c.beginPath();
     c.arc(first.x, first.y, ROAD.closeDistance, 0, Math.PI * 2);
+    if (this.closureReady) {
+      c.fillStyle = "rgba(94,133,102,.1)";
+      c.fill();
+    }
     c.stroke();
     if (dist(first, last) < ROAD.closeDistance) {
       c.beginPath();
@@ -173,7 +236,7 @@ export class TrackEditor {
       c.stroke();
     }
     c.setLineDash([]);
-    c.fillStyle = "#d65932";
+    c.fillStyle = this.closureReady ? "#567d62" : "#d65932";
     c.beginPath();
     c.arc(first.x, first.y, 6, 0, Math.PI * 2);
     c.fill();
@@ -196,6 +259,8 @@ export class TrackEditor {
     this.canvas.removeEventListener("pointermove", this.move);
     this.canvas.removeEventListener("pointerup", this.up);
     this.canvas.removeEventListener("pointercancel", this.cancelPointer);
+    this.canvas.removeEventListener("lostpointercapture", this.cancelPointer);
+    window.removeEventListener("resize", this.cancelPointer);
     this.canvas.remove();
   }
 }

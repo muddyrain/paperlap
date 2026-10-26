@@ -19,6 +19,7 @@ import {
   writeSave,
 } from "../src/game/storage.ts";
 import { formatTime } from "../src/game/time.ts";
+import { RULES_VERSION } from "../src/game/config.ts";
 const data = derive(defaultTrack());
 const ellipse = (rx = 460, ry = 230, n = 180): Point[] =>
   Array.from({ length: n + 1 }, (_, i) => ({
@@ -232,4 +233,29 @@ test("storage validates shape/geometry/version; corrupted or unavailable storage
   const other = fromDrawing(ellipse());
   assert.equal(other.ok, true);
   if (other.ok) assert.equal(save.records[recordKey(other.track)], undefined);
+});
+test("handling upgrade retains track/preferences and separates legacy records", () => {
+  const legacy = freshSave();
+  legacy.rulesVersion = 1;
+  legacy.muted = false;
+  const oldKey = `${legacy.track.id}:rules-1`;
+  legacy.records[oldKey] = 24.68;
+  const restored = parseSave(JSON.stringify(legacy));
+  assert.equal(restored.rulesVersion, RULES_VERSION);
+  assert.deepEqual(restored.track, legacy.track);
+  assert.equal(restored.muted, false);
+  assert.equal(restored.records[oldKey], 24.68);
+  assert.equal(restored.records[recordKey(restored.track)], undefined);
+  let written = "";
+  assert.ok(
+    writeSave(
+      {
+        setItem(_key, value) {
+          written = value;
+        },
+      },
+      restored,
+    ),
+  );
+  assert.equal(parseSave(written).records[oldKey], 24.68);
 });

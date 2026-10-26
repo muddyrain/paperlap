@@ -9,7 +9,7 @@ const { chromium } = await import("@playwright/test");
 // Separate, headless browser. Never connects to a user's browser or CDP session.
 const browser = await chromium.launch({
   headless: true,
-  args: ["--disable-dev-shm-usage"],
+  args: ["--disable-dev-shm-usage", "--mute-audio"],
 });
 const context = await browser.newContext({
   viewport: { width: 1366, height: 768 },
@@ -18,7 +18,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 const base = process.env.PAPERLAP_URL || "http://127.0.0.1:5173";
 const root = fileURLToPath(new URL("../", import.meta.url));
-await mkdir(`${root}docs/screenshots`, { recursive: true });
+await mkdir(`${root}test-results/screenshots`, { recursive: true });
 await mkdir(`${root}test-results`, { recursive: true });
 const errors = [],
   failures = [],
@@ -36,7 +36,7 @@ const check = (name) => {
 };
 const state = () => page.evaluate(() => window.paperlapDebug);
 const shot = (name) =>
-  page.screenshot({ path: `${root}docs/screenshots/${name}.png` });
+  page.screenshot({ path: `${root}test-results/screenshots/${name}.png` });
 const wait = (ms) => page.waitForTimeout(ms);
 async function ready() {
   await page.goto(`${base}/?debug=1`);

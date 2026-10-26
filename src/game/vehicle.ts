@@ -46,10 +46,23 @@ export function moveCar(car: Car, input: Input, dt: number, onRoad: boolean) {
   );
   if (forward > max)
     forward = Math.max(max, forward - (onRoad ? 180 : 480) * dt);
+  const targetSteering = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  const response =
+    targetSteering === 0 ? DRIVE.steeringReturn : DRIVE.steeringResponse;
   car.steering +=
-    ((input.right ? 1 : 0) - (input.left ? 1 : 0) - car.steering) *
-    Math.min(1, dt * 12);
-  car.angle += car.steering * DRIVE.steering * Math.min(1, forward / 100) * dt;
+    (targetSteering - car.steering) * (1 - Math.exp(-response * dt));
+  // Add steering authority as speed rises, while retaining the low-speed ramp.
+  const speedBlend = Math.max(
+    0,
+    Math.min(
+      1,
+      (forward - DRIVE.steeringSpeed) / (DRIVE.maxSpeed - DRIVE.steeringSpeed),
+    ),
+  );
+  const turnRate =
+    DRIVE.steering + (DRIVE.highSpeedSteering - DRIVE.steering) * speedBlend;
+  car.angle +=
+    car.steering * turnRate * Math.min(1, forward / DRIVE.steeringSpeed) * dt;
   side *= Math.exp(-DRIVE.lateralGrip * dt);
   // Keep a little of the old velocity through a turn, then let tire grip settle it.
   const nextF = { x: Math.cos(car.angle), y: Math.sin(car.angle) },

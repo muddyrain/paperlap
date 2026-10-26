@@ -1,5 +1,5 @@
 export const WORLD = { width: 1440, height: 860 };
-export const RULES_VERSION = 1;
+export const RULES_VERSION = 2;
 export const ROAD = {
   width: 108,
   tolerance: 3,
@@ -8,6 +8,7 @@ export const ROAD = {
   closeDistance: 75,
   maxRaw: 1600,
   maxPoints: 900,
+  smoothingDistance: 27,
   margin: 64,
   minY: 184,
   maxY: 700,
@@ -22,6 +23,10 @@ export const DRIVE = {
   offroadDrag: 3.4,
   offroadSpeed: 75,
   steering: 2.15,
+  highSpeedSteering: 3.1,
+  steeringSpeed: 100,
+  steeringResponse: 22,
+  steeringReturn: 36,
   lateralGrip: 9.5,
   wheelbase: 41,
 };

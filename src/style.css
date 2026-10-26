@@ -563,6 +563,10 @@ kbd {
   touch-action: none;
   cursor: crosshair;
 }
+.draw-surface:focus-visible {
+  outline: 2px solid #72879066;
+  outline-offset: -2px;
+}
 .editing .timing,
 .editing .footer,
 .editing .top-actions,
@@ -659,6 +663,29 @@ kbd {
 .editor-footer > span {
   font-size: 12px;
   color: #65717a;
+}
+.editor-footer kbd {
+  margin-left: 5px;
+  min-width: 25px;
+  width: auto;
+  height: 23px;
+  padding: 0 5px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  color: inherit;
+  border: 1px solid #7d8a8f66;
+  background: #f5ecda;
+  box-shadow: 0 1px 0 #61707c1c;
+}
+.editor-footer .primary kbd {
+  border-color: #fff1d780;
+  background: #ffffff12;
+  box-shadow: none;
+}
+.editor-footer .primary:disabled:hover {
+  background: #c9502b;
 }
 .stamp {
   animation: stamp-in 0.25s ease-out;

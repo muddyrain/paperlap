@@ -110,6 +110,40 @@ export function smooth(points: Point[]) {
   }
   return resample(out);
 }
+function smoothDrawing(raw: Point[]) {
+  const distinct = [raw[0]];
+  for (const point of raw.slice(1)) {
+    if (dist(point, distinct.at(-1)!) >= 2) distinct.push(point);
+  }
+  // Uniform distance samples keep a slow hand from giving one part of the
+  // stroke more weight. Circular filtering also smooths the snapped seam.
+  const samples = resample(distinct);
+  const length = samples.reduce(
+    (sum, p, i) => sum + dist(p, samples[(i + 1) % samples.length]),
+    0,
+  );
+  const spacing = length / samples.length;
+  const radius = Math.min(
+    Math.floor(samples.length / 2),
+    Math.ceil((3 * ROAD.smoothingDistance) / (spacing || 1)),
+  );
+  const weights = Array.from({ length: radius * 2 + 1 }, (_, i) =>
+    Math.exp(-0.5 * (((i - radius) * spacing) / ROAD.smoothingDistance) ** 2),
+  );
+  const weight = weights.reduce((sum, w) => sum + w, 0);
+  return resample(
+    samples.map((_, i) => {
+      const point = { x: 0, y: 0 };
+      for (let offset = -radius; offset <= radius; offset++) {
+        const sample = samples[(i + offset + samples.length) % samples.length],
+          w = weights[offset + radius] / weight;
+        point.x += sample.x * w;
+        point.y += sample.y * w;
+      }
+      return point;
+    }),
+  );
+}
 export function fingerprint(points: Point[], width: number) {
   let hash = 2166136261;
   const data = JSON.stringify([
@@ -207,11 +241,7 @@ export function fromDrawing(raw: Point[]): Validation {
     return { ok: false, reason: "路线太短了，按住鼠标画一个完整的圈" };
   if (dist(raw[0], raw.at(-1)!) > ROAD.closeDistance)
     return { ok: false, reason: "请将终点画回起点附近", point: raw.at(-1) };
-  const sparse = [raw[0]];
-  for (const p of raw.slice(1, -1))
-    if (dist(p, sparse.at(-1)!) >= 22) sparse.push(p);
-  if (sparse.length > 3 && dist(sparse[0], sparse.at(-1)!) < 22) sparse.pop();
-  const points = smooth(sparse),
+  const points = smoothDrawing(raw),
     error = validate(points);
   if (error) return { ok: false, ...error };
   return {
