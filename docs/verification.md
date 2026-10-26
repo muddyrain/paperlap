@@ -87,3 +87,29 @@
 另使用 develop-web-game 技能附带的通用 Playwright 客户端，以无头方式执行短按键序列并保存截图，退出码 0，未生成错误日志；已读取 `test-results/game-client/shot-0.png`。项目源码继续使用原有只读遥测，不新增游戏状态写入接口。
 
 数据恢复与容量限制见 [storage-v2.md](storage-v2.md)：V1 孤立成绩缺少中心线，只归档；损坏原文拒绝自动覆盖；超限不自动清除有效数据；本轮不提供跨标签页合并协议、存档修复 UI 或赛道本 UI。声音听感与跨浏览器、Mac 平台表现未在本次 Windows 无头验证中评估。
+
+## PR #2 评审修复：多赛道重复几何校验
+
+2026-10-26，在同一 `feat/p1-01-save-v2` 分支继续处理评审。保留 Save V2/V1 和成绩归属规则，仅在 `save.ts` / `storage.ts` 安全复用未变化几何和已验证原文。未修改 `main.ts`、车辆、几何算法、圈速、编辑器或样式；没有 P1-02 UI。
+
+新增 8 项缓存安全与 2 项性能回归，原有 34 项不变。安全测试覆盖验证后对象突变、冻结数组中的可变点、稀疏数组、同指纹的细小坐标变更、元数据/成绩篡改、新增/替换非法路线、原文外部改动、不同存储对象、同一存储对象超配额失败；不得因缓存写入无效内容。两组性能测试（20×350 / 20×900）先在基线 `93165ce` 失败，再在优化后通过，采用相对于同工作负载完整解析的耗时比例，避免固定硬件毫秒阈值。
+
+| 命令 | 最终结果 |
+| --- | --- |
+| `npm run typecheck` | 通过 |
+| `npm test` | 44/44；同一存储对象失败的定向用例修订后，专项 8/8 也通过 |
+| `npm run build` | 通过，保留原 Phaser chunk 大小提示 |
+| `npm run bench:storage -- --baseline-ref 93165ce` | 精确执行旧源码，通过 |
+| `npm run bench:storage` | 优化后 Node/内存存储基准通过 |
+| `npm run bench:storage:browser` | 真实隔离 localStorage 基准通过，控制台错误 0 |
+| `npm run test:storage` | 7/7 |
+| `npm run test:browser` | 15/15 |
+| `npm run test:handling` | 4/4 |
+| `npm run test:editor` | 9/9 |
+| 编码、Prettier、`git diff --check` | 通过 |
+
+回归指向 `PAPERLAP_URL=http://127.0.0.1:4185` 的生产预览。基准另使用 4186 开发服务加载纯测试模块，不运行游戏渲染。两者均保持不自动打开浏览器。所有 Playwright 会话为独立无头 Chromium，35 项游戏回归的控制台错误为 0；收集网络失败的通用、编辑器、存档三套均为 0；各上下文及浏览器均正常关闭。
+
+基准为当前机器 Windows x64 / i5-12400F / Node 26.4.0 / Chromium 141.0.7390.37。真实 localStorage 的“刷新成绩并写入”中位数：20×350 点 **236.3→3.9 ms**，20×900 点 **1495.6→10.8 ms**；不可信 JSON 的 20×900 点解析仍为 **487.4→492.7 ms**，继续严格校验。Node 基准对应 **234.851→3.503 ms**、**1505.935→8.979 ms**。每项一次预热、5 次样本，测量不包含游戏渲染竞争，不承诺所有设备帧预算；完整表格、安全边界和复现命令见 [storage-performance.md](storage-performance.md)。
+
+截图和既有游戏报告继续位于 `test-results/`，未改产品图片或新增运行时调试入口。另执行技能附带通用无头客户端，短按键序列退出码 0、无错误日志，截图为 `test-results/game-client-review/shot-0.png`；已读取它与完整有效圈截图进行检查。性能原始样本位于 `test-results/storage-performance/`。Mac、其他浏览器及声音听感本轮未评估。

@@ -10,6 +10,9 @@ import {
 export const STORAGE_KEY = "paperlap.save.v2";
 export const V1_STORAGE_KEY = "paperlap.save.v1";
 type SaveStorage = Pick<Storage, "getItem" | "setItem">;
+// One exact, validated string per store. Never cache mutable Save objects or
+// skip getItem: another tab/devtools can replace the stored data at any time.
+const checkedV2 = new WeakMap<SaveStorage, string>();
 export type StorageError =
   | SaveError
   | "invalid-v1"
@@ -36,14 +39,18 @@ export function writeSave(storage: SaveStorage, save: Save): WriteResult {
     if (!result.ok) return result;
     // Preserve corrupt/unsupported data for recovery instead of overwriting it with a fallback.
     const existing = storage.getItem(STORAGE_KEY);
-    if (existing !== null && !parseSave(existing))
-      return { ok: false, error: "invalid-v2" };
+    if (existing !== null && checkedV2.get(storage) !== existing) {
+      if (!parseSave(existing)) return { ok: false, error: "invalid-v2" };
+      checkedV2.set(storage, existing);
+    }
     if (existing === null) {
       const legacy = storage.getItem(V1_STORAGE_KEY);
       if (legacy !== null && !migrateV1(legacy))
         return { ok: false, error: "invalid-v1" };
     }
-    storage.setItem(STORAGE_KEY, JSON.stringify(result.save));
+    const raw = JSON.stringify(result.save);
+    storage.setItem(STORAGE_KEY, raw);
+    checkedV2.set(storage, raw);
     return { ok: true };
   } catch (error) {
     return { ok: false, error: storageError(error) };
@@ -55,7 +62,10 @@ export function loadSave(storage: SaveStorage): LoadResult {
     const rawV2 = storage.getItem(STORAGE_KEY);
     if (rawV2 !== null) {
       const save = parseSave(rawV2);
-      if (save) return { save, source: "v2", persisted: true };
+      if (save) {
+        checkedV2.set(storage, rawV2);
+        return { save, source: "v2", persisted: true };
+      }
     }
     const rawV1 = storage.getItem(V1_STORAGE_KEY);
     const migrated = migrateV1(rawV1);

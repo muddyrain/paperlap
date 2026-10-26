@@ -12,7 +12,9 @@
     "test:browser": "node tests/browser.mjs",
     "test:handling": "node tests/handling-browser.mjs",
     "test:editor": "node tests/editor-browser.mjs",
-    "test:storage": "node tests/storage-browser.mjs"
+    "test:storage": "node tests/storage-browser.mjs",
+    "bench:storage": "tsx tests/storage-performance.ts",
+    "bench:storage:browser": "node tests/storage-performance-browser.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

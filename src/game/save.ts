@@ -1,5 +1,11 @@
 import { ROAD, RULES_VERSION } from "./config";
-import { defaultTrack, fingerprint, validate, type Track } from "./geometry";
+import {
+  defaultTrack,
+  fingerprint,
+  validate,
+  type Point,
+  type Track,
+} from "./geometry";
 
 export const SAVE_LIMITS = {
   tracks: 20,
@@ -58,20 +64,61 @@ const entryKey =
   /^([a-zA-Z0-9][a-zA-Z0-9_-]{0,79}):track-[a-f\d]+:rules-([1-9]\d*)$/;
 const failure = (error: SaveError): SaveResult => ({ ok: false, error });
 
-function readTrack(value: unknown, legacy = false): Track | null {
+// Coordinates stay mutable in the public API. Identity alone is never proof:
+// compare a fresh numeric copy against this private, unexposed exact snapshot.
+const checkedGeometry = new WeakMap<
+  object,
+  {
+    width: number;
+    id: string;
+    points: readonly Readonly<Point>[];
+  }
+>();
+
+function readTrack(
+  value: unknown,
+  { legacy = false, fullGeometry = false } = {},
+): Track | null {
   if (
     !object(value) ||
     value.schemaVersion !== 1 ||
     value.width !== ROAD.width ||
     !Array.isArray(value.points) ||
-    validate(value.points, value.width)
+    value.points.length < 12 ||
+    value.points.length > ROAD.maxPoints
   )
     return null;
-  const points = value.points.map((p: { x: number; y: number }) => ({
-    x: p.x,
-    y: p.y,
-  }));
-  const id = fingerprint(points, value.width);
+  const points: Point[] = [];
+  for (const point of value.points) {
+    if (!object(point)) return null;
+    const { x, y } = point;
+    if (
+      typeof x !== "number" ||
+      typeof y !== "number" ||
+      !Number.isFinite(x) ||
+      !Number.isFinite(y)
+    )
+      return null;
+    points.push({ x, y });
+  }
+  let geometry = checkedGeometry.get(value.points);
+  if (
+    fullGeometry ||
+    !geometry ||
+    geometry.width !== value.width ||
+    geometry.points.length !== points.length ||
+    !points.every(
+      (p, i) => p.x === geometry!.points[i].x && p.y === geometry!.points[i].y,
+    )
+  ) {
+    if (validate(points, value.width)) return null;
+    geometry = {
+      width: value.width,
+      id: fingerprint(points, value.width),
+      points: points.map((p) => ({ ...p })),
+    };
+  }
+  const id = geometry.id;
   const name = legacy
     ? typeof value.name === "string"
       ? value.name.slice(0, SAVE_LIMITS.name)
@@ -84,6 +131,8 @@ function readTrack(value: unknown, legacy = false): Track | null {
     (!legacy && value.id !== id)
   )
     return null;
+  checkedGeometry.set(value.points, geometry);
+  checkedGeometry.set(points, geometry);
   return { schemaVersion: 1, id, name, width: value.width, points };
 }
 
@@ -186,7 +235,7 @@ export function migrateV1(raw: string | null): Save | null {
       !validRules(old.rulesVersion)
     )
       return null;
-    const track = readTrack(old.track, true);
+    const track = readTrack(old.track, { legacy: true, fullGeometry: true });
     if (!track) return null;
     // Deterministic across failed writes/reloads. A migrated entry is never duplicated.
     const entry = { uid: `entry-v1-${track.id}`, track };
@@ -220,10 +269,12 @@ export function addTrack(save: Save, track: Track, uid: string): SaveResult {
   if (!validUid(uid) || save.tracks.some((entry) => entry.uid === uid))
     return failure("invalid-uid");
   if (!validName(track.name)) return failure("invalid-name");
+  const checked = readTrack(track, { fullGeometry: true });
+  if (!checked) return failure("invalid-track");
   return validateSave({
     ...save,
     activeTrackUid: uid,
-    tracks: [...save.tracks, { uid, track }],
+    tracks: [...save.tracks, { uid, track: checked }],
   });
 }
 
@@ -250,14 +301,17 @@ export function replaceTrack(
   uid: string,
   track: Track,
 ): SaveResult {
-  if (!save.tracks.some((entry) => entry.uid === uid))
-    return failure("not-found");
+  const previous = save.tracks.find((entry) => entry.uid === uid);
+  if (!previous) return failure("not-found");
+  const checked = readTrack(
+    { ...track, name: previous.track.name },
+    { fullGeometry: true },
+  );
+  if (!checked) return failure("invalid-track");
   return validateSave({
     ...save,
     tracks: save.tracks.map((entry) =>
-      entry.uid === uid
-        ? { ...entry, track: { ...track, name: entry.track.name } }
-        : entry,
+      entry.uid === uid ? { ...entry, track: checked } : entry,
     ),
   });
 }
