@@ -28,7 +28,7 @@ async function simulateFor(seconds) {
   await page.waitForFunction(
     (until) => window.paperlapDebug.lap.elapsed >= until,
     until,
-    { timeout: 6000, polling: "raf" },
+    { timeout: 20000, polling: "raf" },
   );
 }
 const check = (name) => {
@@ -45,7 +45,8 @@ try {
   const track = (await state()).track;
   const oldKey = `${track.id}:rules-1`;
   await page.evaluate(
-    ({ track, oldKey }) =>
+    ({ track, oldKey }) => {
+      localStorage.removeItem("paperlap.save.v2");
       localStorage.setItem(
         "paperlap.save.v1",
         JSON.stringify({
@@ -55,7 +56,8 @@ try {
           muted: false,
           records: { [oldKey]: 24.68 },
         }),
-      ),
+      );
+    },
     { track, oldKey },
   );
   await page.reload();
@@ -107,7 +109,7 @@ try {
   let completed = 0,
     coastSamples = 0,
     maxSpeed = 0;
-  const deadline = Date.now() + 65000;
+  const deadline = Date.now() + 180000;
   while (Date.now() < deadline) {
     const s = await state(),
       car = s.car,
@@ -165,11 +167,14 @@ try {
   assert.equal(completed, 2);
   assert.ok(maxSpeed > 210);
   assert.ok(coastSamples > 0);
-  const saved = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("paperlap.save.v1")),
-  );
-  assert.equal(saved.records[oldKey], 24.68);
-  assert.ok(saved.records[`${track.id}:rules-2`] > 5);
+  const { saved, legacy } = await page.evaluate(() => ({
+    saved: JSON.parse(localStorage.getItem("paperlap.save.v2")),
+    legacy: JSON.parse(localStorage.getItem("paperlap.save.v1")),
+  }));
+  assert.equal(legacy.records[oldKey], 24.68);
+  assert.equal(legacy.muted, false);
+  assert.equal(saved.records[`${saved.activeTrackUid}:${oldKey}`], 24.68);
+  assert.ok(saved.records[`${saved.activeTrackUid}:${track.id}:rules-2`] > 5);
   assert.equal(errors.length, 0);
   await page.screenshot({ path: `${root}handling-v2.png` });
   await page.keyboard.press("Escape");

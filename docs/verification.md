@@ -55,3 +55,61 @@
 专用检查命令为 `npm run test:editor`，报告和截图保存在 `test-results/editor/`。使用独立无头 Chromium，通过真实鼠标与键盘操作验证近似截图路线、手抖路线、闭合提示、快捷键与焦点、拖画中断、绘制后驾驶和 1366×768 / 1280×800 / 900×700 布局。自动化截图保存为文件后读取检查。
 
 最终结果：核心测试 16/16、类型检查和生产构建通过；针对生产预览的编辑器检查 9/9、原有浏览器回归 15/15 全部通过，控制台错误与失败资源请求均为零，所有测试上下文与浏览器正常关闭。选取的编辑界面截图为 `docs/screenshots/editor-shortcuts.png`。
+
+## P1-01：Save V2 与无损迁移
+
+验证日期：2026-10-26。环境为 Windows、Node.js 26.4.0、Playwright 1.56.1、独立 Chromium Headless Shell 141.0.7390.37；生产预览使用 `http://127.0.0.1:4175/`。车辆、几何、圈速、编辑器和样式源码保持不变，驾驶规则仍为 2。
+
+| 命令 | 结果 |
+| --- | --- |
+| `npm ci --registry=https://registry.npmjs.org` | 通过；补齐原锁文件缺失的可选平台绑定并改为公共 npm 下载地址，已有版本和 integrity 全部保持不变 |
+| `npm run typecheck` | 通过 |
+| `npm test` | 34/34：原有几何/驾驶/编辑/圈速等 14 项，Save V2 专项 20 项 |
+| `npm run build` | 通过；仍有 Phaser 引擎 chunk 超过 500 kB 的提示 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:storage` | 7/7 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:browser` | 15/15 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:handling` | 4/4 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:editor` | 9/9 |
+| `git diff --check`、中文编码检查 | 通过 |
+
+表中的环境变量写法用于说明配置；PowerShell 实际使用 `$env:PAPERLAP_URL='http://127.0.0.1:4175'` 后运行相应 npm 命令。所有浏览器验证保持 `headless: true`、独立上下文、真实页面键鼠事件和只读遥测；没有系统级输入、已有浏览器接管或自动打开报告。四套浏览器检查共 35 项，控制台错误均为零；通用、编辑器和存档三套收集的失败资源请求也均为零。各次结束均关闭任务创建的上下文和浏览器。
+
+专项单测在迁移和运行时实现前加入，先确认缺少 V2 API 时失败，再实现并验证通过。覆盖：初始化与序列化、V1 中规则 1/2 成绩、40 条旧记录不再被旧 32 条读取窗口裁剪、孤立成绩归档、同几何多 UID、改名、几何/规则隔离、增删切换、最后一条保护、损坏形状/几何/指纹/UID/纪录、容量边界、写入失败、迁移重试与 V1 原文不变。旧存档测试从 `rules.test.ts` 移入扩展后的 `storage.test.ts`。
+
+真实存储检查使用有效 V1 路线与成绩，逐字比较迁移前后的 V1 字符串。迁移成功后修改声音和路线，验证只有 V2 更新；新路线保留 UID、名称和旧纪录，HUD 不套用旧几何成绩。另用两个同几何条目验证各自最佳，覆盖损坏 V2 的只读回退、真实 `QuotaExceededError` 和 `SecurityError` 注入下的继续驾驶及保存失败提示。
+
+首次运行原通用回归，1.4 秒墙钟等待仅推进约 0.40 秒模拟时间，导致位移断言失败。独立构建基线 `cbe5a51` 后，按同样输入得到相同油门状态（速度 41.33），确认是当前无头环境的渲染调度差异。通用和编辑器驾驶等待改用只读模拟计时，保留原有位移/转向/速度断言；R 在真实按键处理后立即采样，验证精确归零。完整圈脚本保留 180 秒墙钟安全上限。没有增加修改车辆或时间的调试入口，没有改变游戏更新步长或渲染配置。
+
+浏览器首次安装在 Node 26 的 ZIP 解压步骤停滞；停止本任务安装进程后，用已下载归档完成 Chromium 解压，并使用 Node 24.19.0 安装匹配的 Headless Shell，随后执行全部回归。
+
+报告位于 `test-results/storage/report.json`、`test-results/browser-report.json`、`test-results/handling-report.json`、`test-results/editor/report.json`。已读取检查迁移后路线、有效圈新纪录和 900×700 编辑器截图。测试产物留在被 Git 忽略的 `test-results/`，不替换原有产品截图。
+
+另使用 develop-web-game 技能附带的通用 Playwright 客户端，以无头方式执行短按键序列并保存截图，退出码 0，未生成错误日志；已读取 `test-results/game-client/shot-0.png`。项目源码继续使用原有只读遥测，不新增游戏状态写入接口。
+
+数据恢复与容量限制见 [storage-v2.md](storage-v2.md)：V1 孤立成绩缺少中心线，只归档；损坏原文拒绝自动覆盖；超限不自动清除有效数据；本轮不提供跨标签页合并协议、存档修复 UI 或赛道本 UI。声音听感与跨浏览器、Mac 平台表现未在本次 Windows 无头验证中评估。
+
+## PR #2 评审修复：多赛道重复几何校验
+
+2026-10-26，在同一 `feat/p1-01-save-v2` 分支继续处理评审。保留 Save V2/V1 和成绩归属规则，仅在 `save.ts` / `storage.ts` 安全复用未变化几何和已验证原文。未修改 `main.ts`、车辆、几何算法、圈速、编辑器或样式；没有 P1-02 UI。
+
+新增 8 项缓存安全与 2 项性能回归，原有 34 项不变。安全测试覆盖验证后对象突变、冻结数组中的可变点、稀疏数组、同指纹的细小坐标变更、元数据/成绩篡改、新增/替换非法路线、原文外部改动、不同存储对象、同一存储对象超配额失败；不得因缓存写入无效内容。两组性能测试（20×350 / 20×900）先在基线 `93165ce` 失败，再在优化后通过，采用相对于同工作负载完整解析的耗时比例，避免固定硬件毫秒阈值。
+
+| 命令 | 最终结果 |
+| --- | --- |
+| `npm run typecheck` | 通过 |
+| `npm test` | 44/44；同一存储对象失败的定向用例修订后，专项 8/8 也通过 |
+| `npm run build` | 通过，保留原 Phaser chunk 大小提示 |
+| `npm run bench:storage -- --baseline-ref 93165ce` | 精确执行旧源码，通过 |
+| `npm run bench:storage` | 优化后 Node/内存存储基准通过 |
+| `npm run bench:storage:browser` | 真实隔离 localStorage 基准通过，控制台错误 0 |
+| `npm run test:storage` | 7/7 |
+| `npm run test:browser` | 15/15 |
+| `npm run test:handling` | 4/4 |
+| `npm run test:editor` | 9/9 |
+| 编码、Prettier、`git diff --check` | 通过 |
+
+回归指向 `PAPERLAP_URL=http://127.0.0.1:4185` 的生产预览。基准另使用 4186 开发服务加载纯测试模块，不运行游戏渲染。两者均保持不自动打开浏览器。所有 Playwright 会话为独立无头 Chromium，35 项游戏回归的控制台错误为 0；收集网络失败的通用、编辑器、存档三套均为 0；各上下文及浏览器均正常关闭。
+
+基准为当前机器 Windows x64 / i5-12400F / Node 26.4.0 / Chromium 141.0.7390.37。真实 localStorage 的“刷新成绩并写入”中位数：20×350 点 **236.3→3.9 ms**，20×900 点 **1495.6→10.8 ms**；不可信 JSON 的 20×900 点解析仍为 **487.4→492.7 ms**，继续严格校验。Node 基准对应 **234.851→3.503 ms**、**1505.935→8.979 ms**。每项一次预热、5 次样本，测量不包含游戏渲染竞争，不承诺所有设备帧预算；完整表格、安全边界和复现命令见 [storage-performance.md](storage-performance.md)。
+
+截图和既有游戏报告继续位于 `test-results/`，未改产品图片或新增运行时调试入口。另执行技能附带通用无头客户端，短按键序列退出码 0、无错误日志，截图为 `test-results/game-client-review/shot-0.png`；已读取它与完整有效圈截图进行检查。性能原始样本位于 `test-results/storage-performance/`。Mac、其他浏览器及声音听感本轮未评估。

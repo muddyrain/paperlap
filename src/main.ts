@@ -3,12 +3,14 @@ import { RaceScene } from "./game/scene";
 import { WORLD } from "./game/config";
 import { TrackEditor } from "./game/editor";
 import {
+  activeTrack,
   freshSave,
-  loadSave,
   recordKey,
-  writeSave,
+  replaceTrack,
+  setBest,
   type Save,
-} from "./game/storage";
+} from "./game/save";
+import { loadSave, writeSave } from "./game/storage";
 import { Sound } from "./game/audio";
 import { formatTime as format } from "./game/time";
 import "./style.css";
@@ -45,12 +47,16 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 </main>`;
 const scene = new RaceScene();
 let save: Save;
+let loadFailed = false;
 try {
-  save = loadSave(window.localStorage);
+  const loaded = loadSave(window.localStorage);
+  save = loaded.save;
+  loadFailed = !!loaded.error;
 } catch {
   save = freshSave();
+  loadFailed = true;
 }
-scene.setTrack(save.track);
+scene.setTrack(activeTrack(save).track);
 const sound = new Sound();
 sound.muted = save.muted;
 const game = new Phaser.Game({
@@ -79,16 +85,14 @@ function toast(message: string, stamp = false) {
   toastTimer = setTimeout(() => (el("toast").textContent = ""), 3000);
 }
 function persist() {
-  save.track = scene.trackData.track;
   try {
-    if (!writeSave(window.localStorage, save))
-      toast("本次未能保存，仍可继续试跑");
+    return writeSave(window.localStorage, save).ok;
   } catch {
-    toast("本次未能保存，仍可继续试跑");
+    return false;
   }
 }
 function updateBest() {
-  const best = save.records[recordKey(scene.trackData.track)];
+  const best = save.records[recordKey(activeTrack(save))];
   el("best").textContent = best ? format(best) : "--:--.--";
 }
 function soundUI() {
@@ -99,6 +103,7 @@ function soundUI() {
 }
 soundUI();
 updateBest();
+if (loadFailed) toast("存档未能更新，仍可继续试跑");
 let uiClock = 0;
 scene.onChange = () => {
   const now = performance.now();
@@ -119,13 +124,21 @@ scene.onChange = () => {
   sound.update(scene.car.speed, scene.mode === "running");
 };
 scene.onLap = (time, valid) => {
-  const key = recordKey(scene.trackData.track),
+  const key = recordKey(activeTrack(save)),
     best = save.records[key];
   if (valid && (!best || time < best)) {
-    save.records[key] = time;
-    persist();
+    const result = setBest(save, save.activeTrackUid, time);
+    if (!result.ok) {
+      toast("成绩未能保存，仍可继续试跑");
+      return;
+    }
+    save = result.save;
+    const persisted = persist();
     updateBest();
-    toast(`新纪录！ ${format(time)}`, true);
+    toast(
+      persisted ? `新纪录！ ${format(time)}` : "本次未能保存，仍可继续试跑",
+      persisted,
+    );
     sound.stamp();
   } else
     toast(
@@ -151,7 +164,7 @@ el("sound").onclick = () => {
   save.muted = sound.muted;
   void sound.unlock();
   soundUI();
-  persist();
+  if (!persist()) toast("本次未能保存，仍可继续试跑");
   if (scene.mode === "running") area.focus();
 };
 function editUI(editing: boolean) {
@@ -186,13 +199,21 @@ function cancelEdit() {
 }
 el("cancel-edit").onclick = cancelEdit;
 function driveDrawing() {
+  if (!editor.candidate) return;
+  const result = replaceTrack(save, save.activeTrackUid, editor.candidate);
+  if (!result.ok) {
+    toast("暂时无法采用这条赛道，原赛道已保留");
+    return;
+  }
+  editor.candidate = activeTrack(result.save).track;
   if (!editor.accept()) return;
+  save = result.save;
   editUI(false);
   el("draw-intro").hidden = true;
-  persist();
+  const persisted = persist();
   updateBest();
   start();
-  toast("你的赛道，你来破纪录。");
+  toast(persisted ? "你的赛道，你来破纪录。" : "本次未能保存，仍可继续试跑");
 }
 el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
