@@ -11,7 +11,8 @@
     "test": "tsx --test tests/*.test.ts",
     "test:browser": "node tests/browser.mjs",
     "test:handling": "node tests/handling-browser.mjs",
-    "test:editor": "node tests/editor-browser.mjs"
+    "test:editor": "node tests/editor-browser.mjs",
+    "test:storage": "node tests/storage-browser.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

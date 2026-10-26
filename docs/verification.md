@@ -55,3 +55,35 @@
 专用检查命令为 `npm run test:editor`，报告和截图保存在 `test-results/editor/`。使用独立无头 Chromium，通过真实鼠标与键盘操作验证近似截图路线、手抖路线、闭合提示、快捷键与焦点、拖画中断、绘制后驾驶和 1366×768 / 1280×800 / 900×700 布局。自动化截图保存为文件后读取检查。
 
 最终结果：核心测试 16/16、类型检查和生产构建通过；针对生产预览的编辑器检查 9/9、原有浏览器回归 15/15 全部通过，控制台错误与失败资源请求均为零，所有测试上下文与浏览器正常关闭。选取的编辑界面截图为 `docs/screenshots/editor-shortcuts.png`。
+
+## P1-01：Save V2 与无损迁移
+
+验证日期：2026-10-26。环境为 Windows、Node.js 26.4.0、Playwright 1.56.1、独立 Chromium Headless Shell 141.0.7390.37；生产预览使用 `http://127.0.0.1:4175/`。车辆、几何、圈速、编辑器和样式源码保持不变，驾驶规则仍为 2。
+
+| 命令 | 结果 |
+| --- | --- |
+| `npm ci --registry=https://registry.npmjs.org` | 通过；补齐原锁文件缺失的可选平台绑定并改为公共 npm 下载地址，已有版本和 integrity 全部保持不变 |
+| `npm run typecheck` | 通过 |
+| `npm test` | 34/34：原有几何/驾驶/编辑/圈速等 14 项，Save V2 专项 20 项 |
+| `npm run build` | 通过；仍有 Phaser 引擎 chunk 超过 500 kB 的提示 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:storage` | 7/7 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:browser` | 15/15 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:handling` | 4/4 |
+| `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:editor` | 9/9 |
+| `git diff --check`、中文编码检查 | 通过 |
+
+表中的环境变量写法用于说明配置；PowerShell 实际使用 `$env:PAPERLAP_URL='http://127.0.0.1:4175'` 后运行相应 npm 命令。所有浏览器验证保持 `headless: true`、独立上下文、真实页面键鼠事件和只读遥测；没有系统级输入、已有浏览器接管或自动打开报告。四套浏览器检查共 35 项，控制台错误均为零；通用、编辑器和存档三套收集的失败资源请求也均为零。各次结束均关闭任务创建的上下文和浏览器。
+
+专项单测在迁移和运行时实现前加入，先确认缺少 V2 API 时失败，再实现并验证通过。覆盖：初始化与序列化、V1 中规则 1/2 成绩、40 条旧记录不再被旧 32 条读取窗口裁剪、孤立成绩归档、同几何多 UID、改名、几何/规则隔离、增删切换、最后一条保护、损坏形状/几何/指纹/UID/纪录、容量边界、写入失败、迁移重试与 V1 原文不变。旧存档测试从 `rules.test.ts` 移入扩展后的 `storage.test.ts`。
+
+真实存储检查使用有效 V1 路线与成绩，逐字比较迁移前后的 V1 字符串。迁移成功后修改声音和路线，验证只有 V2 更新；新路线保留 UID、名称和旧纪录，HUD 不套用旧几何成绩。另用两个同几何条目验证各自最佳，覆盖损坏 V2 的只读回退、真实 `QuotaExceededError` 和 `SecurityError` 注入下的继续驾驶及保存失败提示。
+
+首次运行原通用回归，1.4 秒墙钟等待仅推进约 0.40 秒模拟时间，导致位移断言失败。独立构建基线 `cbe5a51` 后，按同样输入得到相同油门状态（速度 41.33），确认是当前无头环境的渲染调度差异。通用和编辑器驾驶等待改用只读模拟计时，保留原有位移/转向/速度断言；R 在真实按键处理后立即采样，验证精确归零。完整圈脚本保留 180 秒墙钟安全上限。没有增加修改车辆或时间的调试入口，没有改变游戏更新步长或渲染配置。
+
+浏览器首次安装在 Node 26 的 ZIP 解压步骤停滞；停止本任务安装进程后，用已下载归档完成 Chromium 解压，并使用 Node 24.19.0 安装匹配的 Headless Shell，随后执行全部回归。
+
+报告位于 `test-results/storage/report.json`、`test-results/browser-report.json`、`test-results/handling-report.json`、`test-results/editor/report.json`。已读取检查迁移后路线、有效圈新纪录和 900×700 编辑器截图。测试产物留在被 Git 忽略的 `test-results/`，不替换原有产品截图。
+
+另使用 develop-web-game 技能附带的通用 Playwright 客户端，以无头方式执行短按键序列并保存截图，退出码 0，未生成错误日志；已读取 `test-results/game-client/shot-0.png`。项目源码继续使用原有只读遥测，不新增游戏状态写入接口。
+
+数据恢复与容量限制见 [storage-v2.md](storage-v2.md)：V1 孤立成绩缺少中心线，只归档；损坏原文拒绝自动覆盖；超限不自动清除有效数据；本轮不提供跨标签页合并协议、存档修复 UI 或赛道本 UI。声音听感与跨浏览器、Mac 平台表现未在本次 Windows 无头验证中评估。

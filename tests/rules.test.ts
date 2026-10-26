@@ -11,15 +11,7 @@ import {
 } from "../src/game/geometry.ts";
 import { advanceLap, crossing, newLap } from "../src/game/laps.ts";
 import { FixedStepper, moveCar, noInput, spawn } from "../src/game/vehicle.ts";
-import {
-  freshSave,
-  loadSave,
-  parseSave,
-  recordKey,
-  writeSave,
-} from "../src/game/storage.ts";
 import { formatTime } from "../src/game/time.ts";
-import { RULES_VERSION } from "../src/game/config.ts";
 const data = derive(defaultTrack());
 const ellipse = (rx = 460, ry = 230, n = 180): Point[] =>
   Array.from({ length: n + 1 }, (_, i) => ({
@@ -188,74 +180,4 @@ test("no stationary spinning, braking stops, offroad slows, pause does not advan
   stepper.reset();
   assert.equal(lap.elapsed, time);
   assert.equal(newLap().elapsed, 0);
-});
-test("storage validates shape/geometry/version; corrupted or unavailable storage is recoverable", () => {
-  for (const raw of [
-    "{oops",
-    "null",
-    "{}",
-    JSON.stringify({ schemaVersion: 99 }),
-    JSON.stringify({
-      schemaVersion: 1,
-      track: {
-        schemaVersion: 1,
-        width: 108,
-        points: Array(20).fill({ x: "a", y: 1 }),
-      },
-    }),
-  ])
-    assert.deepEqual(parseSave(raw), freshSave());
-  assert.deepEqual(
-    loadSave({
-      getItem() {
-        throw Error("blocked");
-      },
-    }),
-    freshSave(),
-  );
-  assert.equal(
-    writeSave(
-      {
-        setItem() {
-          throw Error("full");
-        },
-      },
-      freshSave(),
-    ),
-    false,
-  );
-  const save = freshSave();
-  save.records[recordKey(save.track)] = 24.68;
-  save.muted = false;
-  assert.deepEqual(parseSave(JSON.stringify(save)), save);
-  const old = { ...save, rulesVersion: 99 };
-  assert.deepEqual(parseSave(JSON.stringify(old)).records, {});
-  const other = fromDrawing(ellipse());
-  assert.equal(other.ok, true);
-  if (other.ok) assert.equal(save.records[recordKey(other.track)], undefined);
-});
-test("handling upgrade retains track/preferences and separates legacy records", () => {
-  const legacy = freshSave();
-  legacy.rulesVersion = 1;
-  legacy.muted = false;
-  const oldKey = `${legacy.track.id}:rules-1`;
-  legacy.records[oldKey] = 24.68;
-  const restored = parseSave(JSON.stringify(legacy));
-  assert.equal(restored.rulesVersion, RULES_VERSION);
-  assert.deepEqual(restored.track, legacy.track);
-  assert.equal(restored.muted, false);
-  assert.equal(restored.records[oldKey], 24.68);
-  assert.equal(restored.records[recordKey(restored.track)], undefined);
-  let written = "";
-  assert.ok(
-    writeSave(
-      {
-        setItem(_key, value) {
-          written = value;
-        },
-      },
-      restored,
-    ),
-  );
-  assert.equal(parseSave(written).records[oldKey], 24.68);
 });

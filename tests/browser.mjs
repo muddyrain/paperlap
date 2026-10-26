@@ -38,6 +38,15 @@ const state = () => page.evaluate(() => window.paperlapDebug);
 const shot = (name) =>
   page.screenshot({ path: `${root}test-results/screenshots/${name}.png` });
 const wait = (ms) => page.waitForTimeout(ms);
+// Headless render speed varies by host; driving duration is game time, not wall time.
+async function simulateFor(seconds) {
+  const until = (await state()).lap.elapsed + seconds;
+  await page.waitForFunction(
+    (until) => window.paperlapDebug.lap.elapsed >= until,
+    until,
+    { timeout: 20000, polling: "raf" },
+  );
+}
 async function ready() {
   await page.goto(`${base}/?debug=1`);
   await page.locator("#game canvas").waitFor();
@@ -71,9 +80,9 @@ try {
   const start = (await state()).car;
   await page.locator("#start").click();
   await page.keyboard.down("ArrowUp");
-  await wait(1400);
+  await simulateFor(1.4);
   await page.keyboard.down("ArrowRight");
-  await wait(250);
+  await simulateFor(0.25);
   await page.keyboard.up("ArrowRight");
   await page.keyboard.up("ArrowUp");
   const driven = await state();
@@ -88,14 +97,27 @@ try {
   assert.deepEqual((await state()).car, paused.car);
   assert.ok(await page.locator("#pause-panel").isVisible());
   await page.locator("#resume").click();
+  // Observe immediately after the game's key handler, before rendering can advance time.
+  await page.evaluate(() => {
+    document.querySelector(".board").addEventListener(
+      "keydown",
+      () => {
+        window.paperlapTestReset = window.paperlapDebug;
+      },
+      { once: true },
+    );
+  });
   await page.keyboard.press("r");
-  await wait(50);
-  const reset = await state();
-  assert.ok(reset.lap.elapsed < 0.15);
+  const reset = await page.evaluate(() => {
+    const snapshot = window.paperlapTestReset;
+    delete window.paperlapTestReset;
+    return snapshot;
+  });
+  assert.equal(reset.lap.elapsed, 0);
   assert.ok(Math.hypot(reset.car.x - start.x, reset.car.y - start.y) < 0.01);
   check("pause freezes timer and vehicle; resume and R reset work");
   await page.keyboard.down("ArrowUp");
-  await wait(200);
+  await simulateFor(0.2);
   await page.evaluate(() => window.dispatchEvent(new Event("blur")));
   await page.keyboard.up("ArrowUp");
   await wait(100);
@@ -137,7 +159,7 @@ try {
   const custom = await state();
   assert.notEqual(custom.trackId, driven.trackId);
   await page.keyboard.down("w");
-  await wait(500);
+  await simulateFor(0.5);
   await page.keyboard.up("w");
   assert.ok((await state()).car.speed > 20);
   check("real pointer creates track; custom track is keyboard-drivable");
@@ -206,7 +228,10 @@ try {
   check("1366x768, 1280x800, 900x700 layouts and scaled drawing align");
   await page.setViewportSize({ width: 1366, height: 768 });
   // Restore the default via storage deletion, through the real reload path.
-  await page.evaluate(() => localStorage.removeItem("paperlap.save.v1"));
+  await page.evaluate(() => {
+    localStorage.removeItem("paperlap.save.v2");
+    localStorage.removeItem("paperlap.save.v1");
+  });
   await ready();
   for (const [width, height] of [
     [1366, 768],
@@ -259,7 +284,7 @@ try {
         pressed.add(key);
       }
   }
-  const deadline = Date.now() + 50000;
+  const deadline = Date.now() + 180000;
   let last;
   while (Date.now() < deadline) {
     const s = await state();
@@ -310,7 +335,7 @@ try {
   await page.locator("#start").click();
   await page.keyboard.down("ArrowUp");
   await page.keyboard.down("ArrowRight");
-  await wait(2600);
+  await simulateFor(2.6);
   await page.keyboard.up("ArrowRight");
   await page.keyboard.up("ArrowUp");
   assert.equal((await state()).lap.valid, false);
@@ -331,16 +356,17 @@ try {
   assert.equal(await page.locator(".draw-surface").count(), 1);
   assert.ok((await state()).effects <= 140);
   check("repeated editing/restart keeps one engine canvas and bounded effects");
-  await page.evaluate(() =>
-    localStorage.setItem("paperlap.save.v1", "broken json"),
-  );
+  await page.evaluate(() => {
+    localStorage.setItem("paperlap.save.v2", "broken json");
+    localStorage.setItem("paperlap.save.v1", "broken json");
+  });
   await ready();
   assert.ok(await page.locator("#start").isVisible());
   assert.equal((await state()).trackId, driven.trackId);
   check("corrupt storage falls back to playable default");
   await page.locator("#start").click();
   await page.keyboard.down("ArrowUp");
-  await wait(900);
+  await simulateFor(0.9);
   await page.keyboard.up("ArrowUp");
   await shot("final-game");
   await page.keyboard.press("Escape");

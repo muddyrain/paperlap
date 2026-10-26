@@ -1,100 +1,83 @@
-import { RULES_VERSION, ROAD } from "./config";
-import { defaultTrack, fingerprint, validate, type Track } from "./geometry";
-export const STORAGE_KEY = "paperlap.save.v1";
-export interface Save {
-  schemaVersion: 1;
-  rulesVersion: number;
-  track: Track;
-  records: Record<string, number>;
-  muted: boolean;
+import {
+  freshSave,
+  migrateV1,
+  parseSave,
+  validateSave,
+  type Save,
+  type SaveError,
+} from "./save";
+
+export const STORAGE_KEY = "paperlap.save.v2";
+export const V1_STORAGE_KEY = "paperlap.save.v1";
+type SaveStorage = Pick<Storage, "getItem" | "setItem">;
+export type StorageError =
+  | SaveError
+  | "invalid-v1"
+  | "invalid-v2"
+  | "quota"
+  | "unavailable";
+export type WriteResult = { ok: true } | { ok: false; error: StorageError };
+export interface LoadResult {
+  save: Save;
+  source: "v2" | "v1" | "default";
+  persisted: boolean;
+  error?: StorageError;
 }
-export const recordKey = (track: Track) => `${track.id}:rules-${RULES_VERSION}`;
-export const freshSave = (): Save => ({
-  schemaVersion: 1,
-  rulesVersion: RULES_VERSION,
-  track: defaultTrack(),
-  records: {},
-  muted: true,
-});
-export function parseSave(raw: string | null): Save {
-  const fallback = freshSave();
-  if (!raw || raw.length > 150000) return fallback;
+
+function storageError(error: unknown): StorageError {
+  return error instanceof Error && error.name === "QuotaExceededError"
+    ? "quota"
+    : "unavailable";
+}
+
+export function writeSave(storage: SaveStorage, save: Save): WriteResult {
   try {
-    const value = JSON.parse(raw),
-      t = value?.track;
-    if (
-      value.schemaVersion !== 1 ||
-      !t ||
-      t.schemaVersion !== 1 ||
-      t.width !== ROAD.width ||
-      !Array.isArray(t.points) ||
-      validate(t.points, t.width)
-    )
-      return fallback;
-    if (t.points.some((p: unknown) => typeof p !== "object" || p === null))
-      return fallback;
-    const points = t.points.map((p: { x: number; y: number }) => ({
-      x: p.x,
-      y: p.y,
-    }));
-    const track: Track = {
-      schemaVersion: 1,
-      id: fingerprint(points, t.width),
-      width: t.width,
-      points,
-      name: typeof t.name === "string" ? t.name.slice(0, 40) : "我的手绘赛道",
-    };
-    const records: Record<string, number> = {};
-    if (
-      Number.isInteger(value.rulesVersion) &&
-      value.rulesVersion >= 1 &&
-      value.rulesVersion <= RULES_VERSION &&
-      value.records &&
-      typeof value.records === "object"
-    )
-      for (const [key, time] of Object.entries(value.records).slice(-32)) {
-        if (
-          /^track-[a-f\d]+:rules-\d+$/.test(key) &&
-          typeof time === "number" &&
-          Number.isFinite(time) &&
-          time > 2 &&
-          time < 3600
-        )
-          records[key] = time;
-      }
+    const result = validateSave(save);
+    if (!result.ok) return result;
+    // Preserve corrupt/unsupported data for recovery instead of overwriting it with a fallback.
+    const existing = storage.getItem(STORAGE_KEY);
+    if (existing !== null && !parseSave(existing))
+      return { ok: false, error: "invalid-v2" };
+    if (existing === null) {
+      const legacy = storage.getItem(V1_STORAGE_KEY);
+      if (legacy !== null && !migrateV1(legacy))
+        return { ok: false, error: "invalid-v1" };
+    }
+    storage.setItem(STORAGE_KEY, JSON.stringify(result.save));
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: storageError(error) };
+  }
+}
+
+export function loadSave(storage: SaveStorage): LoadResult {
+  try {
+    const rawV2 = storage.getItem(STORAGE_KEY);
+    if (rawV2 !== null) {
+      const save = parseSave(rawV2);
+      if (save) return { save, source: "v2", persisted: true };
+    }
+    const rawV1 = storage.getItem(V1_STORAGE_KEY);
+    const migrated = migrateV1(rawV1);
+    const save = migrated ?? freshSave();
+    const source = migrated ? "v1" : "default";
+    if (rawV2 !== null)
+      return { save, source, persisted: false, error: "invalid-v2" };
+    if (rawV1 !== null && !migrated)
+      return { save, source, persisted: false, error: "invalid-v1" };
+    const result = writeSave(storage, save);
     return {
-      schemaVersion: 1,
-      rulesVersion: RULES_VERSION,
-      track,
-      records,
-      muted: typeof value.muted === "boolean" ? value.muted : true,
+      save,
+      source,
+      persisted: result.ok,
+      ...(!result.ok ? { error: result.error } : {}),
     };
-  } catch {
-    return fallback;
-  }
-}
-export function loadSave(storage: Pick<Storage, "getItem">): Save {
-  try {
-    return parseSave(storage.getItem(STORAGE_KEY));
-  } catch {
-    return freshSave();
-  }
-}
-export function writeSave(
-  storage: Pick<Storage, "setItem">,
-  save: Save,
-): boolean {
-  try {
-    const entries = Object.entries(save.records);
-    const current = recordKey(save.track);
-    const records = Object.fromEntries(
-      entries.filter(([key]) => key !== current).slice(-31),
-    );
-    if (save.records[current] !== undefined)
-      records[current] = save.records[current];
-    storage.setItem(STORAGE_KEY, JSON.stringify({ ...save, records }));
-    return true;
-  } catch {
-    return false;
+  } catch (error) {
+    return {
+      save: freshSave(),
+      source: "default",
+      persisted: false,
+      error: storageError(error),
+    };
   }
 }

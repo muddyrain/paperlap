@@ -55,6 +55,9 @@ try {
     () => !!window.paperlapDebug && document.querySelector("#game canvas"),
   );
   const original = (await state()).trackId;
+  const originalSave = await page.evaluate(() =>
+    localStorage.getItem("paperlap.save.v2"),
+  );
   await page.locator("#edit").click();
   await page.keyboard.press("Enter");
   assert.equal((await state()).mode, "editing");
@@ -139,8 +142,8 @@ try {
   await page.keyboard.press("Enter");
   assert.equal((await state()).mode, "editing");
   assert.equal(
-    await page.evaluate(() => localStorage.getItem("paperlap.save.v1")),
-    null,
+    await page.evaluate(() => localStorage.getItem("paperlap.save.v2")),
+    originalSave,
   );
   await page.keyboard.press("r");
   // Interrupt a captured drag and then draw again, using only page API events.
@@ -199,8 +202,13 @@ try {
   const accepted = (await state()).trackId;
   assert.notEqual(accepted, original);
   const car = (await state()).car;
+  const until = (await state()).lap.elapsed + 0.7;
   await page.keyboard.down("ArrowUp");
-  await page.waitForTimeout(700);
+  await page.waitForFunction(
+    (until) => window.paperlapDebug.lap.elapsed >= until,
+    until,
+    { timeout: 20000, polling: "raf" },
+  );
   await page.keyboard.up("ArrowUp");
   assert.ok(
     Math.hypot((await state()).car.x - car.x, (await state()).car.y - car.y) >
