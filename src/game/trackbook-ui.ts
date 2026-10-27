@@ -25,6 +25,7 @@ export class TrackbookView {
       create: () => CommandResult;
       change: (action: Operation) => void;
       open: () => void;
+      close?: () => boolean;
     },
   ) {
     this.dialog = document.createElement("dialog");
@@ -144,6 +145,7 @@ export class TrackbookView {
     this.settle();
     if (!this.dialog.open) return;
     this.dialog.close();
+    if (restore && this.hooks.close?.()) return;
     if (restore && this.returnFocus?.isConnected)
       this.returnFocus.focus({ preventScroll: true });
   }

@@ -10,6 +10,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "tsx --test tests/*.test.ts",
     "test:browser": "node tests/browser.mjs",
+    "test:menu": "node tests/menu-browser.mjs",
     "test:sound": "node tests/sound-browser.mjs",
     "test:handling": "node tests/handling-browser.mjs",
     "test:editor": "node tests/editor-browser.mjs",

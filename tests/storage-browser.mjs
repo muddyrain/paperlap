@@ -124,7 +124,7 @@ try {
     assert.notEqual(edited.tracks[0].track.id, track.id);
     assert.deepEqual(edited.records, migrated.records);
     assert.deepEqual(edited.legacyRecords, migrated.legacyRecords);
-    await page.keyboard.press("Escape");
+    await page.keyboard.press("Space");
     await ready(page);
     assert.equal(await page.locator("#best").innerText(), "--:--.--");
     assert.equal(await read(page, v1key), original);
@@ -210,7 +210,7 @@ try {
       assert.ok(
         (await page.evaluate(() => window.paperlapDebug)).car.speed > 0,
       );
-      await page.keyboard.press("Escape");
+      await page.keyboard.press("Space");
       await page.locator("#sound").click();
       assert.match(await page.locator("#toast").innerText(), /未能保存/);
       check(

@@ -1032,3 +1032,122 @@ button .button-label {
     font-size: 10px;
   }
 }
+
+/* P1-04A stays immediate; coordinated game motion belongs to P1-04B. */
+.game-menu {
+  position: fixed;
+  left: max(16px, calc((100vw - min(100vw, 167.44186vh)) / 2 + 24px));
+  right: auto;
+  top: 50%;
+  margin: 0;
+  transform: translateY(-50%);
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  max-height: min(calc(100vh - 32px), calc(59.72222vw - 32px));
+  padding: 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #c9bda7;
+  border-radius: 5px 8px 6px 4px;
+  box-shadow: 4px 5px 10px #58442b24;
+  color: var(--ink);
+}
+.game-menu::backdrop {
+  background: #37455320;
+}
+.menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.menu-heading h2 {
+  font-size: 22px;
+  margin: 0;
+}
+.game-menu button {
+  font-size: 14px;
+  min-height: 35px;
+  padding: 6px 8px;
+  gap: 7px;
+}
+.game-menu button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.menu-heading button {
+  font-size: 12px;
+  padding: 4px 6px;
+}
+.menu-context {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0 12px;
+  font-size: 12px;
+  color: #56646a;
+}
+#menu-track {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700;
+}
+#menu-track:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.menu-actions .button-key {
+  margin-left: auto;
+}
+#menu-hint,
+#menu-status {
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+#menu-status {
+  color: #a33f2b;
+}
+#menu-hint:empty,
+#menu-status:empty {
+  display: none;
+}
+#menu-controls-page {
+  font-size: 12px;
+  line-height: 1.7;
+}
+#menu-controls-page dt {
+  font-weight: 700;
+  margin-top: 8px;
+}
+#menu-controls-page dd {
+  margin-left: 0;
+}
+#menu-controls-page kbd {
+  font-size: 10px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 3px;
+  border-width: 1px;
+}
+#menu-discard {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.game-menu[data-layer="discard"] {
+  width: 340px;
+}
+.game-menu[data-layer="discard"] .menu-heading h2 {
+  font-size: 20px;
+}
+.menu-open #welcome,
+.menu-open #pause-panel {
+  visibility: hidden;
+}

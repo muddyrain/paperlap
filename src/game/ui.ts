@@ -1,5 +1,6 @@
 export const icon = (name: string) => {
   const paths: Record<string, string> = {
+    help: "M12 17v.5M9 8a3 3 0 1 1 4 3c-1 .5-1 1-1 2m9-1a9 9 0 1 1-18 0 9 9 0 0 1 18 0",
     book: "M4 4h7a3 3 0 0 1 2 1 3 3 0 0 1 2-1h5v16h-5a3 3 0 0 0-2 1 3 3 0 0 0-2-1H4V4Zm9 1v16",
     add: "M12 4v16M4 12h16",
     trash: "M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7",

@@ -1,3 +1,4 @@
+import { cancelDrawing, confirmDiscard } from "./fixtures/editor-actions.mjs";
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -130,6 +131,7 @@ try {
   check("text fields and modified shortcuts do not trigger editor actions");
   await page.locator("#cancel-edit").focus();
   await page.keyboard.press("Enter");
+  await confirmDiscard(page);
   assert.equal((await state()).trackId, original);
   assert.equal((await state()).mode, "ready");
   check(
@@ -218,12 +220,12 @@ try {
     Math.hypot((await state()).car.x - car.x, (await state()).car.y - car.y) >
       5,
   );
-  await page.keyboard.press("Escape");
+  await page.keyboard.press("Space");
   await page.waitForFunction(() => window.paperlapDebug.mode === "paused");
   const paused = await state();
   await page.locator("#edit").click();
   await draw(wobblyLoop());
-  await page.keyboard.press("Escape");
+  await cancelDrawing(page);
   const restored = await state();
   assert.equal(restored.trackId, accepted);
   assert.deepEqual(restored.car, paused.car);
@@ -260,7 +262,7 @@ try {
       bounds[0].right < bounds[1].left && bounds[1].right < bounds[2].left,
     );
     await shot(`shortcuts-${width}`);
-    await page.keyboard.press("Escape");
+    await cancelDrawing(page);
   }
   check(
     "hand-drawn wobble and shortcut buttons work at all three desktop sizes",

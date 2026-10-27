@@ -1,3 +1,4 @@
+import { cancelDrawing } from "./fixtures/editor-actions.mjs";
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -279,7 +280,7 @@ try {
       0,
       "old held key cannot accelerate after explicit start",
     );
-    await page.keyboard.press("Escape");
+    await page.keyboard.press("Space");
     for (const uid of [b.uid, a.uid, b.uid]) {
       await select(page, uid);
       assert.equal((await state(page)).mode, "ready");
@@ -333,7 +334,7 @@ try {
     const paused = await state(page),
       old = await read(page);
     await draw(page);
-    await page.keyboard.press("Escape");
+    await cancelDrawing(page);
     const cancelled = await state(page);
     assert.equal(cancelled.mode, "paused");
     assert.deepEqual(cancelled.car, paused.car);
@@ -347,7 +348,7 @@ try {
       { x: 700, y: 400 },
     ]);
     assert.equal(await page.locator("#drive-drawing").isEnabled(), false);
-    await page.keyboard.press("Escape");
+    await cancelDrawing(page);
     assert.equal(await read(page), old);
     await open(page);
     await page.locator("#new-track").click();
@@ -355,7 +356,7 @@ try {
     await page.keyboard.press("r");
     assert.equal(await page.locator("#drive-drawing").isEnabled(), false);
     await draw(page);
-    await page.keyboard.press("Escape");
+    await cancelDrawing(page);
     assert.equal(await read(page), old);
     check(
       "replace and create cancellation restore car/lap; invalid drafts, R and previews never write",
@@ -466,7 +467,7 @@ try {
         assert.equal(JSON.parse(await read(page)).tracks.length, 3);
         assert.equal((await state(page)).mode, "ready");
       } else {
-        await page.keyboard.press("Escape");
+        await cancelDrawing(page);
         assert.equal(await read(page), old);
         assert.equal((await state(page)).trackId, b.track.id);
         await page.locator("#edit").click();
@@ -509,7 +510,7 @@ try {
     await draw(page);
     await page.keyboard.press("Enter");
     assert.match(await page.locator("#editor-status").innerText(), /存档损坏/);
-    await page.keyboard.press("Escape");
+    await cancelDrawing(page);
     assert.equal(await read(page), "{broken");
     assert.equal((await state(page)).trackId, original.trackId);
     check(
@@ -652,7 +653,7 @@ try {
       await page.screenshot({ path: `${output}ux-hud-${viewport.width}.png` });
       await drive(page, 0.2);
       await page.keyboard.up("ArrowUp");
-      await page.keyboard.press("Escape");
+      await page.keyboard.press("Space");
       await page.locator("#pause-panel").waitFor({ state: "visible" });
       const paused = await state(page);
       await clearOfRoad(page, "#pause-panel");
@@ -719,7 +720,7 @@ try {
         await page.locator("#editor-title").innerText(),
         "编辑当前赛道",
       );
-      await page.keyboard.press("Escape");
+      await cancelDrawing(page);
       assert.equal(await read(page), saved);
       assert.deepEqual((await state(page)).car, paused.car);
       await open(page);
