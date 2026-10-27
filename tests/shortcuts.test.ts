@@ -11,10 +11,7 @@ test("game shortcuts are scoped to the surface and match every displayed state",
       ["KeyR", "restart"],
     ])
       assert.equal(shortcut({ code }, mode, "surface"), action);
-    assert.equal(
-      shortcut({ code: "Escape" }, mode, "surface"),
-      mode === "running" ? "pause" : null,
-    );
+    assert.equal(shortcut({ code: "Escape" }, mode, "surface"), "menu");
     for (const target of ["text", "button"] as const)
       assert.equal(shortcut({ code: "Space" }, mode, target), null);
   }
@@ -52,4 +49,25 @@ test("text, IME, modifiers and repeated actions cannot cross shortcut contexts",
     shortcut({ code: "ArrowDown", repeat: true }, "list", "card"),
     "next",
   );
+});
+
+test("menu shortcuts preserve native buttons and protect child pages", () => {
+  for (const [code, action] of [
+    ["KeyR", "restart"],
+    ["KeyT", "book"],
+    ["KeyE", "edit"],
+    ["Escape", "back"],
+  ]) {
+    assert.equal(shortcut({ code }, "menu", "button"), action);
+    assert.equal(shortcut({ code, repeat: true }, "menu", "button"), null);
+  }
+  assert.equal(shortcut({ code: "Space" }, "menu", "button"), null);
+  assert.equal(shortcut({ code: "Space" }, "menu", "surface"), "toggle");
+  assert.equal(shortcut({ code: "KeyE" }, "menu", "text"), null);
+  assert.equal(
+    shortcut({ code: "Escape", isComposing: true }, "menu", "button"),
+    null,
+  );
+  assert.equal(shortcut({ code: "KeyT" }, "menu-child", "button"), null);
+  assert.equal(shortcut({ code: "Escape" }, "menu-child", "button"), "back");
 });

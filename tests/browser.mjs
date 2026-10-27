@@ -1,3 +1,4 @@
+import { cancelDrawing } from "./fixtures/editor-actions.mjs";
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -89,7 +90,7 @@ try {
   assert.ok(Math.hypot(driven.car.x - start.x, driven.car.y - start.y) > 60);
   assert.ok(Math.abs(driven.car.angle - start.angle) > 0.1);
   check("real keyboard accelerates and steers");
-  await page.keyboard.press("Escape");
+  await page.keyboard.press("Space");
   await wait(100);
   const paused = await state();
   await wait(250);
@@ -181,7 +182,7 @@ try {
   });
   await draw(crossing);
   assert.match(await page.locator("#editor-status").innerText(), /交叉|太近/);
-  await page.locator("#cancel-edit").click();
+  await cancelDrawing(page, "button");
   assert.equal((await state()).trackId, savedId);
   check(
     "open/crossing drafts show errors; redraw and cancel preserve saved track",
@@ -223,7 +224,7 @@ try {
     await page.locator("#edit").click();
     await draw(ellipse());
     assert.ok(await page.locator("#drive-drawing").isEnabled());
-    await page.locator("#cancel-edit").click();
+    await cancelDrawing(page, "button");
   }
   check("1366x768, 1280x800, 900x700 layouts and scaled drawing align");
   await page.setViewportSize({ width: 1366, height: 768 });
@@ -325,7 +326,7 @@ try {
   );
   await shot("race-record");
   const record = await page.locator("#best").innerText();
-  await page.locator("#pause").click();
+  await page.keyboard.press("Space");
   await ready();
   assert.equal(await page.locator("#best").innerText(), record);
   check(
@@ -344,13 +345,13 @@ try {
   await wait(80);
   assert.equal((await state()).lap.valid, true);
   check("offroad invalidates lap; R restores validity");
-  await page.locator("#pause").click();
+  await page.keyboard.press("Space");
   for (let i = 0; i < 4; i++) {
     await page.locator("#edit").click();
-    await page.locator("#cancel-edit").click();
+    await cancelDrawing(page, "button");
     await page.locator("#resume").click();
     await page.keyboard.press("r");
-    await page.locator("#pause").click();
+    await page.keyboard.press("Space");
   }
   assert.equal(await page.locator("#game canvas").count(), 1);
   assert.equal(await page.locator(".draw-surface").count(), 1);

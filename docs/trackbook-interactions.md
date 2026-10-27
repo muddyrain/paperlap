@@ -1,5 +1,7 @@
 # P1-03：快捷键、焦点和赛道本交互
 
+P1-04A 后 Esc 的正式菜单、草稿放弃确认和编辑返回路径以 [游戏菜单规则](game-menu.md) 为准；以下记录 P1-03 原有赛道本规则。
+
 基线：master / `24dd2c1`，对应 [Issue #5](https://github.com/muddyrain/paperlap/issues/5)。先确定操作规则，再实现抽屉、卡片与动效。Save V2 及控制层提交顺序不变。
 
 | 范围                                     | 按键            | 行为                                                                        |

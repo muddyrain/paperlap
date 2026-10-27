@@ -243,3 +243,49 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 | 改动源码/测试 Prettier、`git diff --check` | 通过 |
 
 本次三套浏览器共 26 项，控制台错误与失败请求均为 0，命令退出码均为 0。使用独立、明确 headless 的 Chromium，忽略 PWDEBUG；全部测试浏览器、上下文及本任务预览服务已释放。没有修改或重新生成已验收的抽屉、缩略图、动画与截图。专项报告为 `test-results/sound/report.json`，原有两套报告位置不变。
+
+## P1-04A：正式 Esc 游戏菜单
+
+2026-10-27，从最新 master `ac678a6` 创建 `feat/p1-04a-esc-menu`，按 [Issue #7](https://github.com/muddyrain/paperlap/issues/7) 先写 [菜单状态表与返回规则](game-menu.md)，再增加状态/按键单测、实现原生 dialog 与路由，最后验证实际键鼠与截图。本轮不实施 #8 的完整动效升级。环境继续使用 macOS 15.7.9 arm64、Node.js 22.22.3、Playwright 1.56.1，生产构建预览为 `http://127.0.0.1:4174/`。
+
+独立 MenuState 管理覆盖层、一次性的恢复许可和编辑来源，GameMenu 管理视图与焦点。Esc 在 ready/running/paused 均打开同一菜单；running 先暂停、清键、静音。只有直接来自 running、赛道身份不变、没有失焦/隐藏/缩放或进入赛道本/编辑、且关闭时文档与菜单焦点正常，Esc 才恢复原驾驶；其他关闭保留 ready/paused。遮罩关闭不恢复。Space 在游戏区域仍是快速开始/暂停/继续，菜单按钮上的 Enter/Space 保留原生操作。菜单提供继续/开始、重开、赛道本、编辑、声音和操作说明，真实快捷键均有图标、中文和键帽。
+
+菜单→赛道本→关闭返回菜单；T 直达赛道本仍返回游戏。菜单/赛道本进入编辑会记录来源，取消返回对应入口；有笔迹或有效预览的 Esc/取消先进入放弃确认，默认继续绘制，Esc/Enter 不丢草稿，显式放弃才还原旧赛道、车位与圈时。确认展示编辑前的冻结圈时。保存沿用 create→ready、replace→running，清空返回链。各路由先关闭旧 dialog，再打开新 dialog，避免双模态。
+
+恢复清空驾驶键后，旧按键 repeat 不再重新加油，必须松开重新按；车辆惯性保留。blur/hidden 的安全暂停、P1-03 声音鼠标防失焦修复继续有效。菜单恢复失败保护会清理覆盖层，任何游戏快捷键均不能启动故障场景；重载按钮仍允许原生 Enter/Space 显式重载。
+
+状态单测先确认缺少模块时失败，再实现通过。真实无头测试覆盖非零圈时与车位恢复、A/B 新建/切换/刷新、说明返回、Tab/Shift+Tab 首尾循环、原生按钮、重按、输入框/IME/组合键、窗口生命周期、容量/存储与场景异常、三种尺寸和 reduced-motion。生命周期通过页面 API 投递，未切换用户前台应用；驾驶、绘图与卡片选择均用实际页面键鼠，未写入车辆、圈时或检查点状态。
+
+原回归中的“Esc 快速暂停”场景改用仍保留的 Space；草稿取消补上显式确认，并在需要回到主游戏的旧场景中显式关闭重新打开的赛道本。原车位、圈时、存档与几何断言保留，菜单中间层级另由专项覆盖。初次并发验证出现完整圈离路/未见新纪录；保持原速度目标和断言，改为串行复测。两次菜单进程误写同一目录的中间日志也已弃用，最终菜单报告来自一次独立完整运行。
+
+实际修改文件：
+
+- 新增 `src/game/menu-state.ts`、`src/game/game-menu.ts`；修改 `src/main.ts`、`src/game/shortcuts.ts`、`src/game/ui.ts`、`src/style.css`；`src/game/trackbook-ui.ts` 仅新增关闭返回钩子。
+- 新增 `tests/menu-state.test.ts`、`tests/menu-browser.mjs`、`tests/fixtures/editor-actions.mjs`；扩展 `tests/shortcuts.test.ts`，同步 `tests/browser.mjs`、`tests/editor-browser.mjs`、`tests/storage-browser.mjs`、`tests/trackbook-browser.mjs`、`tests/fixtures/trackbook-ux.mjs`。
+- `package.json` 增加 `test:menu`；更新 `README.md`、`docs/game-menu.md`、`docs/trackbook-interactions.md` 与本验证记录，另提供下列截图。
+
+`scene.ts`、`editor.ts`、`trackbook.ts`、Save V2、存储/迁移/性能缓存、物理、几何、圈速与 RULES_VERSION 均未修改。没有新增依赖、转场等待或完整动效系统。
+
+| 最终检查 | 结果 |
+| --- | --- |
+| `npm run build`（含 typecheck） | 通过，保留既有 Phaser chunk 提示 |
+| `npm test` | 61/61，原 56 项 + 菜单状态 4 项 + 菜单按键 1 项；缓存安全和性能回归保留 |
+| `npm run test:menu` | 13/13，最终单独完整运行，含非零圈时、Tab 首尾循环及 running 来源的写入失败 |
+| `npm run test:trackbook` | 26/26，含真实有效圈新纪录与完整赛道管理回归 |
+| `npm run test:editor` / `test:storage` / `test:sound` | 9/9、7/7、4/4 |
+| `npm run test:browser` / `test:handling` | 15/15、4/4，含真实有效圈与连续两圈较快驾驶 |
+| 改动源码/测试 Prettier、`git diff --check` | 通过 |
+
+七套浏览器共 78 项，控制台错误均为 0；收集失败资源请求的六套均为 0。所有最终命令退出码为 0，浏览器和上下文均释放，本任务生产预览服务在验证后关闭。全部明确 headless、清除继承的 PWDEBUG、使用隔离上下文，未接管个人浏览器或进行系统级键鼠/前台操作。报告位于 `test-results/menu/report.json` 及原有各套报告位置。
+
+交付截图为实际生产构建输出，已读取检查，原始 PNG 入库：
+
+- [1366×768：驾驶中 Esc 暂停，冻结圈时与继续入口](screenshots/p1-04a-menu-running-1366.png)
+- [1280×800：长赛道名与菜单键帽](screenshots/p1-04a-menu-1280.png)
+- [900×700：紧凑菜单及焦点环](screenshots/p1-04a-menu-900.png)
+- [900×700：操作说明](screenshots/p1-04a-controls-900.png)
+- [900×700：有效预览的放弃确认，默认继续绘制](screenshots/p1-04a-discard-900.png)
+- [900×700：reduced-motion 静态状态](screenshots/p1-04a-reduced-motion-900.png)
+- [1366×768：菜单进入赛道本，换轨返回菜单，仍为 ready](screenshots/p1-04a-book-return-1366.png)
+
+已知限制：草稿只保留在当前页面内，刷新不恢复；完整游戏动效仍留在 P1-04B。自动化覆盖 Chromium 和页面生命周期事件，Safari/Firefox、实际系统应用切换与人工听感未验证。键盘完整圈测试对主机并发负载敏感，本轮最终采用串行运行，并保留原驾驶断言和目标速度。未发现阻塞本轮验收的问题，继续等待用户试玩和 Code Review。

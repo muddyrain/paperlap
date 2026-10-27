@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { GameMenu } from "./game/game-menu";
 import { RaceScene } from "./game/scene";
 import { WORLD } from "./game/config";
 import { TrackEditor } from "./game/editor";
@@ -24,9 +25,9 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
  <header class="hud"><div class="mode-note paper"><span class="flag">${icon("flag")}</span><div class="mode-copy"><h1><span class="track-label">当前赛道：</span><span id="track-name" tabindex="0"></span></h1><span id="mode-label">自由试跑</span></div></div>
  <div class="timing paper"><div class="current"><span>本圈</span><output id="timer">00:00.00</output></div><div class="best"><span>个人最佳</span><output id="best">--:--.--</output><span class="best-star">☆</span></div></div>
  <div class="editor-caption" hidden><div class="editor-heading"><h2 id="editor-title">新建赛道</h2><span id="editor-target">目标赛道：<strong id="editor-track-name" tabindex="0"></strong></span></div><p id="editor-intent"></p><div id="draw-intro" hidden>按住画一圈 · 起点附近松开 · 自动修圆</div></div>
- <div class="top-actions"><button id="trackbook-open" class="paper" aria-haspopup="dialog" aria-expanded="false" aria-controls="trackbook" aria-keyshortcuts="T" title="赛道本 (T)">${buttonContent("book", "赛道本", "T")}</button><button id="pause" class="paper" aria-keyshortcuts="Space" title="暂停 (Space / Esc)" disabled>${buttonContent("pause", "暂停", "Space")}</button></div></header>
+ <div class="top-actions"><button id="trackbook-open" class="paper" aria-haspopup="dialog" aria-expanded="false" aria-controls="trackbook" aria-keyshortcuts="T" title="赛道本 (T)">${buttonContent("book", "赛道本", "T")}</button><button id="pause" class="paper" aria-keyshortcuts="Escape" aria-haspopup="dialog" aria-controls="game-menu" aria-expanded="false" title="游戏菜单 (Esc)">${buttonContent("pause", "菜单", "Esc")}</button></div></header>
  <div id="lap-status" class="lap-status" role="status"></div><div id="toast" class="toast" role="status"></div>
- <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 暂停</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-keyshortcuts="Space" title="开始试跑 (Space)" aria-describedby="start-hint">${buttonContent("play", "开始试跑", "Space")}</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-keyshortcuts="Space" title="继续试跑 (Space)" aria-describedby="pause-reason">${buttonContent("play", "继续试跑", "Space")}</button></section><div class="bottom-actions"><button id="sound" class="paper" aria-label="开启声音" title="开启声音">${buttonContent("mute", "声音")}</button><button id="edit" class="paper accent" aria-keyshortcuts="E" title="编辑当前赛道 (E)">${buttonContent("edit", "编辑当前", "E")}</button><button id="restart" class="paper" aria-keyshortcuts="R" title="重新开始 (R)">${buttonContent("reset", "重新开始", "R")}</button></div></footer>
+ <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 菜单</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-keyshortcuts="Space" title="开始试跑 (Space)" aria-describedby="start-hint">${buttonContent("play", "开始试跑", "Space")}</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-keyshortcuts="Space" title="继续试跑 (Space)" aria-describedby="pause-reason">${buttonContent("play", "继续试跑", "Space")}</button></section><div class="bottom-actions"><button id="sound" class="paper" aria-label="开启声音" title="开启声音">${buttonContent("mute", "声音")}</button><button id="edit" class="paper accent" aria-keyshortcuts="E" title="编辑当前赛道 (E)">${buttonContent("edit", "编辑当前", "E")}</button><button id="restart" class="paper" aria-keyshortcuts="R" title="重新开始 (R)">${buttonContent("reset", "重新开始", "R")}</button></div></footer>
  <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper" aria-keyshortcuts="Escape" title="取消编辑 (Esc)">${icon("close")}取消编辑<kbd class="button-key" aria-hidden="true">Esc</kbd></button><div id="editor-status" class="editor-status" role="status" hidden></div><div><button id="redraw" class="paper" aria-keyshortcuts="R" title="重新绘制 (R)">${icon("reset")}重新绘制<kbd class="button-key" aria-hidden="true">R</kbd></button><button id="drive-drawing" class="primary" aria-keyshortcuts="Enter" title="保存修改并试跑 (Enter)" disabled>${icon("check")}<span id="drawing-action">保存修改并试跑</span><kbd class="button-key" aria-hidden="true">Enter ↵</kbd></button></div></footer>
  <section id="recovery" class="center-note paper" role="alert" hidden><h2>画面加载失败</h2><p>请重新加载以恢复已保存的赛道。</p><button id="reload" class="primary">${buttonContent("reset", "重新加载")}</button></section>
  <div class="page-signature">DRAW A LITTLE. DRIVE A LITTLE.</div>
@@ -86,6 +87,7 @@ const book = new Trackbook(save, {
     scene.mode = "paused";
     game.loop.stop();
     sound.update(0, false);
+    menu.block();
     board.classList.add("recovering");
     board.querySelectorAll("dialog").forEach((dialog) => dialog.close());
     el("recovery").hidden = false;
@@ -93,8 +95,9 @@ const book = new Trackbook(save, {
   },
 });
 const trackbook = new TrackbookView(book, board, {
-  create: () => beginEdit("create"),
+  create: () => menu.edit("create"),
   open: () => pause(),
+  close: () => menu.bookClosed(),
   change: (action) => {
     updateBest();
     if (action === "select") {
@@ -109,7 +112,27 @@ const trackbook = new TrackbookView(book, board, {
     }
   },
 });
-el("trackbook-open").onclick = () => trackbook.open();
+const menu = new GameMenu(board, area, {
+  context: () => ({
+    mode: scene.mode,
+    identity: `${book.save.activeTrackUid}:${scene.trackData.track.id}`,
+    name: trackName(activeTrack(book.save)),
+    elapsed: editor.previous?.lap.elapsed ?? scene.lap.elapsed,
+    muted: sound.muted,
+    blocked: book.reloadRequired,
+  }),
+  pause,
+  start,
+  restart,
+  book: () => trackbook.open(),
+  edit: applyEdit,
+  draft: () => editor.raw.length > 0 || !!editor.candidate || editor.drawing,
+  interrupt: () => editor.interrupt(),
+  cancelEdit,
+  focusEditor: () => editor.focus(),
+  sound: toggleSound,
+});
+el("trackbook-open").onclick = () => menu.openBook();
 el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
 let toastMotion: Animation | null = null;
@@ -158,7 +181,8 @@ scene.onChange = () => {
   el("pause-panel").hidden = scene.mode !== "paused";
   board.classList.toggle("paused", scene.mode === "paused");
   board.classList.toggle("ready", scene.mode === "ready");
-  el<HTMLButtonElement>("pause").disabled = scene.mode !== "running";
+  el<HTMLButtonElement>("pause").disabled =
+    scene.mode === "editing" || book.reloadRequired;
   el("lap-status").textContent =
     scene.mode === "editing"
       ? ""
@@ -192,6 +216,7 @@ scene.onLap = (time, valid) => {
     );
 };
 function start() {
+  if (book.reloadRequired || scene.mode === "editing") return;
   void sound.unlock();
   scene.start();
   uiClock = 0;
@@ -207,30 +232,31 @@ function pause() {
   scene.onChange();
 }
 function restart() {
+  if (book.reloadRequired || scene.mode === "editing") return;
   scene.reset();
   start();
 }
-// Keep focus until click: blur would pause and disable this button on pointerdown.
+// Keep game focus so opening the menu can capture the actual running source.
 el("pause").onpointerdown = (event) => {
   if (event.button === 0) event.preventDefault();
 };
-el("pause").onclick = () => {
-  pause();
-  area.focus({ preventScroll: true });
-};
+el("pause").onclick = () => menu.open();
 el("restart").onclick = restart;
 // Pointer sound toggles keep driving focus; keyboard focus changes still pause.
 el("sound").onpointerdown = (event) => {
   if (event.button === 0 && scene.mode === "running") event.preventDefault();
 };
-el("sound").onclick = () => {
+function toggleSound() {
   sound.muted = !sound.muted;
   book.save.muted = sound.muted;
   void sound.unlock();
   soundUI();
-  if (!persist()) toast("本次未能保存，仍可继续试跑");
+  const saved = persist();
+  if (!saved) toast("本次未能保存，仍可继续试跑");
   if (scene.mode === "running") area.focus();
-};
+  return saved;
+}
+el("sound").onclick = toggleSound;
 function editUI(editing: boolean) {
   board.classList.toggle("editing", editing);
   el("editor-footer").hidden = !editing;
@@ -252,7 +278,7 @@ function editUI(editing: boolean) {
   uiClock = 0;
   scene.onChange();
 }
-function beginEdit(intent: EditIntent) {
+function applyEdit(intent: EditIntent) {
   const result = book.beginEdit(intent);
   if (!result.ok) return result;
   editor.enter(intent, trackName(activeTrack(book.save)));
@@ -260,7 +286,7 @@ function beginEdit(intent: EditIntent) {
   editor.focus();
   return result;
 }
-el("edit").onclick = () => beginEdit("replace");
+el("edit").onclick = () => menu.edit("replace");
 editor.onStatus = (message, valid, kind) => {
   el("editor-status").textContent = message;
   el("editor-status").dataset.kind = kind;
@@ -278,7 +304,7 @@ function cancelEdit() {
   el("draw-intro").hidden = true;
   area.focus({ preventScroll: true });
 }
-el("cancel-edit").onclick = cancelEdit;
+el("cancel-edit").onclick = () => menu.cancelEdit();
 function driveDrawing() {
   if (!editor.candidate) return;
   const create = book.intent === "create";
@@ -289,6 +315,7 @@ function driveDrawing() {
     return;
   }
   editor.finish();
+  menu.editFinished();
   editUI(false);
   el("draw-intro").hidden = true;
   trackbook.render();
@@ -305,18 +332,19 @@ function driveDrawing() {
 }
 el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
-  if (book.reloadRequired || ignoresShortcuts(e)) return;
+  if (book.reloadRequired || ignoresShortcuts(e) || menu.state.layer !== "none")
+    return;
   const target = shortcutTarget(e.target);
   const inEditor = scene.mode === "editing";
   const action = shortcut(e, scene.mode, target);
-  if (action && (inEditor || e.target === area)) {
+  if (action && (inEditor || e.target === area || action === "menu")) {
     e.preventDefault();
     switch (action) {
       case "book":
-        trackbook.open();
+        menu.openBook();
         break;
       case "edit":
-        beginEdit("replace");
+        menu.edit("replace");
         break;
       case "toggle":
         if (scene.mode === "running") pause();
@@ -325,8 +353,8 @@ function keydown(e: KeyboardEvent) {
       case "restart":
         restart();
         break;
-      case "pause":
-        pause();
+      case "menu":
+        menu.open();
         break;
       case "redraw":
         editor.redraw();
@@ -336,7 +364,7 @@ function keydown(e: KeyboardEvent) {
         driveDrawing();
         break;
       case "cancel":
-        cancelEdit();
+        menu.cancelEdit();
         break;
     }
     return;
@@ -356,11 +384,12 @@ function keydown(e: KeyboardEvent) {
     ].includes(e.code)
   ) {
     e.preventDefault();
-    scene.keys.add(e.code);
+    if (!e.repeat) scene.keys.add(e.code);
   }
 }
 const keyup = (e: KeyboardEvent) => scene.keys.delete(e.code);
 function loseFocus() {
+  menu.invalidate();
   editor.interrupt();
   scene.keys.clear();
   scene.pause();
@@ -373,6 +402,7 @@ function visibility() {
 function areaBlur() {
   scene.keys.clear();
   if (scene.mode === "running") {
+    menu.invalidate();
     scene.pause();
     uiClock = 0;
     scene.onChange();
@@ -381,6 +411,8 @@ function areaBlur() {
 function pointerFocus() {
   if (scene.mode === "running") area.focus();
 }
+const resizeMenu = () => menu.invalidate();
+window.addEventListener("resize", resizeMenu);
 board.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
 window.addEventListener("blur", loseFocus);
@@ -414,6 +446,8 @@ if (import.meta.hot)
   import.meta.hot.dispose(() => {
     clearTimeout(toastTimer);
     toastMotion?.cancel();
+    menu.destroy();
+    window.removeEventListener("resize", resizeMenu);
     editor.destroy();
     trackbook.destroy();
     sound.destroy();

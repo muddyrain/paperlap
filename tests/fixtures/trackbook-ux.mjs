@@ -110,12 +110,12 @@ export async function verifyTrackbookUX(h) {
     assert.equal((await state(page)).mode, "paused");
     await page.keyboard.press("r");
     assert.equal((await state(page)).mode, "running");
-    await page.locator("#pause").click();
+    await page.keyboard.press("Space");
     assert.equal(await focus(page), "game");
     assert.equal((await state(page)).mode, "paused");
     await page.keyboard.press("Space");
     assert.equal((await state(page)).mode, "running");
-    await page.keyboard.press("Escape");
+    await page.keyboard.press("Space");
     const beforeEdit = await read(page);
     await page.keyboard.press("e");
     assert.equal((await state(page)).mode, "editing");
@@ -134,6 +134,8 @@ export async function verifyTrackbookUX(h) {
     await page.keyboard.up("Enter");
     assert.equal((await state(page)).mode, "paused");
     assert.equal(await focus(page), "game");
+    await page.keyboard.press("Escape");
+    assert.equal(await page.locator("#game-menu").isVisible(), true);
     await page.keyboard.press("Escape");
     assert.equal((await state(page)).mode, "paused");
     await page.locator("#trackbook-open").focus();

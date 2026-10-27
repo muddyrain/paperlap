@@ -4,7 +4,9 @@ export type ShortcutScope =
   | "paused"
   | "editing"
   | "list"
-  | "form";
+  | "form"
+  | "menu"
+  | "menu-child";
 export type ShortcutTarget = "surface" | "button" | "text" | "card";
 type Key = Pick<KeyboardEvent, "code"> &
   Partial<
@@ -36,6 +38,19 @@ export function shortcut(
     return null; // Enter/Space stay native button activation.
   }
   if (scope === "form") return null;
+  if (scope === "menu" || scope === "menu-child") {
+    if (key.code === "Escape") return "back";
+    if (scope === "menu-child") return null;
+    if (key.code === "Space") return target === "surface" ? "toggle" : null;
+    return (
+      (
+        { KeyR: "restart", KeyT: "book", KeyE: "edit" } as Record<
+          string,
+          string
+        >
+      )[key.code] ?? null
+    );
+  }
   if (scope === "editing") {
     if (key.code === "Escape") return "cancel";
     if (key.code === "KeyR") return "redraw";
@@ -43,6 +58,7 @@ export function shortcut(
       return "accept";
     return null;
   }
+  if (key.code === "Escape") return "menu";
   if (target !== "surface") return null;
   return (
     (
@@ -51,7 +67,6 @@ export function shortcut(
         KeyE: "edit",
         Space: "toggle",
         KeyR: "restart",
-        ...(scope === "running" ? { Escape: "pause" } : {}),
       } as Record<string, string>
     )[key.code] ?? null
   );
