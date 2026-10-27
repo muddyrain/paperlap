@@ -176,3 +176,51 @@
 - [900×700：新建赛道](screenshots/p1-02-ux-new-900.png)
 - [900×700：新建保存与 ready](screenshots/p1-02-ux-saved-900.png)
 - [900×700：真实有效圈新纪录](screenshots/p1-02-ux-record-900.png)
+
+## P1-03：赛道本操作体验
+
+2026-10-27，从最新 master / `24dd2c1` 创建 `feat/p1-03-trackbook-ux`，按 [Issue #5](https://github.com/muddyrain/paperlap/issues/5) 先编写 [状态与交互规则](trackbook-interactions.md)，再实现抽屉/卡片，最后接入微交互。环境为 macOS 15.7.9 arm64、Node.js 22.22.3、Playwright 1.56.1、Phaser 3.90.0；生产预览地址 `http://127.0.0.1:4174/`。
+
+游戏区域的 T/E/Space/R 分别对应赛道本、编辑当前、开始/暂停/继续和重新开始。抽屉 N 新建，上下键只移动卡片焦点，Enter/Space 使用赛道但不起跑。Esc 从改名/删除确认退回列表，再关闭并恢复入口；Tab/Shift+Tab 在可见控件内循环。绘图 R/Enter/Esc 保留重画/保存/取消语义。输入框、IME、Ctrl/Meta/Alt 不触发动作；按钮首次原生激活保留，重复 Enter 不会在改名完成后意外切换非当前卡片。取消绘图与点击暂停后焦点回到游戏，方便接续快捷键。
+
+右侧纸片抽屉显示数量、实际 SVG 路线、名称、当前标记及 UID+几何+rules-2 的个人最佳。缩略图使用完整中心线和道路宽度、按边界留白缩放；不进入存档，不在每帧生成。20 条长名称列表内部滚动，Phaser 画布尺寸不变。900×700 使用较紧凑的卡片间距，保留中文动作、图标和键帽。
+
+抽屉打开 220ms、关闭 200ms，新的卡片操作可取消退出动画；旧回调不能关闭重开的抽屉。卡片有悬停、焦点和按压反馈，切换后的名称和边缘纸贴仅在控制层成功后出现。改名/删除反馈位于抽屉底部，保存/新纪录反馈位于游戏边缘。reduced-motion 下跳过动效，运行期间切换此偏好也能结束抽屉过渡。
+
+新增快捷键与缩略图单测先确认缺少模块时失败，再实现通过。浏览器还复现并修复了取消后焦点落在开始按钮、点击暂停失焦先禁用按钮，以及长按 Enter 改名后激活非当前卡片的问题。已有编辑器检查的一次重跑暴露出 viewport 协议完成早于 resize 事件的等待竞争；测试现在先等待页面实际显示“中断”再松开鼠标，保留原有中断与后续画线断言，没有修改编辑器实现。
+
+实际改动文件：
+
+- `src/main.ts`、`src/style.css`：动作入口、焦点、键帽、紧凑反馈和纸片样式。
+- `src/game/trackbook-ui.ts`：抽屉、卡片、表单/确认、导航与可取消动效。
+- 新增 `src/game/shortcuts.ts`、`src/game/thumbnail.ts`、`src/game/ui.ts`：状态映射、真实缩略图、共用图标/按钮内容。
+- 新增 `tests/shortcuts.test.ts`、`tests/thumbnail.test.ts`、`tests/fixtures/trackbook-ux.mjs`；扩展 `tests/trackbook-browser.mjs`，同步 `tests/editor-browser.mjs` 的 resize 等待。
+- `README.md`、`docs/trackbook-interactions.md`、本验证记录及下列实际游戏截图。
+
+Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的准备/写入/提交流程和性能缓存均保持原样；`scene.ts`、`editor.ts`、`geometry.ts`、`vehicle.ts`、`laps.ts`、`config.ts`、RULES_VERSION 均未改动。没有新增依赖或外部素材请求。
+
+| 检查 | 结果 |
+| --- | --- |
+| `npm run typecheck` / `npm run build` | 通过；保留既有 Phaser chunk 超过 500 kB 提示 |
+| `npm test` | 56/56，含原有 53 项、快捷键 2 项、缩略图 1 项；缓存安全与 20×350/900 点性能回归通过 |
+| `npm run test:trackbook` | 26/26，原有 17 项加本轮 9 项交互检查 |
+| `npm run test:storage` | 7/7 |
+| `npm run test:editor` | 9/9 |
+| `npm run test:browser` | 15/15，含真实有效圈与纪录持久化 |
+| `npm run test:handling` | 4/4，含真实连续两圈较快驾驶 |
+| 改动源码/测试 Prettier、`git diff --check`、UTF-8 检查 | 通过 |
+
+五套浏览器共 61 项，控制台错误为 0；收集失败资源请求的四套均为 0。所有命令退出码均为 0。全部清除继承的 PWDEBUG，明确 `headless: true`，使用隔离 Chromium 上下文与页面键鼠 API；没有前台浏览器、系统键鼠或个人 Chrome 接管。测试浏览器、上下文及本任务生产预览服务在验证后释放。报告在 Git 忽略的 `test-results/` 内，按既有位置保存。
+
+实际截图已读取检查，8 张原始 PNG 入库供审查：
+
+- [1366×768：抽屉、真实 A/B 卡片、最佳与选中状态](screenshots/p1-03-drawer-1366.png)
+- [1280×800：纸片抽屉与键帽](screenshots/p1-03-drawer-1280.png)
+- [900×700：紧凑卡片、中文动作与键盘焦点](screenshots/p1-03-drawer-900.png)
+- [900×700：切换后 ready，完整赛道与边缘反馈](screenshots/p1-03-switch-ready-900.png)
+- [1366×768：reduced-motion 静态状态](screenshots/p1-03-reduced-motion-1366.png)
+- [1366×768：打开动画中间状态](screenshots/p1-03-opening-1366.png)
+- [900×700：编辑意图与保存键帽](screenshots/p1-03-edit-900.png)
+- [900×700：真实键盘有效圈触发新纪录反馈](screenshots/p1-03-record-900.png)
+
+未发现阻塞验收的问题。此次浏览器自动化覆盖 Chromium；Safari/Firefox 与人工听感未验证。既有跨标签同步限制、存储受限时原有编辑可继续本次试玩的行为保持不变；仍需用户真实试玩评审后再决定合并。
