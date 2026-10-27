@@ -60,6 +60,7 @@ npm run preview
 
 ```bash
 npm run test:browser
+npm run test:sound
 npm run test:handling
 npm run test:editor
 npm run test:storage
@@ -69,6 +70,8 @@ npm run test:trackbook
 首次运行若缺少测试浏览器，先执行 `npx playwright install chromium`。脚本使用 `headless: true` 启动 Playwright 自带的独立 Chromium，不使用日常 Chrome。不连接已有浏览器、不使用系统级输入、不打开测试报告。所有键盘和鼠标操作都只发送给无头测试页面，并忽略继承的 `PWDEBUG` 环境设置。
 
 也可通过 `PAPERLAP_URL=http://127.0.0.1:4173 npm run test:browser` 验证生产预览。测试会修改自己的隔离浏览器上下文中的存档，不接触日常浏览器数据。自动化截图写入 `test-results/screenshots/`，结果写入 `test-results/browser-report.json`；`docs/screenshots/` 保留交付时选取的截图。
+
+`test:sound` 用真实页面鼠标和键盘验证驾驶中开关声音时计时、车辆、音频增益、持久化与输入保持正常，检查 ready/paused 下 Tab、Enter、Space 的原生行为，并投递窗口/标签生命周期事件验证安全暂停。报告保存在 `test-results/sound/report.json`；不切换系统前台应用。
 
 `test:handling` 检查真实方向输入、连续两圈较快驾驶、急弯前松油以及旧成绩迁移，结果为 `test-results/handling-report.json`，截图为 `test-results/handling-v2.png`。
 

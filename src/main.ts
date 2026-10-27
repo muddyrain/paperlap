@@ -219,6 +219,10 @@ el("pause").onclick = () => {
   area.focus({ preventScroll: true });
 };
 el("restart").onclick = restart;
+// Pointer sound toggles keep driving focus; keyboard focus changes still pause.
+el("sound").onpointerdown = (event) => {
+  if (event.button === 0 && scene.mode === "running") event.preventDefault();
+};
 el("sound").onclick = () => {
   sound.muted = !sound.muted;
   book.save.muted = sound.muted;

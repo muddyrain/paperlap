@@ -224,3 +224,22 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 - [900×700：真实键盘有效圈触发新纪录反馈](screenshots/p1-03-record-900.png)
 
 未发现阻塞验收的问题。此次浏览器自动化覆盖 Chromium；Safari/Firefox 与人工听感未验证。既有跨标签同步限制、存储受限时原有编辑可继续本次试玩的行为保持不变；仍需用户真实试玩评审后再决定合并。
+
+## PR #6 复审修复：声音按钮焦点
+
+2026-10-27，基线 `1212cc5`，处理 [main.ts 第 222 行的 Review](https://github.com/muddyrain/paperlap/pull/6#discussion_r4385048839)。新增专项测试先在实际生产构建复现：按住 ArrowUp，鼠标点击声音按钮后错误进入 paused。原因是 pointerdown 的默认焦点转移先触发游戏 blur，onclick 中的 running 判断已无法恢复焦点。
+
+`src/main.ts` 仅为声音按钮新增局部 pointerdown 处理：running 且鼠标主按钮按下时 preventDefault，保留游戏焦点和 held keys；ready/paused 的鼠标聚焦、Tab/Enter/Space 原生按钮操作，以及 window blur / visibilitychange 的暂停逻辑均保持原样。未改动抽屉、缩略图、动画、Save V2、音频实现或驾驶规则。
+
+新增 `tests/sound-browser.mjs` 和 `npm run test:sound`，同步 README 命令说明。四项隔离无头 Chromium 检查覆盖：驾驶中开/关声音后的车辆位移、加速、模拟计时、音频增益、偏好保存、转向及松键；ready 点击后正常开始；Tab 离开游戏仍暂停，Enter/Space 各切换一次且不误起跑；声音切换后的窗口/标签生命周期事件仍冻结车辆/计时、清键并静音，直到显式恢复。生命周期事件通过页面 API 投递，没有操作系统前台切换；全部车辆和圈速数据只读。
+
+| 本次复测 | 结果 |
+| --- | --- |
+| `npm run test:sound` | 4/4，先复现失败再修复通过 |
+| `npm run test:browser` | 15/15，含失焦、暂停/恢复、声音偏好、真实有效圈与三种桌面尺寸 |
+| `npm run test:storage` | 7/7，迁移、偏好和存储失败回归 |
+| `npm test` | 56/56 |
+| `npm run build`（含 typecheck） | 通过，保留既有 Phaser chunk 提示 |
+| 改动源码/测试 Prettier、`git diff --check` | 通过 |
+
+本次三套浏览器共 26 项，控制台错误与失败请求均为 0，命令退出码均为 0。使用独立、明确 headless 的 Chromium，忽略 PWDEBUG；全部测试浏览器、上下文及本任务预览服务已释放。没有修改或重新生成已验收的抽屉、缩略图、动画与截图。专项报告为 `test-results/sound/report.json`，原有两套报告位置不变。
