@@ -107,6 +107,90 @@ async function blockWrites(page, error = "QuotaExceededError") {
 async function restoreWrites(page) {
   await page.evaluate(() => window.restoreTrackbookStorage());
 }
+async function rename(page, uid, name) {
+  await open(page);
+  await row(page, uid).locator('[data-action="rename"]').click();
+  await page.locator("#track-name-input").fill(name);
+  await page.locator("#track-name-input").press("Enter");
+  await close(page);
+}
+async function clearOfRoad(page, selector) {
+  const overlaps = await page.evaluate((selector) => {
+    const board = document.querySelector(".board").getBoundingClientRect();
+    const box = document.querySelector(selector).getBoundingClientRect();
+    const x0 = ((box.left - board.left) * 1440) / board.width;
+    const x1 = ((box.right - board.left) * 1440) / board.width;
+    const y0 = ((box.top - board.top) * 860) / board.height;
+    const y1 = ((box.bottom - board.top) * 860) / board.height;
+    const distance = (p) =>
+      Math.hypot(
+        Math.max(x0 - p.x, 0, p.x - x1),
+        Math.max(y0 - p.y, 0, p.y - y1),
+      );
+    return {
+      road: window.paperlapDebug.track.points.some(
+        (p) => distance(p) < window.paperlapDebug.track.width / 2,
+      ),
+      car: distance(window.paperlapDebug.car) < 40,
+    };
+  }, selector);
+  assert.deepEqual(
+    overlaps,
+    { road: false, car: false },
+    `${selector} leaves road and car visible`,
+  );
+}
+async function completeLap(page) {
+  await page.locator("#start").click();
+  const held = new Set();
+  const keys = async (wanted) => {
+    for (const key of [...held])
+      if (!wanted.includes(key)) {
+        await page.keyboard.up(key);
+        held.delete(key);
+      }
+    for (const key of wanted)
+      if (!held.has(key)) {
+        await page.keyboard.down(key);
+        held.add(key);
+      }
+  };
+  try {
+    const deadline = Date.now() + 180000;
+    while (Date.now() < deadline) {
+      const s = await state(page);
+      if (s.lap.completed >= 1) return;
+      const points = s.track.points,
+        car = s.car;
+      let index = 0,
+        distance = Infinity;
+      for (let i = 0; i < points.length; i++) {
+        const d = Math.hypot(car.x - points[i].x, car.y - points[i].y);
+        if (d < distance) {
+          distance = d;
+          index = i;
+        }
+      }
+      const target =
+        points[
+          (index + Math.max(5, Math.round((car.speed * 0.32) / 8))) %
+            points.length
+        ];
+      const turn = Math.atan2(target.y - car.y, target.x - car.x) - car.angle;
+      const angle = Math.atan2(Math.sin(turn), Math.cos(turn));
+      const wanted = [];
+      if (angle > 0.035) wanted.push("ArrowRight");
+      if (angle < -0.035) wanted.push("ArrowLeft");
+      if (car.speed < 165) wanted.push("ArrowUp");
+      if (car.speed > 180) wanted.push("ArrowDown");
+      await keys(wanted);
+      await page.waitForTimeout(45);
+    }
+    assert.fail("keyboard driver must complete a lap");
+  } finally {
+    await keys([]);
+  }
+}
 let ab;
 try {
   await isolated(async (page) => {
@@ -513,6 +597,169 @@ try {
         `${stage} canvas failure: preserves old state before write or blocks broken rendering until reload from durable selection`,
       );
     });
+
+  await isolated(async (page) => {
+    const name = "清晨绕湖的纸上飞驰练习赛道".repeat(3).slice(0, 40);
+    const a = ab.tracks[0];
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1280, height: 800 },
+      { width: 900, height: 700 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await seed(page, { ...ab, activeTrackUid: a.uid });
+      for (const text of ["晨跑", name]) {
+        await rename(page, a.uid, text);
+        assert.equal(await page.locator("#track-name").innerText(), text);
+        assert.equal(
+          await page.locator("#track-name").getAttribute("title"),
+          text,
+        );
+        const headline = await page.evaluate(() => {
+          const name = document.querySelector("#track-name"),
+            mode = document.querySelector("#mode-label");
+          const note = name.closest(".mode-note"),
+            box = note.getBoundingClientRect(),
+            timer = document.querySelector(".timing").getBoundingClientRect();
+          return {
+            inPaper: note.classList.contains("paper"),
+            marked: note.textContent.includes("当前赛道："),
+            prominent:
+              parseFloat(getComputedStyle(name).fontSize) >
+              parseFloat(getComputedStyle(mode).fontSize),
+            separated: box.right + 8 < timer.left,
+            fits: name.clientWidth <= name.parentElement.clientWidth,
+            truncated: name.scrollWidth > name.clientWidth,
+          };
+        });
+        assert.ok(
+          headline.inPaper &&
+            headline.marked &&
+            headline.prominent &&
+            headline.separated &&
+            headline.fits,
+        );
+        if (text === name) assert.equal(headline.truncated, true);
+      }
+      await clearOfRoad(page, ".mode-note");
+      await clearOfRoad(page, "#welcome");
+      await page.screenshot({ path: `${output}ux-hud-${viewport.width}.png` });
+      await drive(page, 0.2);
+      await page.keyboard.up("ArrowUp");
+      await page.keyboard.press("Escape");
+      await page.locator("#pause-panel").waitFor({ state: "visible" });
+      const paused = await state(page);
+      await clearOfRoad(page, "#pause-panel");
+      await page.screenshot({
+        path: `${output}ux-paused-${viewport.width}.png`,
+      });
+      assert.deepEqual((await state(page)).car, paused.car);
+      assert.deepEqual((await state(page)).lap, paused.lap);
+
+      const saved = await read(page);
+      await page.locator("#edit").click();
+      assert.equal(
+        await page.locator("#editor-title").innerText(),
+        "编辑当前赛道",
+      );
+      assert.equal(await page.locator("#editor-track-name").innerText(), name);
+      assert.equal(
+        await page.locator("#editor-track-name").getAttribute("title"),
+        name,
+      );
+      assert.match(
+        await page.locator("#editor-intent").innerText(),
+        /保存将替换当前赛道路线.*取消不会影响原赛道/,
+      );
+      assert.equal(
+        await page.locator("#drive-drawing").getAttribute("aria-label"),
+        "保存修改并试跑 (Enter)",
+      );
+      assert.equal(
+        await page.locator("#drive-drawing").getAttribute("title"),
+        "保存修改并试跑 (Enter)",
+      );
+      const label = await page
+        .locator(".draw-surface")
+        .getAttribute("aria-label");
+      assert.ok(
+        label.includes(name) &&
+          label.includes("Enter 保存修改并试跑") &&
+          label.includes("取消不会影响原赛道"),
+      );
+      assert.equal(
+        await page.evaluate(() => {
+          const board = document
+            .querySelector(".board")
+            .getBoundingClientRect();
+          return (
+            document.querySelector(".editor-caption").getBoundingClientRect()
+              .bottom <
+            board.top + (board.height * 184) / 860
+          );
+        }),
+        true,
+        "all initial guidance stays above the drawing bounds",
+      );
+      await page.screenshot({ path: `${output}ux-edit-${viewport.width}.png` });
+      await draw(page);
+      assert.match(
+        await page.locator("#editor-status").innerText(),
+        /Enter 保存修改并试跑/,
+      );
+      await page.keyboard.press("r");
+      assert.equal(await page.locator("#drive-drawing").isEnabled(), false);
+      assert.equal(
+        await page.locator("#editor-title").innerText(),
+        "编辑当前赛道",
+      );
+      await page.keyboard.press("Escape");
+      assert.equal(await read(page), saved);
+      assert.deepEqual((await state(page)).car, paused.car);
+      await open(page);
+      await page.locator("#new-track").click();
+      assert.equal(await page.locator("#editor-title").innerText(), "新建赛道");
+      assert.equal(await page.locator("#editor-target").isVisible(), false);
+      assert.match(
+        await page.locator("#editor-intent").innerText(),
+        /独立赛道.*原有赛道保留/,
+      );
+      assert.equal(
+        await page.locator("#drive-drawing").getAttribute("aria-label"),
+        "保存新赛道 (Enter)",
+      );
+      assert.match(
+        await page.locator(".draw-surface").getAttribute("aria-label"),
+        /新建赛道.*原有赛道保留.*Enter 保存新赛道/,
+      );
+      await page.screenshot({ path: `${output}ux-new-${viewport.width}.png` });
+      await draw(page);
+      await page.keyboard.press("Enter");
+      assert.equal((await state(page)).mode, "ready");
+      assert.match(await page.locator("#toast").innerText(), /新赛道已保存/);
+      await clearOfRoad(page, "#toast");
+      await clearOfRoad(page, "#welcome");
+      await page.screenshot({
+        path: `${output}ux-saved-${viewport.width}.png`,
+      });
+      check(
+        `${viewport.width}×${viewport.height}: long/short track HUD, unobstructed pause/notification, explicit create/replace copy and shortcuts`,
+      );
+    }
+  });
+
+  await isolated(async (page) => {
+    await page.setViewportSize({ width: 900, height: 700 });
+    await seed(page, { ...ab, activeTrackUid: ab.tracks[0].uid, records: {} });
+    await completeLap(page);
+    assert.equal((await state(page)).lap.valid, true);
+    assert.match(await page.locator("#toast.stamp").innerText(), /新纪录/);
+    await clearOfRoad(page, "#toast");
+    await page.screenshot({ path: `${output}ux-record-900.png` });
+    check(
+      "real keyboard lap celebrates a saved best in a compact notice clear of road and car",
+    );
+  });
 
   await isolated(async (page) => {
     await seed(page, ab);

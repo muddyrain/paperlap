@@ -145,3 +145,34 @@
 五套无头浏览器共 48 项检查，控制台错误均为 0；收集失败资源请求的四套均为 0。所有任务创建的浏览器和上下文已正常关闭；开发与生产预览服务在验证后关闭。报告为 `test-results/trackbook/report.json`、`test-results/storage/report.json`、`test-results/browser-report.json`、`test-results/handling-report.json`、`test-results/editor/report.json`，三种尺寸赛道本截图为 `test-results/trackbook/list-*.png`。测试产物保留在 Git 忽略目录，不替换已有产品截图。
 
 本轮修改 13 个文件：新增 `src/game/trackbook.ts`、`src/game/trackbook-ui.ts`、`tests/trackbook.test.ts`、`tests/trackbook-browser.mjs`、`docs/trackbook-flow.md`；修改 `src/main.ts`、`src/game/editor.ts`、`src/game/scene.ts`、`src/style.css`、`package.json`、`README.md`、`docs/storage-v2.md`、本验收文档。
+
+## PR #4 试玩评审修复：名称层级与画面遮挡
+
+2026-10-27，继续在 `feat/p1-02-trackbook-flow` 处理 [用户 Code Review](https://github.com/muddyrain/paperlap/pull/4#pullrequestreview-5661649265)，基线为 `3826723`。只调整表现层、文案与相应浏览器检查；`trackbook.ts`、Save V2、存储/迁移/性能缓存、场景、车辆、几何和圈速规则均未修改。
+
+- 左上纸片主标题为“当前赛道：名称”，“自由试跑”缩为次要信息。名称限制在独立宽度内省略显示，DOM 保留全文，支持键盘聚焦和悬停 title；切换、改名及删除活动条目沿用现有同步入口。赛道本入口移到右上。
+- 成功、警告与新纪录反馈缩为右上边缘纸条，新纪录保留星标和轻微出现动画，遵循 reduced motion。准备和暂停操作移到页脚纸条；准备状态也不再生成中央卡片，避免新建保存后重新遮住道路。车辆、计时冻结和显式开始/恢复行为不变。
+- 新建顶部持续说明“将保存为独立赛道，原有赛道保留”，主按钮“保存新赛道”；编辑顶部显示“编辑当前赛道”、目标名称、“保存将替换当前赛道路线，取消不会影响原赛道”，主按钮“保存修改并试跑”。同步 title、aria-label、Canvas 标签及 Enter 成功提示。绘图初始说明移到顶部，校验和错误信息位于底部操作区，画布中心留空。
+
+`test:trackbook` 保留原 13 项，新增三种桌面尺寸（1366×768、1280×800、900×700）的 UX 场景及一个真实有效圈新纪录场景。通过实际 UI 改名验证短名称、40 字长名称、省略与全文 title、主次字号及计时器间隔；通过真实键鼠验证暂停冻结、新建/编辑意图及 Enter/R/Esc、取消不写盘、新建保存后 ready。对准备、暂停、通知区域直接计算与道路/车辆的距离，检查初始绘图说明全部位于绘制边界上方。新纪录通过外部只读遥测和真实键盘驾驶触发，没有向游戏状态写值或伪造印章。
+
+原始截图位于 `test-results/trackbook/ux-*.png`：每种尺寸各有 HUD、暂停、编辑、新建、新建保存五张，另有 `ux-record-900.png`，共 16 张。选取不同尺寸与状态的画面放入 `docs/screenshots/p1-02-ux-*.png` 供 PR 评审。
+
+新增检查先复现了编辑界面缺少明确标题/覆盖说明的问题；接入后又发现改名不重建场景，Canvas 标签从场景取名会沿用旧名称。现在由活动条目向编辑器传入仅用于标签的名称，保留场景和赛道管理规则。长名称测试同时核对视觉目标名称和 Canvas 全文标签。
+
+| 检查 | 结果 |
+| --- | --- |
+| `npm run typecheck`、`npm run build` | 通过，保留既有 Phaser chunk 大小提示 |
+| `npm test` | 53/53，含缓存安全和 20×350/900 点性能回归 |
+| `npm run test:trackbook` | 17/17，保留原 13 项并新增 4 项 UX 场景 |
+| `npm run test:storage` / `test:editor` / `test:browser` / `test:handling` | 7/7、9/9、15/15、4/4 |
+| 改动源码/测试 Prettier、`git diff --check` | 通过 |
+
+五套浏览器共 52 项，控制台错误为 0；收集失败请求的四套均为 0。全部使用隔离无头 Chromium，测试浏览器、上下文和本任务服务均已关闭。已读取检查全部六张入库截图：
+
+- [1366×768：长赛道名 HUD](screenshots/p1-02-ux-hud-1366.png)
+- [1280×800：暂停](screenshots/p1-02-ux-paused-1280.png)
+- [900×700：编辑当前赛道](screenshots/p1-02-ux-edit-900.png)
+- [900×700：新建赛道](screenshots/p1-02-ux-new-900.png)
+- [900×700：新建保存与 ready](screenshots/p1-02-ux-saved-900.png)
+- [900×700：真实有效圈新纪录](screenshots/p1-02-ux-record-900.png)

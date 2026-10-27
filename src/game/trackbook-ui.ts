@@ -97,9 +97,9 @@ export class TrackbookView {
       ?.focus();
   }
   render() {
-    document.getElementById("track-name")!.textContent = trackName(
-      activeTrack(this.book.save),
-    );
+    const label = document.getElementById("track-name")!;
+    label.textContent = trackName(activeTrack(this.book.save));
+    label.title = label.textContent;
     const list = this.get("track-list");
     list.replaceChildren();
     for (const entry of this.book.save.tracks) {
