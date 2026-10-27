@@ -380,6 +380,106 @@ kbd {
 .toast:empty {
   display: none;
 }
+.track-note {
+  position: absolute;
+  top: 16%;
+  left: 2.4%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: var(--layer-ui);
+  max-width: 33%;
+  font-size: 12px;
+}
+#track-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.track-note button {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+.editing .track-note {
+  display: none;
+}
+.trackbook {
+  width: min(620px, 90vw);
+  max-height: 80vh;
+  padding: 22px;
+  border: 1px solid #c9bda7;
+  color: var(--ink);
+}
+.trackbook::backdrop {
+  background: #37455355;
+}
+.trackbook-heading,
+.trackbook-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.trackbook h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.trackbook p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.trackbook button {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+#track-list {
+  list-style: none;
+  padding: 4px;
+  max-height: 38vh;
+  overflow-y: auto;
+}
+#track-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+#track-list li[aria-current] .track-entry-name {
+  color: var(--accent);
+  font-weight: 700;
+}
+.track-entry-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+#track-list button {
+  flex-shrink: 0;
+}
+.trackbook label {
+  display: block;
+  margin: 20px 0 8px;
+  font-size: 14px;
+}
+.trackbook input {
+  width: 100%;
+  padding: 10px;
+  font: inherit;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+#trackbook-status {
+  color: #a33f2b;
+}
+#trackbook-status:empty {
+  display: none;
+}
+.recovering > :not(#recovery) {
+  visibility: hidden;
+  pointer-events: none;
+}
 @media (max-width: 1100px) {
   .controls {
     gap: 13px;

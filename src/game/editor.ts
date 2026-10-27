@@ -3,7 +3,9 @@ import { dist, fromDrawing, type Point, type Track } from "./geometry";
 import type { RaceScene } from "./scene";
 import type { Car } from "./vehicle";
 import type { LapState } from "./laps";
+import type { EditIntent } from "./trackbook";
 export class TrackEditor {
+  private intent: EditIntent = "replace";
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   raw: Point[] = [];
@@ -49,7 +51,14 @@ export class TrackEditor {
     this.canvas.addEventListener("lostpointercapture", this.cancelPointer);
     window.addEventListener("resize", this.cancelPointer);
   }
-  enter() {
+  enter(intent: EditIntent = "replace") {
+    this.intent = intent;
+    this.canvas.setAttribute(
+      "aria-label",
+      intent === "create"
+        ? "绘制新赛道，R 重画，Enter 保存，Esc 取消"
+        : "绘制赛道，R 重画，Enter 试跑，Esc 取消",
+    );
     this.previous = {
       track: this.scene.trackData.track,
       car: { ...this.scene.car },
@@ -98,15 +107,12 @@ export class TrackEditor {
     this.previous = null;
     this.scene.onChange();
   }
-  accept(): Track | null {
-    if (!this.candidate) return null;
-    const track = this.candidate;
+  finish() {
     this.release();
-    this.scene.setTrack(track);
     this.scene.restoreCar();
     this.canvas.hidden = true;
     this.previous = null;
-    return track;
+    this.candidate = null;
   }
   private point(e: PointerEvent): Point {
     const r = this.canvas.getBoundingClientRect();
@@ -169,7 +175,9 @@ export class TrackEditor {
       this.scene.preview(result.track);
       this.ctx.clearRect(0, 0, WORLD.width, WORLD.height);
       this.onStatus(
-        "赛道画好了！按 Enter 试跑，或按 R 重新绘制。",
+        this.intent === "create"
+          ? "赛道画好了！按 Enter 保存新赛道，或按 R 重新绘制。"
+          : "赛道画好了！按 Enter 试跑，或按 R 重新绘制。",
         true,
         "success",
       );

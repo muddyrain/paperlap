@@ -6,12 +6,13 @@ import {
   activeTrack,
   freshSave,
   recordKey,
-  replaceTrack,
   setBest,
   type Save,
 } from "./game/save";
 import { loadSave, writeSave } from "./game/storage";
 import { Sound } from "./game/audio";
+import { Trackbook, trackbookMessage, type EditIntent } from "./game/trackbook";
+import { TrackbookView } from "./game/trackbook-ui";
 import { formatTime as format } from "./game/time";
 import "./style.css";
 
@@ -41,8 +42,10 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
  <section id="pause-panel" class="center-note paper" hidden><span class="tiny">休息一下，赛道等你。</span><h2>已暂停</h2><p id="pause-reason">车辆和计时都已暂停</p><button id="resume" class="primary">${icon("play")}继续试跑</button></section>
  <div id="draw-intro" class="draw-intro" hidden><svg viewBox="0 0 230 100" fill="none" aria-hidden="true"><path d="M28 64C-4 16 96 2 109 35s108-37 103 18-133 44-179 16" stroke="currentColor" stroke-width="2" stroke-dasharray="6 6"/><circle cx="28" cy="64" r="6" fill="currentColor"/><path d="m30 49-2 15 16-3" stroke="currentColor" stroke-width="2"/></svg><strong>从这里，随手画一圈。</strong><span>线条不用太工整，回到起点圆圈内松开就好。</span></div>
  <div id="editor-status" class="editor-status" role="status" hidden></div>
+ <div class="track-note"><span id="track-name"></span><button id="trackbook-open" class="paper" aria-haspopup="dialog">赛道本</button></div>
  <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 暂停</span></div><div class="bottom-actions"><button id="edit" class="paper accent">${icon("edit")}编辑赛道</button><button id="restart" class="paper">${icon("reset")}重新开始</button></div></footer>
  <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper" aria-keyshortcuts="Escape" title="取消编辑 (Esc)">${icon("close")}取消编辑<kbd aria-hidden="true">Esc</kbd></button><span>随手画，线条会自动修圆。</span><div><button id="redraw" class="paper" aria-keyshortcuts="R" title="重新绘制 (R)">${icon("reset")}重新绘制<kbd aria-hidden="true">R</kbd></button><button id="drive-drawing" class="primary" aria-keyshortcuts="Enter" title="开始试跑 (Enter)" disabled>开始试跑<kbd aria-hidden="true">Enter ↵</kbd></button></div></footer>
+ <section id="recovery" class="center-note paper" role="alert" hidden><h2>画面加载失败</h2><p>请重新加载以恢复已保存的赛道。</p><button id="reload" class="primary">重新加载</button></section>
  <div class="page-signature">DRAW A LITTLE. DRIVE A LITTLE.</div>
 </main>`;
 const scene = new RaceScene();
@@ -77,6 +80,41 @@ const el = <T extends HTMLElement = HTMLElement>(id: string) =>
 const area = el("game");
 const board = document.querySelector<HTMLElement>(".board")!;
 const editor = new TrackEditor(scene, board);
+const book = new Trackbook(save, {
+  uid: () => crypto.randomUUID(),
+  write: (candidate) => writeSave(window.localStorage, candidate),
+  stop: () => {
+    scene.keys.clear();
+    scene.pause();
+    sound.update(0, false);
+  },
+  prepare: (entry) => {
+    const apply = scene.prepareTrack(entry.track);
+    return () => {
+      apply();
+      scene.mode = "ready";
+      scene.restoreCar();
+      uiClock = 0;
+      scene.onChange();
+    };
+  },
+  recover: () => {
+    scene.keys.clear();
+    scene.mode = "paused";
+    game.loop.stop();
+    sound.update(0, false);
+    board.classList.add("recovering");
+    board.querySelectorAll("dialog").forEach((dialog) => dialog.close());
+    el("recovery").hidden = false;
+    el("reload").focus();
+  },
+});
+const trackbook = new TrackbookView(book, board, {
+  create: () => beginEdit("create"),
+  change: () => updateBest(),
+});
+el("trackbook-open").onclick = () => trackbook.open();
+el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
 function toast(message: string, stamp = false) {
   clearTimeout(toastTimer);
@@ -85,14 +123,10 @@ function toast(message: string, stamp = false) {
   toastTimer = setTimeout(() => (el("toast").textContent = ""), 3000);
 }
 function persist() {
-  try {
-    return writeSave(window.localStorage, save).ok;
-  } catch {
-    return false;
-  }
+  return book.persist().ok;
 }
 function updateBest() {
-  const best = save.records[recordKey(activeTrack(save))];
+  const best = book.save.records[recordKey(activeTrack(book.save))];
   el("best").textContent = best ? format(best) : "--:--.--";
 }
 function soundUI() {
@@ -124,15 +158,15 @@ scene.onChange = () => {
   sound.update(scene.car.speed, scene.mode === "running");
 };
 scene.onLap = (time, valid) => {
-  const key = recordKey(activeTrack(save)),
-    best = save.records[key];
+  const key = recordKey(activeTrack(book.save)),
+    best = book.save.records[key];
   if (valid && (!best || time < best)) {
-    const result = setBest(save, save.activeTrackUid, time);
+    const result = setBest(book.save, book.save.activeTrackUid, time);
     if (!result.ok) {
       toast("成绩未能保存，仍可继续试跑");
       return;
     }
-    save = result.save;
+    book.save = result.save;
     const persisted = persist();
     updateBest();
     toast(
@@ -161,7 +195,7 @@ el("restart").onclick = () => {
 };
 el("sound").onclick = () => {
   sound.muted = !sound.muted;
-  save.muted = sound.muted;
+  book.save.muted = sound.muted;
   void sound.unlock();
   soundUI();
   if (!persist()) toast("本次未能保存，仍可继续试跑");
@@ -172,15 +206,27 @@ function editUI(editing: boolean) {
   el("editor-footer").hidden = !editing;
   el("editor-status").hidden = !editing;
   document.querySelector<HTMLElement>(".editor-caption")!.hidden = !editing;
-  el("mode-label").textContent = editing ? "手绘赛道" : "自由试跑";
+  el("mode-label").textContent = editing
+    ? book.intent === "create"
+      ? "新建赛道"
+      : "手绘赛道"
+    : "自由试跑";
+  el("drive-drawing").firstChild!.textContent =
+    book.intent === "create" ? "保存新赛道" : "开始试跑";
+  el("drive-drawing").title =
+    book.intent === "create" ? "保存新赛道 (Enter)" : "开始试跑 (Enter)";
   uiClock = 0;
   scene.onChange();
 }
-el("edit").onclick = () => {
-  editor.enter();
+function beginEdit(intent: EditIntent) {
+  const result = book.beginEdit(intent);
+  if (!result.ok) return result;
+  editor.enter(intent);
   editUI(true);
   editor.focus();
-};
+  return result;
+}
+el("edit").onclick = () => beginEdit("replace");
 editor.onStatus = (message, valid, kind) => {
   el("editor-status").textContent = message;
   el("editor-status").dataset.kind = kind;
@@ -193,6 +239,7 @@ el("redraw").onclick = () => {
 };
 function cancelEdit() {
   editor.cancel();
+  book.cancelEdit();
   editUI(false);
   el("draw-intro").hidden = true;
   el(scene.mode === "ready" ? "start" : "resume").focus();
@@ -200,23 +247,31 @@ function cancelEdit() {
 el("cancel-edit").onclick = cancelEdit;
 function driveDrawing() {
   if (!editor.candidate) return;
-  const result = replaceTrack(save, save.activeTrackUid, editor.candidate);
+  const create = book.intent === "create";
+  const result = book.acceptDrawing(editor.candidate);
   if (!result.ok) {
-    toast("暂时无法采用这条赛道，原赛道已保留");
+    el("editor-status").textContent = trackbookMessage(result.error);
+    el("editor-status").dataset.kind = "error";
     return;
   }
-  editor.candidate = activeTrack(result.save).track;
-  if (!editor.accept()) return;
-  save = result.save;
+  editor.finish();
   editUI(false);
   el("draw-intro").hidden = true;
-  const persisted = persist();
+  trackbook.render();
   updateBest();
-  start();
-  toast(persisted ? "你的赛道，你来破纪录。" : "本次未能保存，仍可继续试跑");
+  if (create) area.focus();
+  else start();
+  toast(
+    result.persisted
+      ? create
+        ? "新赛道已保存，点击开始试跑。"
+        : "你的赛道，你来破纪录。"
+      : "本次未能保存，仍可继续试跑",
+  );
 }
 el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
+  if (book.reloadRequired) return;
   if (e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
   if (
     e.target instanceof Element &&
@@ -304,6 +359,13 @@ if (debug)
       car: { ...scene.car },
       lap: { ...scene.lap },
       trackId: scene.trackData.track.id,
+      activeTrackUid: book.save.activeTrackUid,
+      keys: [...scene.keys],
+      sound: {
+        muted: sound.muted,
+        running: scene.mode === "running" && !sound.muted,
+        motorGain: sound.gain?.gain.value ?? 0,
+      },
       track: structuredClone(scene.trackData.track),
       offroad: scene.offroad,
       effects: scene.trail.length,
@@ -313,6 +375,7 @@ if (import.meta.hot)
   import.meta.hot.dispose(() => {
     clearTimeout(toastTimer);
     editor.destroy();
+    trackbook.destroy();
     sound.destroy();
     board.removeEventListener("keydown", keydown);
     window.removeEventListener("keyup", keyup);
