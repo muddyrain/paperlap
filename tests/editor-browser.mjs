@@ -174,6 +174,10 @@ try {
     rect.y + rect.height * 0.35,
   );
   await page.setViewportSize({ width: 1280, height: 800 });
+  // Viewport protocol completion can precede the page resize event.
+  await page.waitForFunction(() =>
+    document.querySelector("#editor-status").textContent.includes("中断"),
+  );
   await page.mouse.up();
   assert.match(await page.locator("#editor-status").innerText(), /中断/);
   await draw(screenshotLoop);

@@ -430,63 +430,242 @@ kbd {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+button .button-label {
+  white-space: nowrap;
+}
+.button-key {
+  flex-shrink: 0;
+  min-width: 21px;
+  height: 22px;
+  padding: 0 5px;
+  font:
+    600 11px/1 ui-monospace,
+    monospace;
+  border: 1px solid #7d8a8f80;
+  background: #f5ecda;
+  color: inherit;
+  border-radius: 4px;
+  box-shadow: 0 1px 0 #61707c20;
+}
+.primary .button-key {
+  border-color: #fff1d780;
+  background: #ffffff12;
+  box-shadow: none;
+}
 .trackbook {
-  width: min(620px, 90vw);
-  max-height: 80vh;
-  padding: 22px;
+  position: fixed;
+  left: auto;
+  top: max(16px, calc((100vh - min(59.72222vw, 100vh)) / 2 + 16px));
+  bottom: max(16px, calc((100vh - min(59.72222vw, 100vh)) / 2 + 16px));
+  right: max(16px, calc((100vw - min(100vw, 167.44186vh)) / 2 + 16px));
+  margin: 0;
+  width: min(404px, 46vw);
+  max-width: none;
+  max-height: none;
+  height: auto;
+  padding: 20px;
+  overflow: hidden;
   border: 1px solid #c9bda7;
+  border-radius: 5px 9px 7px 4px;
   color: var(--ink);
+  box-shadow: -5px 4px 8px #58442b24;
+}
+.trackbook[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .trackbook::backdrop {
-  background: #37455355;
+  background: #37455320;
+  animation: veil-in 220ms ease-out;
+}
+.trackbook[data-motion="closing"]::backdrop {
+  animation: veil-out 200ms ease-in forwards;
+}
+@keyframes veil-in {
+  from {
+    background: transparent;
+  }
+  to {
+    background: #37455320;
+  }
+}
+@keyframes veil-out {
+  from {
+    background: #37455320;
+  }
+  to {
+    background: transparent;
+  }
 }
 .trackbook-heading,
+.trackbook-toolbar,
 .trackbook-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
+.trackbook-heading {
+  flex-shrink: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #acaa9c;
+}
+.notebook-label {
+  display: block;
+  font-size: 10px;
+  color: #56646a;
+  margin-bottom: 4px;
+}
 .trackbook h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
+}
+.trackbook h3 {
+  overflow-wrap: anywhere;
+  font-size: 18px;
+  line-height: 1.5;
 }
 .trackbook p {
   font-size: 13px;
   line-height: 1.6;
 }
 .trackbook button {
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 7px 9px;
+  font-size: 13px;
+  gap: 6px;
+}
+.trackbook button svg {
+  width: 18px;
+  height: 18px;
+}
+#trackbook-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.trackbook-toolbar {
+  flex-shrink: 0;
+}
+#track-count {
+  font-size: 12px;
+  color: #56646a;
+  font-variant-numeric: tabular-nums;
+}
+.trackbook .trackbook-hint {
+  margin: 10px 0;
+  font-size: 11px;
+  color: #56646a;
+}
+.trackbook-hint kbd {
+  min-width: 18px;
+  height: 19px;
+  padding: 0 4px;
+  font-size: 10px;
+  border-width: 1px;
 }
 #track-list {
   list-style: none;
-  padding: 4px;
-  max-height: 38vh;
+  padding: 5px;
+  margin: 0 -5px;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
-#track-list li {
+.track-card {
+  margin-bottom: 12px;
+  padding: 9px;
+  background: #fff9ed;
+  border: 1px solid #c9bda780;
+  border-radius: 4px 7px 5px 3px;
+  box-shadow: 0 2px 3px #58442b18;
+  transition:
+    transform 180ms ease-out,
+    border-color 180ms ease-out;
+}
+.track-card:hover {
+  transform: translateY(-2px);
+}
+.track-card[aria-current] {
+  border-color: #c84e28;
+  background: #fff4df;
+}
+.trackbook .track-use {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 12px;
+  width: 100%;
+  padding: 3px;
+  text-align: left;
+  background: transparent;
+  box-shadow: none;
+  font-weight: 500;
 }
-#track-list li[aria-current] .track-entry-name {
-  color: var(--accent);
-  font-weight: 700;
+.trackbook .track-use:hover {
+  transform: none;
+}
+.trackbook .track-use:active {
+  transform: translateY(1px);
+}
+.track-thumb {
+  display: block;
+  flex: 0 0 100px;
+  height: 78px;
+  padding: 3px;
+  background: #eee5d4;
+  border-radius: 3px 5px 3px 4px;
+}
+.trackbook .track-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.track-card-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
 }
 .track-entry-name {
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
-  font-size: 14px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 15px;
 }
-#track-list button {
-  flex-shrink: 0;
+.track-best {
+  font-size: 12px;
+  color: #56646a;
+  font-variant-numeric: tabular-nums;
+}
+.track-choice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 12px;
+}
+.track-choice .button-key {
+  margin-left: auto;
+}
+.track-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+.trackbook .track-card-actions button {
+  font-size: 12px;
+  padding: 5px 9px;
 }
 .trackbook label {
   display: block;
-  margin: 20px 0 8px;
+  margin: 14px 0 8px;
   font-size: 14px;
 }
 .trackbook input {
@@ -495,9 +674,25 @@ kbd {
   font: inherit;
   color: var(--ink);
   margin-bottom: 16px;
+  border: 1px solid #74808b;
+  border-radius: 3px;
+  background: #fff9ed;
+}
+.trackbook input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 #trackbook-status {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 12px;
   color: #a33f2b;
+  background: #fff9ed;
+  padding: 7px 9px;
+  border-left: 2px solid currentColor;
+}
+#trackbook-status[data-kind="success"] {
+  color: #405e4c;
 }
 #trackbook-status:empty {
   display: none;
@@ -507,6 +702,17 @@ kbd {
   pointer-events: none;
 }
 @media (max-width: 1100px) {
+  .track-thumb {
+    flex-basis: 92px;
+    height: 66px;
+  }
+  .track-card {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  .track-card-actions {
+    margin-top: 5px;
+  }
   .controls {
     gap: 13px;
     font-size: 12px;
@@ -784,45 +990,14 @@ kbd {
   padding: 14px 20px;
   font-size: 16px;
 }
-.editor-footer kbd {
-  margin-left: 5px;
-  min-width: 25px;
-  width: auto;
-  height: 23px;
-  padding: 0 5px;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 600;
-  color: inherit;
-  border: 1px solid #7d8a8f66;
-  background: #f5ecda;
-  box-shadow: 0 1px 0 #61707c1c;
-}
-.editor-footer .primary kbd {
-  border-color: #fff1d780;
-  background: #ffffff12;
-  box-shadow: none;
-}
 .editor-footer .primary:disabled:hover {
   background: #c9502b;
 }
 .stamp {
-  animation: stamp-in 0.25s ease-out;
   font-weight: 700;
 }
 .stamp:before {
   content: "☆ ";
-}
-@keyframes stamp-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 @media (max-width: 1100px) {
   .editor-footer .paper {

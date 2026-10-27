@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { wobblyLoop } from "./fixtures/editor-paths.mjs";
+import { verifyTrackbookUX } from "./fixtures/trackbook-ux.mjs";
 
 delete process.env.PWDEBUG;
 const { chromium } = await import("@playwright/test");
@@ -65,9 +66,11 @@ async function draw(page, points = wobblyLoop()) {
 const row = (page, uid) => page.locator(`#track-list [data-uid="${uid}"]`);
 async function open(page) {
   await page.locator("#trackbook-open").click();
+  await page.locator('#trackbook[data-motion="open"]').waitFor();
 }
 async function close(page) {
   await page.locator("#trackbook-close").click();
+  await page.locator("#trackbook").waitFor({ state: "hidden" });
 }
 async function select(page, uid) {
   await open(page);
@@ -310,6 +313,7 @@ try {
     await input.fill("WASD R 我的 B");
     await input.press("Enter");
     await page.keyboard.press("Escape");
+    await page.locator("#trackbook").waitFor({ state: "hidden" });
     assert.equal(await page.locator("#trackbook").isVisible(), false);
     const renamed = JSON.parse(await read(page));
     assert.equal(renamed.tracks[1].track.name, "WASD R 我的 B");
@@ -498,6 +502,8 @@ try {
       /存档损坏/,
     );
     await page.keyboard.press("Escape");
+    assert.equal(await page.locator("#trackbook-list").isVisible(), true);
+    await close(page);
     await open(page);
     await page.locator("#new-track").click();
     await draw(page);
@@ -771,6 +777,7 @@ try {
       await page.setViewportSize(viewport);
       await page.locator("#trackbook-open").focus();
       await page.keyboard.press("Enter");
+      await page.locator('#trackbook[data-motion="open"]').waitFor();
       for (const selector of [
         "#trackbook-close",
         "#new-track",
@@ -790,6 +797,7 @@ try {
       }
       await page.screenshot({ path: `${output}list-${viewport.width}.png` });
       await page.keyboard.press("Escape");
+      await page.locator("#trackbook").waitFor({ state: "hidden" });
       assert.equal(
         await page
           .locator("#trackbook-open")
@@ -800,6 +808,21 @@ try {
     check(
       "1366×768, 1280×800, 900×700 controls fit; keyboard opens/closes the dialog and restores focus",
     );
+  });
+  await verifyTrackbookUX({
+    isolated,
+    ab,
+    state,
+    read,
+    seed,
+    open,
+    close,
+    row,
+    draw,
+    blockWrites,
+    restoreWrites,
+    output,
+    check,
   });
   assert.deepEqual(errors, []);
   assert.deepEqual(failedRequests, []);

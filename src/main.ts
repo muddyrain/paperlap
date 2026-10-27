@@ -14,33 +14,21 @@ import { Sound } from "./game/audio";
 import { Trackbook, trackbookMessage, type EditIntent } from "./game/trackbook";
 import { TrackbookView, trackName } from "./game/trackbook-ui";
 import { formatTime as format } from "./game/time";
+import { icon, buttonContent } from "./game/ui";
+import { shortcut, shortcutTarget, ignoresShortcuts } from "./game/shortcuts";
 import "./style.css";
 
-const icon = (name: string) => {
-  const paths: Record<string, string> = {
-    flag: "M5 21V3m0 1c5-4 9 4 15 0v10c-6 4-10-4-15 0m5-10v10m5-9v10M5 8h15",
-    pause: "M8 5v14M16 5v14",
-    play: "m8 4 13 8-13 8Z",
-    edit: "m4 16 12-12 4 4L8 20l-5 1 1-5Zm9-9 4 4",
-    reset: "M20 7v5h-5M4 17a8 8 0 1 0 0-10",
-    sound: "m11 5-6 4H2v6h3l6 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14",
-    mute: "m11 5-6 4H2v6h3l6 4V5Zm5 4 5 6m0-6-5 6",
-    arrow: "M4 12h16m-6-6 6 6-6 6",
-    close: "m6 6 12 12M6 18 18 6",
-  };
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] ? `<path d="${paths[name]}"/>` : ""}</svg>`;
-};
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 <main class="board" aria-label="纸上飞驰赛车游戏">
  <div id="game" tabindex="0" role="application" aria-label="赛车区域，方向键或 WASD 驾驶"></div>
  <header class="hud"><div class="mode-note paper"><span class="flag">${icon("flag")}</span><div class="mode-copy"><h1><span class="track-label">当前赛道：</span><span id="track-name" tabindex="0"></span></h1><span id="mode-label">自由试跑</span></div></div>
  <div class="timing paper"><div class="current"><span>本圈</span><output id="timer">00:00.00</output></div><div class="best"><span>个人最佳</span><output id="best">--:--.--</output><span class="best-star">☆</span></div></div>
  <div class="editor-caption" hidden><div class="editor-heading"><h2 id="editor-title">新建赛道</h2><span id="editor-target">目标赛道：<strong id="editor-track-name" tabindex="0"></strong></span></div><p id="editor-intent"></p><div id="draw-intro" hidden>按住画一圈 · 起点附近松开 · 自动修圆</div></div>
- <div class="top-actions"><button id="trackbook-open" class="paper" aria-haspopup="dialog">赛道本</button><button id="sound" class="icon-button" aria-label="开启声音" title="开启声音">${icon("mute")}</button><button id="pause" class="paper" disabled>${icon("pause")}<span>暂停</span></button></div></header>
+ <div class="top-actions"><button id="trackbook-open" class="paper" aria-haspopup="dialog" aria-expanded="false" aria-controls="trackbook" aria-keyshortcuts="T" title="赛道本 (T)">${buttonContent("book", "赛道本", "T")}</button><button id="pause" class="paper" aria-keyshortcuts="Space" title="暂停 (Space / Esc)" disabled>${buttonContent("pause", "暂停", "Space")}</button></div></header>
  <div id="lap-status" class="lap-status" role="status"></div><div id="toast" class="toast" role="status"></div>
- <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 暂停</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-describedby="start-hint">${icon("play")}开始试跑</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-describedby="pause-reason">${icon("play")}继续试跑</button></section><div class="bottom-actions"><button id="edit" class="paper accent">${icon("edit")}编辑赛道</button><button id="restart" class="paper">${icon("reset")}重新开始</button></div></footer>
- <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper" aria-keyshortcuts="Escape" title="取消编辑 (Esc)">${icon("close")}取消编辑<kbd aria-hidden="true">Esc</kbd></button><div id="editor-status" class="editor-status" role="status" hidden></div><div><button id="redraw" class="paper" aria-keyshortcuts="R" title="重新绘制 (R)">${icon("reset")}重新绘制<kbd aria-hidden="true">R</kbd></button><button id="drive-drawing" class="primary" aria-keyshortcuts="Enter" title="保存修改并试跑 (Enter)" disabled><span id="drawing-action">保存修改并试跑</span><kbd aria-hidden="true">Enter ↵</kbd></button></div></footer>
- <section id="recovery" class="center-note paper" role="alert" hidden><h2>画面加载失败</h2><p>请重新加载以恢复已保存的赛道。</p><button id="reload" class="primary">重新加载</button></section>
+ <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 暂停</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-keyshortcuts="Space" title="开始试跑 (Space)" aria-describedby="start-hint">${buttonContent("play", "开始试跑", "Space")}</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-keyshortcuts="Space" title="继续试跑 (Space)" aria-describedby="pause-reason">${buttonContent("play", "继续试跑", "Space")}</button></section><div class="bottom-actions"><button id="sound" class="paper" aria-label="开启声音" title="开启声音">${buttonContent("mute", "声音")}</button><button id="edit" class="paper accent" aria-keyshortcuts="E" title="编辑当前赛道 (E)">${buttonContent("edit", "编辑当前", "E")}</button><button id="restart" class="paper" aria-keyshortcuts="R" title="重新开始 (R)">${buttonContent("reset", "重新开始", "R")}</button></div></footer>
+ <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper" aria-keyshortcuts="Escape" title="取消编辑 (Esc)">${icon("close")}取消编辑<kbd class="button-key" aria-hidden="true">Esc</kbd></button><div id="editor-status" class="editor-status" role="status" hidden></div><div><button id="redraw" class="paper" aria-keyshortcuts="R" title="重新绘制 (R)">${icon("reset")}重新绘制<kbd class="button-key" aria-hidden="true">R</kbd></button><button id="drive-drawing" class="primary" aria-keyshortcuts="Enter" title="保存修改并试跑 (Enter)" disabled>${icon("check")}<span id="drawing-action">保存修改并试跑</span><kbd class="button-key" aria-hidden="true">Enter ↵</kbd></button></div></footer>
+ <section id="recovery" class="center-note paper" role="alert" hidden><h2>画面加载失败</h2><p>请重新加载以恢复已保存的赛道。</p><button id="reload" class="primary">${buttonContent("reset", "重新加载")}</button></section>
  <div class="page-signature">DRAW A LITTLE. DRIVE A LITTLE.</div>
 </main>`;
 const scene = new RaceScene();
@@ -106,16 +94,39 @@ const book = new Trackbook(save, {
 });
 const trackbook = new TrackbookView(book, board, {
   create: () => beginEdit("create"),
-  change: () => updateBest(),
+  open: () => pause(),
+  change: (action) => {
+    updateBest();
+    if (action === "select") {
+      toast("赛道已切换 · 等待开始试跑");
+      el("track-name")
+        .getAnimations()
+        .forEach((motion) => motion.cancel());
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+        el("track-name").animate([{ opacity: 0.5 }, { opacity: 1 }], {
+          duration: 220,
+        });
+    }
+  },
 });
 el("trackbook-open").onclick = () => trackbook.open();
 el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
+let toastMotion: Animation | null = null;
 function toast(message: string, stamp = false) {
   clearTimeout(toastTimer);
   el("toast").textContent = message;
   el("toast").title = message;
   el("toast").classList.toggle("stamp", stamp);
+  toastMotion?.cancel();
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+    toastMotion = el("toast").animate(
+      [
+        { opacity: 0.5, transform: "translateY(-3px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ],
+      { duration: 220, easing: "ease-out" },
+    );
   toastTimer = setTimeout(() => (el("toast").textContent = ""), 3000);
 }
 function persist() {
@@ -126,7 +137,10 @@ function updateBest() {
   el("best").textContent = best ? format(best) : "--:--.--";
 }
 function soundUI() {
-  el("sound").innerHTML = icon(sound.muted ? "mute" : "sound");
+  el("sound").innerHTML = buttonContent(
+    sound.muted ? "mute" : "sound",
+    sound.muted ? "声音" : "静音",
+  );
   el("sound").setAttribute("aria-label", sound.muted ? "开启声音" : "静音");
   el("sound").setAttribute("title", sound.muted ? "开启声音" : "静音");
   el("sound").setAttribute("aria-pressed", String(!sound.muted));
@@ -186,10 +200,28 @@ function start() {
 }
 el("start").onclick = start;
 el("resume").onclick = start;
-el("pause").onclick = () => scene.pause();
-el("restart").onclick = () => {
+function pause() {
+  scene.keys.clear();
+  scene.pause();
+  uiClock = 0;
+  scene.onChange();
+}
+function restart() {
   scene.reset();
   start();
+}
+// Keep focus until click: blur would pause and disable this button on pointerdown.
+el("pause").onpointerdown = (event) => {
+  if (event.button === 0) event.preventDefault();
+};
+el("pause").onclick = () => {
+  pause();
+  area.focus({ preventScroll: true });
+};
+el("restart").onclick = restart;
+// Pointer sound toggles keep driving focus; keyboard focus changes still pause.
+el("sound").onpointerdown = (event) => {
+  if (event.button === 0 && scene.mode === "running") event.preventDefault();
 };
 el("sound").onclick = () => {
   sound.muted = !sound.muted;
@@ -244,7 +276,7 @@ function cancelEdit() {
   book.cancelEdit();
   editUI(false);
   el("draw-intro").hidden = true;
-  el(scene.mode === "ready" ? "start" : "resume").focus();
+  area.focus({ preventScroll: true });
 }
 el("cancel-edit").onclick = cancelEdit;
 function driveDrawing() {
@@ -273,40 +305,45 @@ function driveDrawing() {
 }
 el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
-  if (book.reloadRequired) return;
-  if (e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
-  if (
-    e.target instanceof Element &&
-    e.target.closest("input,textarea,select,[contenteditable]")
-  )
-    return;
-  if (scene.mode === "editing") {
-    if (e.code === "Enter" || e.code === "NumpadEnter") {
-      if (e.target instanceof Element && e.target.closest("button,a")) return;
-      e.preventDefault();
-      if (!e.repeat) driveDrawing();
-    } else if (e.code === "KeyR") {
-      e.preventDefault();
-      if (!e.repeat) {
+  if (book.reloadRequired || ignoresShortcuts(e)) return;
+  const target = shortcutTarget(e.target);
+  const inEditor = scene.mode === "editing";
+  const action = shortcut(e, scene.mode, target);
+  if (action && (inEditor || e.target === area)) {
+    e.preventDefault();
+    switch (action) {
+      case "book":
+        trackbook.open();
+        break;
+      case "edit":
+        beginEdit("replace");
+        break;
+      case "toggle":
+        if (scene.mode === "running") pause();
+        else start();
+        break;
+      case "restart":
+        restart();
+        break;
+      case "pause":
+        pause();
+        break;
+      case "redraw":
         editor.redraw();
         editor.focus();
-      }
-    } else if (e.code === "Escape") {
-      e.preventDefault();
-      if (!e.repeat) cancelEdit();
+        break;
+      case "accept":
+        driveDrawing();
+        break;
+      case "cancel":
+        cancelEdit();
+        break;
     }
     return;
   }
-  if (e.target !== area) return;
-  if (e.code === "Escape" && scene.mode === "running") {
-    e.preventDefault();
-    scene.pause();
-    uiClock = 0;
-    scene.onChange();
-  } else if (e.code === "KeyR" && scene.mode === "running") {
-    e.preventDefault();
-    scene.reset();
-  } else if (
+  if (
+    e.target === area &&
+    scene.mode === "running" &&
     [
       "ArrowUp",
       "ArrowDown",
@@ -316,8 +353,7 @@ function keydown(e: KeyboardEvent) {
       "KeyS",
       "KeyA",
       "KeyD",
-    ].includes(e.code) &&
-    scene.mode === "running"
+    ].includes(e.code)
   ) {
     e.preventDefault();
     scene.keys.add(e.code);
@@ -351,6 +387,7 @@ window.addEventListener("blur", loseFocus);
 document.addEventListener("visibilitychange", visibility);
 area.addEventListener("blur", areaBlur);
 area.addEventListener("pointerdown", pointerFocus);
+area.focus({ preventScroll: true });
 // Read-only telemetry is available only with ?debug=1 for local inspection.
 const debug = new URLSearchParams(location.search).has("debug");
 if (debug)
@@ -376,6 +413,7 @@ if (debug)
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     clearTimeout(toastTimer);
+    toastMotion?.cancel();
     editor.destroy();
     trackbook.destroy();
     sound.destroy();
