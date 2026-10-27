@@ -3,7 +3,9 @@ import { dist, fromDrawing, type Point, type Track } from "./geometry";
 import type { RaceScene } from "./scene";
 import type { Car } from "./vehicle";
 import type { LapState } from "./laps";
+import type { EditIntent } from "./trackbook";
 export class TrackEditor {
+  private intent: EditIntent = "replace";
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   raw: Point[] = [];
@@ -37,7 +39,7 @@ export class TrackEditor {
     this.canvas.tabIndex = 0;
     this.canvas.setAttribute(
       "aria-label",
-      "绘制赛道，R 重画，Enter 试跑，Esc 取消",
+      "编辑当前赛道，R 重画，Enter 保存修改并试跑，Esc 取消",
     );
     container.append(this.canvas);
     this.ctx = this.canvas.getContext("2d")!;
@@ -49,7 +51,17 @@ export class TrackEditor {
     this.canvas.addEventListener("lostpointercapture", this.cancelPointer);
     window.addEventListener("resize", this.cancelPointer);
   }
-  enter() {
+  enter(
+    intent: EditIntent = "replace",
+    name = this.scene.trackData.track.name,
+  ) {
+    this.intent = intent;
+    this.canvas.setAttribute(
+      "aria-label",
+      intent === "create"
+        ? "新建赛道，原有赛道保留，R 重画，Enter 保存新赛道，Esc 取消"
+        : `编辑当前赛道“${name.trim() || "未命名赛道"}”，保存将替换当前赛道路线，取消不会影响原赛道，R 重画，Enter 保存修改并试跑，Esc 取消`,
+    );
     this.previous = {
       track: this.scene.trackData.track,
       car: { ...this.scene.car },
@@ -98,15 +110,12 @@ export class TrackEditor {
     this.previous = null;
     this.scene.onChange();
   }
-  accept(): Track | null {
-    if (!this.candidate) return null;
-    const track = this.candidate;
+  finish() {
     this.release();
-    this.scene.setTrack(track);
     this.scene.restoreCar();
     this.canvas.hidden = true;
     this.previous = null;
-    return track;
+    this.candidate = null;
   }
   private point(e: PointerEvent): Point {
     const r = this.canvas.getBoundingClientRect();
@@ -169,7 +178,9 @@ export class TrackEditor {
       this.scene.preview(result.track);
       this.ctx.clearRect(0, 0, WORLD.width, WORLD.height);
       this.onStatus(
-        "赛道画好了！按 Enter 试跑，或按 R 重新绘制。",
+        this.intent === "create"
+          ? "赛道画好了！按 Enter 保存新赛道，或按 R 重新绘制。"
+          : "路线画好了！按 Enter 保存修改并试跑，或按 R 重新绘制。",
         true,
         "success",
       );

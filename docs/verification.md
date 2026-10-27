@@ -113,3 +113,66 @@
 基准为当前机器 Windows x64 / i5-12400F / Node 26.4.0 / Chromium 141.0.7390.37。真实 localStorage 的“刷新成绩并写入”中位数：20×350 点 **236.3→3.9 ms**，20×900 点 **1495.6→10.8 ms**；不可信 JSON 的 20×900 点解析仍为 **487.4→492.7 ms**，继续严格校验。Node 基准对应 **234.851→3.503 ms**、**1505.935→8.979 ms**。每项一次预热、5 次样本，测量不包含游戏渲染竞争，不承诺所有设备帧预算；完整表格、安全边界和复现命令见 [storage-performance.md](storage-performance.md)。
 
 截图和既有游戏报告继续位于 `test-results/`，未改产品图片或新增运行时调试入口。另执行技能附带通用无头客户端，短按键序列退出码 0、无错误日志，截图为 `test-results/game-client-review/shot-0.png`；已读取它与完整有效圈截图进行检查。性能原始样本位于 `test-results/storage-performance/`。Mac、其他浏览器及声音听感本轮未评估。
+
+## P1-02：赛道本最小可用流程
+
+验证日期：2026-10-27。环境为 macOS arm64、Node.js 22.22.3、Playwright 1.56.1，使用独立无头 Chromium。基线为 `master` 的 P1-01 合并提交 `6356036d`；开发分支为 `feat/p1-02-trackbook-flow`。状态转换与失败策略在实现前写入 [trackbook-flow.md](trackbook-flow.md)，随后逐项加入控制层测试并实现。
+
+`trackbook.ts` 协调新建/编辑意图、纯 Save 候选、持久化和场景提交；`trackbook-ui.ts` 提供文字列表、改名及删除确认。新建保存新 UID 后进入 ready，切换或删除活动条目也回到 ready；重命名与删除非活动条目不重建场景。取消恢复车位和圈速，不写盘；新建失败保留有效草稿。现有编辑、静音和纪录的存储受限试玩语义保留。
+
+9 项控制层单测覆盖同几何独立 UID、取消、重选无副作用、先保存后提交、严格管理失败保留旧数据、替换时保留名称/历史、确认删除和最后一条保护、元数据不重建场景、20 条上限，以及写盘前/后的渲染失败恢复。原有 44 项包含缓存突变安全、V1 原文保护、Save V2 归属和 20×350/900 点性能回归。
+
+`test:trackbook` 通过真实鼠标创建 B，反复 A/B 切换及刷新；检查正确中心线、起点、零计时、车辆、越界、特效、held keys 和目标纪录，并读取实际引擎增益确认切换后静音。还覆盖非法/重复名称、输入框键盘隔离、编辑与新建取消、无效草稿、R/Enter/Esc、删除确认/取消、活动与非活动删除、损坏 V2、配额、存储拒绝、20 条上限和历史空名显示回退。浏览器在 Canvas API 边界注入异常：准备失败不写盘，提交失败停止游戏循环、隐藏坏画面，经按钮重新加载已保存条目；不开放游戏状态写入接口。
+
+新增的真实键盘用例复现了新建保存后焦点移到开始按钮、长按 Enter 会立即起跑的问题。修复为焦点留在游戏区域，重复键不会启动驾驶；新建按钮、成功提示与无障碍标签明确写“保存”，编辑当前仍使用“试跑”。
+
+所有浏览器检查通过 `PAPERLAP_URL=http://127.0.0.1:4174` 指向生产预览，明确 `headless: true`，清除继承的 PWDEBUG，使用独立上下文和页面键鼠 API。没有接管个人浏览器、激活窗口、发送系统输入或自动打开报告。截图保存在文件中，已读取检查赛道本三种尺寸中的 900×700 画面；完整纸片抽屉和缩略图仍留在 P1-03。
+
+未修改 `save.ts`、`storage.ts`、`geometry.ts`、`vehicle.ts`、`laps.ts`、`config.ts` 或 RULES_VERSION。存档格式、迁移与性能缓存不变，没有跨标签合并协议。极少见的写盘后渲染错误采用已保存数据重新加载，不保证保留本次未保存的试玩变化。声音自动化检查状态与增益，听感和其他浏览器尚未人工验证。
+
+| 命令 | 最终结果 |
+| --- | --- |
+| `npm run typecheck` | 通过 |
+| `npm test` | 53/53：原有 44 项、控制层新增 9 项 |
+| `npm run build` | 通过；保留既有 Phaser chunk 超过 500 kB 提示 |
+| `npm run test:trackbook` | 13/13，包含长按 Enter、实际引擎增益与两阶段 Canvas 故障 |
+| `npm run test:storage` | 7/7 |
+| `npm run test:browser` | 15/15，含真实键盘完整有效圈与纪录刷新 |
+| `npm run test:handling` | 4/4，含连续两圈较快驾驶与旧规则纪录保留 |
+| `npm run test:editor` | 9/9，新增意图接入后复跑通过 |
+| 源码/专项测试 Prettier、`git diff --check` | 通过 |
+
+五套无头浏览器共 48 项检查，控制台错误均为 0；收集失败资源请求的四套均为 0。所有任务创建的浏览器和上下文已正常关闭；开发与生产预览服务在验证后关闭。报告为 `test-results/trackbook/report.json`、`test-results/storage/report.json`、`test-results/browser-report.json`、`test-results/handling-report.json`、`test-results/editor/report.json`，三种尺寸赛道本截图为 `test-results/trackbook/list-*.png`。测试产物保留在 Git 忽略目录，不替换已有产品截图。
+
+本轮修改 13 个文件：新增 `src/game/trackbook.ts`、`src/game/trackbook-ui.ts`、`tests/trackbook.test.ts`、`tests/trackbook-browser.mjs`、`docs/trackbook-flow.md`；修改 `src/main.ts`、`src/game/editor.ts`、`src/game/scene.ts`、`src/style.css`、`package.json`、`README.md`、`docs/storage-v2.md`、本验收文档。
+
+## PR #4 试玩评审修复：名称层级与画面遮挡
+
+2026-10-27，继续在 `feat/p1-02-trackbook-flow` 处理 [用户 Code Review](https://github.com/muddyrain/paperlap/pull/4#pullrequestreview-5661649265)，基线为 `3826723`。只调整表现层、文案与相应浏览器检查；`trackbook.ts`、Save V2、存储/迁移/性能缓存、场景、车辆、几何和圈速规则均未修改。
+
+- 左上纸片主标题为“当前赛道：名称”，“自由试跑”缩为次要信息。名称限制在独立宽度内省略显示，DOM 保留全文，支持键盘聚焦和悬停 title；切换、改名及删除活动条目沿用现有同步入口。赛道本入口移到右上。
+- 成功、警告与新纪录反馈缩为右上边缘纸条，新纪录保留星标和轻微出现动画，遵循 reduced motion。准备和暂停操作移到页脚纸条；准备状态也不再生成中央卡片，避免新建保存后重新遮住道路。车辆、计时冻结和显式开始/恢复行为不变。
+- 新建顶部持续说明“将保存为独立赛道，原有赛道保留”，主按钮“保存新赛道”；编辑顶部显示“编辑当前赛道”、目标名称、“保存将替换当前赛道路线，取消不会影响原赛道”，主按钮“保存修改并试跑”。同步 title、aria-label、Canvas 标签及 Enter 成功提示。绘图初始说明移到顶部，校验和错误信息位于底部操作区，画布中心留空。
+
+`test:trackbook` 保留原 13 项，新增三种桌面尺寸（1366×768、1280×800、900×700）的 UX 场景及一个真实有效圈新纪录场景。通过实际 UI 改名验证短名称、40 字长名称、省略与全文 title、主次字号及计时器间隔；通过真实键鼠验证暂停冻结、新建/编辑意图及 Enter/R/Esc、取消不写盘、新建保存后 ready。对准备、暂停、通知区域直接计算与道路/车辆的距离，检查初始绘图说明全部位于绘制边界上方。新纪录通过外部只读遥测和真实键盘驾驶触发，没有向游戏状态写值或伪造印章。
+
+原始截图位于 `test-results/trackbook/ux-*.png`：每种尺寸各有 HUD、暂停、编辑、新建、新建保存五张，另有 `ux-record-900.png`，共 16 张。选取不同尺寸与状态的画面放入 `docs/screenshots/p1-02-ux-*.png` 供 PR 评审。
+
+新增检查先复现了编辑界面缺少明确标题/覆盖说明的问题；接入后又发现改名不重建场景，Canvas 标签从场景取名会沿用旧名称。现在由活动条目向编辑器传入仅用于标签的名称，保留场景和赛道管理规则。长名称测试同时核对视觉目标名称和 Canvas 全文标签。
+
+| 检查 | 结果 |
+| --- | --- |
+| `npm run typecheck`、`npm run build` | 通过，保留既有 Phaser chunk 大小提示 |
+| `npm test` | 53/53，含缓存安全和 20×350/900 点性能回归 |
+| `npm run test:trackbook` | 17/17，保留原 13 项并新增 4 项 UX 场景 |
+| `npm run test:storage` / `test:editor` / `test:browser` / `test:handling` | 7/7、9/9、15/15、4/4 |
+| 改动源码/测试 Prettier、`git diff --check` | 通过 |
+
+五套浏览器共 52 项，控制台错误为 0；收集失败请求的四套均为 0。全部使用隔离无头 Chromium，测试浏览器、上下文和本任务服务均已关闭。已读取检查全部六张入库截图：
+
+- [1366×768：长赛道名 HUD](screenshots/p1-02-ux-hud-1366.png)
+- [1280×800：暂停](screenshots/p1-02-ux-paused-1280.png)
+- [900×700：编辑当前赛道](screenshots/p1-02-ux-edit-900.png)
+- [900×700：新建赛道](screenshots/p1-02-ux-new-900.png)
+- [900×700：新建保存与 ready](screenshots/p1-02-ux-saved-900.png)
+- [900×700：真实有效圈新纪录](screenshots/p1-02-ux-record-900.png)

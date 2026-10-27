@@ -63,20 +63,28 @@ export class RaceScene extends Phaser.Scene {
     this.onChange();
   }
   setTrack(track: Track) {
-    this.trackData = derive(track);
-    this.reset();
-    if (this.roadImage) {
-      this.textures.remove("road");
-      this.textures.addCanvas("road", roadArt(this.trackData));
-      this.roadImage
-        .setTexture("road")
-        .setDisplaySize(WORLD.width, WORLD.height);
-      this.textures.remove("scenery");
-      this.textures.addCanvas("scenery", sceneryArt(this.trackData));
-      this.scenery
-        .setTexture("scenery")
-        .setDisplaySize(WORLD.width, WORLD.height);
-    }
+    this.prepareTrack(track)();
+  }
+  prepareTrack(track: Track): () => void {
+    const data = derive(track);
+    const road = this.roadImage ? roadArt(data) : null;
+    const scenery = this.roadImage ? sceneryArt(data) : null;
+    return () => {
+      this.trackData = data;
+      this.reset();
+      if (road && scenery) {
+        this.textures.remove("road");
+        this.textures.addCanvas("road", road);
+        this.roadImage
+          .setTexture("road")
+          .setDisplaySize(WORLD.width, WORLD.height);
+        this.textures.remove("scenery");
+        this.textures.addCanvas("scenery", scenery);
+        this.scenery
+          .setTexture("scenery")
+          .setDisplaySize(WORLD.width, WORLD.height);
+      }
+    };
   }
   reset() {
     this.car = spawn(this.trackData);
@@ -85,6 +93,8 @@ export class RaceScene extends Phaser.Scene {
     this.stepper.reset();
     this.offroad = false;
     this.trail = [];
+    this.effectClock = 0;
+    this.effects?.clear();
     this.onChange();
   }
   pause() {

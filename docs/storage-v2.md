@@ -81,7 +81,7 @@ interface Save {
 - `getItem`、`setItem` 或访问 `window.localStorage` 失败：捕获异常，不影响现有驾驶、暂停或编辑。已成功持久化的 V2 不被删除；内存中的新结果可能在刷新后丢失，界面明确提示。
 - 旧几何或旧规则成绩累积到上限：拒绝新增纪录，保留全部已有有效内容；本轮不提供清理历史成绩的 UI。
 
-当前 `main.ts` 只使用一个活动条目，编辑会替换该条目几何，不自动新增条目；这样保持当前单赛道视觉和操作流程。数据层已支持多个条目，但本轮没有赛道列表、命名/删除交互、缩略图、幽灵车或云同步。localStorage 按 origin 隔离；没有跨标签页合并协议，多标签页同时修改仍采用最后一次成功写入，建议只在一个标签页游戏。
+P1-02 通过 `trackbook.ts` 接入新建、切换、改名和删除，以及最小文字列表。管理命令先写入候选 Save，成功才提交内存及场景；新建写入失败保留草稿。编辑当前条目沿用未保存仍可试玩的行为。详细状态转换和渲染异常恢复见 [trackbook-flow.md](trackbook-flow.md)。Save V2 模型、V1 保护和验证缓存保持不变。localStorage 按 origin 隔离；没有跨标签页合并协议，多标签页同时修改仍采用最后一次成功写入，建议只在一个标签页游戏。
 
 ## 验证入口
 
@@ -94,6 +94,7 @@ npm run test:storage
 npm run test:browser
 npm run test:handling
 npm run test:editor
+npm run test:trackbook
 ```
 
 单测覆盖纯函数与模拟存储失败；`test:storage` 验证真实 localStorage 的初始化、V1 迁移、V1 原文保留、改线/双 UID 成绩、损坏 V2、配额异常与受限存储下继续驾驶。浏览器报告位于 `test-results/storage/report.json`。完整结果参见 [verification.md](verification.md)。
