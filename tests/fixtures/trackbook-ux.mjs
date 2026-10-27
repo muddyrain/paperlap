@@ -365,12 +365,12 @@ export async function verifyTrackbookUX(h) {
         duration: dialog.getAnimations()[0]?.effect.getTiming().duration,
       };
     });
-    assert.deepEqual(opened, { state: "opening", duration: 220 });
+    assert.deepEqual(opened, { state: "opening", duration: 300 });
     // Capture a deterministic midpoint, then let the real animation finish.
     await page.locator("#trackbook").evaluate((el) => {
       for (const animation of el.getAnimations()) {
         animation.pause();
-        animation.currentTime = 110;
+        animation.currentTime = 150;
       }
     });
     await page.screenshot({ path: `${output}drawer-opening-1366.png` });
@@ -388,12 +388,17 @@ export async function verifyTrackbookUX(h) {
             cancelable: true,
           }),
         );
-        return document.querySelector("#trackbook").dataset.motion;
+        return document.querySelector("#trackbook").open;
       });
-    assert.equal(closing, "closing");
-    await page.keyboard.press("ArrowUp"); // A new operation cancels exit.
-    await page.waitForTimeout(260);
-    assert.equal(await page.locator("#trackbook").isVisible(), true);
+    assert.equal(
+      closing,
+      false,
+      "modal closes immediately; only inert paper exits",
+    );
+    assert.equal(await focus(page), "game");
+    await page.keyboard.press("t"); // Reopen while the old visual exits.
+    await settled(page);
+    await page.keyboard.press("ArrowUp");
     assert.equal(await focus(page), a.uid);
     await page.keyboard.press("Escape");
     await hidden(page);
@@ -405,7 +410,7 @@ export async function verifyTrackbookUX(h) {
       "true",
     );
     await page.keyboard.press("Escape");
-    await page.emulateMedia({ reducedMotion: "reduce" }); // Changing preference completes a pending close.
+    await page.emulateMedia({ reducedMotion: "reduce" }); // Changing preference removes an exiting visual immediately.
     await hidden(page);
     assert.equal(await focus(page), "game");
     await page.keyboard.press("t");
@@ -436,7 +441,7 @@ export async function verifyTrackbookUX(h) {
     await page.keyboard.press("Escape");
     assert.equal(await page.locator("#trackbook").isVisible(), false);
     check(
-      "220/200ms drawer transitions cancel safely on new input, rapid reopen retains focus, reduced motion removes animations including during close",
+      "300/180ms drawer presentation never delays modal close, rapid reopen retains focus, reduced motion removes animations including during exit",
     );
   });
 
@@ -480,8 +485,22 @@ export async function verifyTrackbookUX(h) {
     assert.match(await page.locator("#trackbook-status").innerText(), /20/);
     assert.equal(await read(page), old);
     assert.deepEqual(await page.locator("#game canvas").boundingBox(), canvas);
+    await page.keyboard.press("ArrowUp");
+    const scrollAtExit = await page
+      .locator("#track-list")
+      .evaluate((el) => el.scrollTop);
+    assert.ok(scrollAtExit > 0);
+    await page.keyboard.press("Escape");
+    assert.equal(await page.locator("#trackbook").isVisible(), false);
+    assert.equal(
+      await page
+        .locator('.motion-echo [data-echo-id="track-list"]')
+        .evaluate((el) => el.scrollTop),
+      scrollAtExit,
+      "exiting paper keeps the last visible cards",
+    );
     check(
-      "20 long-name cards scroll internally, arrow navigation wraps, full names remain accessible, N explains cap without changing canvas/save",
+      "20 long-name cards scroll internally, exit keeps scroll position, arrows wrap, full names stay accessible, N explains cap without changing canvas/save",
     );
   });
 

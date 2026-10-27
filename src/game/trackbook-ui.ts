@@ -1,3 +1,4 @@
+import type { GameMotion } from "./game-motion";
 import { activeTrack, recordKey, SAVE_LIMITS, type TrackEntry } from "./save";
 import { Trackbook, trackbookMessage, type CommandResult } from "./trackbook";
 import { shortcut, shortcutTarget, ignoresShortcuts } from "./shortcuts";
@@ -14,19 +15,18 @@ export class TrackbookView {
   private target = "";
   private view: "list" | "rename" | "delete" = "list";
   private returnFocus: HTMLElement | null = null;
-  private motion: Animation | null = null;
-  private closing = false;
   private blockCancel = false;
-  private reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   constructor(
     private book: Trackbook,
     container: HTMLElement,
     private hooks: {
       create: () => CommandResult;
-      change: (action: Operation) => void;
+      beforeSelect: () => HTMLCanvasElement | null;
+      change: (action: Operation, sheet?: HTMLCanvasElement | null) => void;
       open: () => void;
       close?: () => boolean;
     },
+    private motion: GameMotion,
   ) {
     this.dialog = document.createElement("dialog");
     this.dialog.id = "trackbook";
@@ -63,7 +63,6 @@ export class TrackbookView {
       )
         this.backOrClose();
     });
-    this.reduced.addEventListener("change", this.motionPreference);
     this.dialog
       .querySelectorAll<HTMLButtonElement>("[data-back]")
       .forEach((button) => {
@@ -95,17 +94,8 @@ export class TrackbookView {
     return this.dialog.querySelector<T>(`#${id}`)!;
   }
   private settle() {
-    this.motion?.cancel();
-    this.motion = null;
-    this.closing = false;
-    this.dialog.dataset.motion = "open";
+    this.motion.settleOverlay(this.dialog);
   }
-  private motionPreference = () => {
-    if (!this.reduced.matches) return;
-    const closing = this.closing;
-    this.settle();
-    if (closing) this.finishClose();
-  };
   open() {
     if (this.book.reloadRequired || this.book.intent) return;
     this.settle();
@@ -121,29 +111,14 @@ export class TrackbookView {
       document
         .getElementById("trackbook-open")
         ?.setAttribute("aria-expanded", "true");
-      if (!this.reduced.matches) {
-        this.dialog.dataset.motion = "opening";
-        const motion = this.dialog.animate(
-          [
-            { transform: "translateX(32px)", opacity: 0.5 },
-            { transform: "translateX(0)", opacity: 1 },
-          ],
-          { duration: 220, easing: "cubic-bezier(.16,1,.3,1)" },
-        );
-        this.motion = motion;
-        void motion.finished.then(
-          () => {
-            if (this.motion === motion) this.settle();
-          },
-          () => {},
-        );
-      }
+      this.motion.overlayOpen(this.dialog, true);
     }
     this.focusRow();
   }
   private finishClose(restore = true) {
     this.settle();
     if (!this.dialog.open) return;
+    this.motion.overlayClose(this.dialog, true);
     this.dialog.close();
     if (restore && this.hooks.close?.()) return;
     if (restore && this.returnFocus?.isConnected)
@@ -156,28 +131,9 @@ export class TrackbookView {
       this.focusRow(this.target);
       return;
     }
-    if (this.closing || this.reduced.matches) {
-      this.finishClose();
-      return;
-    }
-    this.settle();
-    this.closing = true;
-    this.dialog.dataset.motion = "closing";
-    const motion = this.dialog.animate(
-      [
-        { transform: "translateX(0)", opacity: 1 },
-        { transform: "translateX(32px)", opacity: 0 },
-      ],
-      { duration: 200, easing: "ease-in" },
-    );
-    this.motion = motion;
-    void motion.finished.then(
-      () => {
-        if (this.motion === motion && this.dialog.open) this.finishClose();
-      },
-      () => {},
-    );
+    this.finishClose();
   }
+
   private keydown = (event: KeyboardEvent) => {
     event.stopPropagation();
     this.blockCancel = ignoresShortcuts(event) || event.repeat;
@@ -244,10 +200,16 @@ export class TrackbookView {
       "Esc",
     );
     this.get("trackbook-status").textContent = "";
+    if (this.dialog.open) this.motion.overlayOpen(this.dialog, true, true);
   }
   private status(message: string, kind: "error" | "success") {
     this.get("trackbook-status").textContent = message;
     this.get("trackbook-status").dataset.kind = kind;
+    this.motion.emphasize(
+      "book-status",
+      this.get("trackbook-status"),
+      kind === "error" ? "error" : "saved",
+    );
   }
   private create() {
     this.settle();
@@ -262,7 +224,11 @@ export class TrackbookView {
       this.status(trackbookMessage(result.error), "error");
     }
   }
-  private run(result: CommandResult, action: Operation): boolean {
+  private run(
+    result: CommandResult,
+    action: Operation,
+    sheet?: HTMLCanvasElement | null,
+  ): boolean {
     if (!result.ok) {
       this.status(trackbookMessage(result.error), "error");
       return false;
@@ -270,7 +236,13 @@ export class TrackbookView {
     if (!result.changed) return true;
     this.render();
     this.show("list");
-    this.hooks.change(action);
+    this.hooks.change(action, sheet);
+    if (action === "select")
+      this.motion.emphasize(
+        "selected",
+        this.dialog.querySelector("[aria-current]"),
+        "saved",
+      );
     this.status(
       {
         select: "已使用该赛道，关闭赛道本后开始试跑。",
@@ -327,7 +299,8 @@ export class TrackbookView {
       use.onclick = () => {
         this.settle();
         this.target = entry.uid;
-        this.run(this.book.select(entry.uid), "select");
+        const sheet = current ? null : this.hooks.beforeSelect();
+        this.run(this.book.select(entry.uid), "select", sheet);
         this.focusRow(entry.uid);
       };
       row.append(use);
@@ -365,7 +338,6 @@ export class TrackbookView {
   }
   destroy() {
     this.settle();
-    this.reduced.removeEventListener("change", this.motionPreference);
     this.dialog.removeEventListener("keydown", this.keydown);
     this.dialog.close();
     this.dialog.remove();

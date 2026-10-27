@@ -1,3 +1,4 @@
+import type { GameMotion } from "./game-motion";
 import { MenuState } from "./menu-state";
 import { shortcut, shortcutTarget, ignoresShortcuts } from "./shortcuts";
 import { buttonContent } from "./ui";
@@ -37,6 +38,7 @@ export class GameMenu {
     private container: HTMLElement,
     private game: HTMLElement,
     private hooks: Hooks,
+    private motion: GameMotion,
   ) {
     this.dialog = document.createElement("dialog");
     this.dialog.id = "game-menu";
@@ -73,6 +75,7 @@ export class GameMenu {
       this.get("menu-status").textContent = saved
         ? "声音设置已保存。"
         : "声音设置未能保存，本次仍可使用。";
+      this.motion.emphasize("menu-sound", this.get("menu-sound"));
     };
     this.get("menu-controls").onclick = () => {
       this.state.controls();
@@ -99,6 +102,7 @@ export class GameMenu {
     return this.dialog.querySelector<HTMLElement>(`#${id}`)!;
   }
   private hide() {
+    this.motion.overlayClose(this.dialog);
     this.dialog.close();
     this.container.classList.remove("menu-open");
     document.getElementById("pause")?.setAttribute("aria-expanded", "false");
@@ -109,6 +113,7 @@ export class GameMenu {
       this.block();
       return;
     }
+    const child = this.dialog.open;
     const context = this.hooks.context(),
       layer = this.state.layer;
     this.get("menu-home").hidden = layer !== "menu";
@@ -148,6 +153,7 @@ export class GameMenu {
     if (!this.dialog.open) this.dialog.showModal();
     document.getElementById("pause")?.setAttribute("aria-expanded", "true");
     this.get(focus).focus({ preventScroll: true });
+    this.motion.overlayOpen(this.dialog, false, child);
   }
   private soundUI() {
     const muted = this.hooks.context().muted;

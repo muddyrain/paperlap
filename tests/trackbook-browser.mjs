@@ -548,7 +548,7 @@ try {
     );
   });
 
-  for (const stage of ["prepare", "apply"])
+  for (const stage of ["capture", "prepare", "apply"])
     await isolated(async (page) => {
       await seed(page, ab);
       await open(page);
@@ -558,11 +558,13 @@ try {
         const failCanvasOnce = () => {
           const get = HTMLCanvasElement.prototype.getContext;
           HTMLCanvasElement.prototype.getContext = function (...args) {
+            const visual = this.classList.contains("motion-sheet");
+            if ((stage === "capture") !== visual) return get.apply(this, args);
             HTMLCanvasElement.prototype.getContext = get;
             throw Error("injected canvas failure");
           };
         };
-        if (stage === "prepare") failCanvasOnce();
+        if (stage !== "apply") failCanvasOnce();
         else {
           const set = Storage.prototype.setItem;
           Storage.prototype.setItem = function (key, value) {
@@ -575,7 +577,20 @@ try {
       await row(page, ab.tracks[0].uid)
         .locator('[data-action="select"]')
         .click();
-      if (stage === "prepare") {
+      if (stage === "capture") {
+        assert.match(
+          await page.locator("#trackbook-status").innerText(),
+          /已使用/,
+        );
+        assert.equal((await state(page)).activeTrackUid, ab.tracks[0].uid);
+        assert.equal((await state(page)).mode, "ready");
+        assert.equal(
+          JSON.parse(await read(page)).activeTrackUid,
+          ab.tracks[0].uid,
+        );
+        assert.equal(await page.locator(".motion-sheet").count(), 0);
+        await close(page);
+      } else if (stage === "prepare") {
         assert.match(
           await page.locator("#trackbook-status").innerText(),
           /画面准备失败/,

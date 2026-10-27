@@ -41,7 +41,7 @@ npm run preview
 
 ![真实路线卡片与快捷键](docs/screenshots/p1-03-drawer-1366.png)
 
-抽屉约 220ms 打开、200ms 关闭；卡片悬停、按钮按压和边缘纸贴提供轻量反馈。选择成功才更新标记与反馈，失败保留旧画面。系统设置“减少动态效果”时取消动效。当前 Esc 菜单、草稿确认与返回链见 [游戏菜单规则](docs/game-menu.md)，赛道本细节见 [交互规则](docs/trackbook-interactions.md)。
+菜单与抽屉采用有层次的纸片落位，退出更快；编辑/新建通过独立纸页交接，触笔立即收走旧页。按钮按下/释放、键盘细描边、卡片选中与纪录印章各有明确反馈。真实状态和焦点立即更新，不等待动效；选择/保存成功后才庆祝。系统“减少动态效果”首次生效或运行中改变时立即收敛。统一节奏和完整操作盘点见 [Motion Spec](docs/game-motion.md)。当前 Esc 菜单、草稿确认与返回链见 [游戏菜单规则](docs/game-menu.md)，赛道本细节见 [交互规则](docs/trackbook-interactions.md)。
 
 ## 存档
 
@@ -75,6 +75,8 @@ npm run test:trackbook
 
 `test:menu` 检查 ready/running/paused 的 Esc、Space 快捷暂停、菜单/说明/赛道本/编辑返回链、草稿放弃确认、原生按钮、重复键、失焦与存储/场景异常，以及三种桌面尺寸和 reduced-motion。报告及截图在 `test-results/menu/`。
 
+`test:motion` 覆盖菜单/编辑纸页、两种意图、快速路由、输入方式焦点、失败不庆祝、三尺寸、初始/运行中 reduced-motion、真实有效圈，并在正常/4× CPU 下测量事件处理完成延迟和 rAF 节奏。`PAPERLAP_URL=http://127.0.0.1:4175 npm run record:motion` 同时录制六段实际 WebM，生成 `test-results/motion/review.html`（手动打开观看，不自动播放/打开）。关键帧与 JSON 报告也在该目录；录制需先运行构建预览，见 [动效验证](docs/game-motion.md)。
+
 `test:sound` 用真实页面鼠标和键盘验证驾驶中开关声音时计时、车辆、音频增益、持久化与输入保持正常，检查 ready/paused 下 Tab、Enter、Space 的原生行为，并投递窗口/标签生命周期事件验证安全暂停。报告保存在 `test-results/sound/report.json`；不切换系统前台应用。
 
 `test:handling` 检查真实方向输入、连续两圈较快驾驶、急弯前松油以及旧成绩迁移，结果为 `test-results/handling-report.json`，截图为 `test-results/handling-v2.png`。
@@ -102,6 +104,8 @@ npm run test:trackbook
 | `src/game/storage.ts`      | localStorage 加载、受保护写入与失败报告              |
 | `src/game/trackbook.ts`    | 新建/编辑意图、管理命令、候选保存与场景提交协调      |
 | `src/game/trackbook-ui.ts` | 纸片抽屉、路线卡片、改名/删除、分层焦点与可取消动效  |
+| `src/game/game-motion.ts`  | 统一纸片/反馈动效、输入方式呈现与生命周期清理        |
+| `src/game/motion-slots.ts` | 动画资源所有权与旧完成回调隔离                       |
 | `src/game/menu-state.ts`   | 独立菜单层、恢复许可和编辑返回路径                   |
 | `src/game/game-menu.ts`    | 原生菜单 dialog、操作路由、焦点与草稿确认            |
 | `src/game/shortcuts.ts`    | 游戏/绘图/抽屉/菜单的按键上下文和保护规则            |
