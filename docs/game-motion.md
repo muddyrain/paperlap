@@ -4,7 +4,7 @@
 
 ## 统一节奏
 
-- 输入落地：按下立即压缩约 3%、下陷 1px，释放 120ms 回正；焦点描边立即可见，selected 始终由静态边框与文字表达。
+- 输入落地：按下立即压缩约 3%、下陷 1px，释放 120ms 回正；键盘铅笔标记立即可见，selected 始终由静态边框与文字表达。
 - 纸片落位：菜单 300ms，右侧抽屉 300ms，前 65% 完成主要位移，末段只回正约 1% / 0.4°。退出 180ms，干净收走。只用一次轻回正，不循环弹跳。
 - 翻纸交接：编辑进入 380ms、退出 300ms；缓存纹理组成独立视觉纸页，沿纸边揭开，真实 Canvas、世界坐标、尺寸与 hit testing 完全不动。标题/意图/目标名立即出现，笔一落下立刻收掉旧页。
 - 确认与奖励：换轨 320ms，保存 300ms，纪录 460ms；视觉重心在 HUD、卡片和边缘通知，禁止中央大印章、全屏闪白或粒子。
@@ -48,11 +48,11 @@ Esc/T/E/N/R/Enter/Space、后续命令、blur/hidden、resize、reduced-motion �
 
 Issue #8 的 2026-10-27 追加意见已纳入：保留 GameMenu.show 的真实默认 DOM 焦点、安全默认动作和 Tab 环绕。统一输入方式由视觉控制器在捕获阶段读取 pointerdown / 非组合 keydown，不阻止或重新派发输入、不修改菜单状态。
 
-鼠标/触屏只显示 hover 与按压，程序聚焦的按钮不显示突兀焦点框；键盘 Esc 打开、Tab/Shift+Tab 或快捷键返回时，当前按钮显示 1.5px 铅笔蓝描边，外扩 2px（主按钮使用暖灰褐），在 reduce 下同样立即可见。输入框保留细焦点描边。赛道 selected 仍由 aria-current、橙色静态边框与“当前赛道”表达，按下由短暂压缩表达，三者不共用持久状态。
+鼠标/触屏只显示 hover 与按压，程序聚焦的按钮不显示突兀焦点框；键盘 Esc 打开、Tab/Shift+Tab 或快捷键返回时，当前按钮以局部 30×3px 铅笔短线和柔和纸色底标记，主橙色按钮使用浅色铅笔线，在 reduce 下同样立即可见。输入框等非按钮控件保留原焦点描边。赛道 selected 仍由 aria-current、橙色静态边框与“当前赛道”表达，不再随 focus-within 改成蓝框；按下由短暂压缩表达，三者不共用持久状态。
 
 `06-focus-inputs.webm` 与鼠标/键盘截图覆盖两种开法、说明返回、草稿确认、赛道本与重新打开；不全局删除 outline。录像与测量不自动打开用户浏览器。
 
-## 实测与实拍（2026-10-27）
+## 初版 ec8e7da 实测与实拍（2026-10-27）
 
 macOS 15.7.9 arm64、Node.js 22.22.3、Playwright 1.56.1；生产构建，隔离无头 Chromium。下表为同一脚本 20 次菜单 Esc 与 5 次编辑进入/空取消的样本。事件开始在 window capture 记时，结束监听位于真实处理器之后，菜单 stopPropagation 不会绕过测量；下一帧为 rAF 回调代理，不是屏幕呈现时间。reduce 是关闭视觉效果的对照，仍执行相同业务操作。
 
@@ -79,3 +79,5 @@ PAPERLAP_URL=http://127.0.0.1:4175 npm run record:motion
 ```
 
 不需录屏时运行同一路径的 `npm run test:motion`；默认 URL 为本地 5173，可用 PAPERLAP_URL 指向预览。完整回归结果见 [验证记录](verification.md)。
+
+PR #10 最新 Review 修正：按钮不再以完整外轮廓表示键盘焦点。仅游戏内、由既有输入方式追踪管理的按钮使用非封闭替代；全局 fallback 和非按钮 outline 保留。短线使用对比清楚的纸片墨色，forced-colors 下使用系统 Highlight，reduce 下静态可见。`test:focus` 验证鼠标→Esc 返回「我的赛道本」、Tab/Shift+Tab、Enter/Space、说明/草稿/赛道本、三尺寸与高对比模式；`PAPERLAP_FOCUS_BASELINE=1` 仅采集指定旧构建的同路径画面（本次修前为 ec8e7da，必须让 PAPERLAP_URL 指向该提交的构建；环境变量本身不切换代码），不声称修前符合新视觉验收。产物位于 `test-results/focus-review/{before,after}/`，主流程自动隔离无头录制，不打开播放器。

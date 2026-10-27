@@ -41,7 +41,7 @@ npm run preview
 
 ![真实路线卡片与快捷键](docs/screenshots/p1-03-drawer-1366.png)
 
-菜单与抽屉采用有层次的纸片落位，退出更快；编辑/新建通过独立纸页交接，触笔立即收走旧页。按钮按下/释放、键盘细描边、卡片选中与纪录印章各有明确反馈。真实状态和焦点立即更新，不等待动效；选择/保存成功后才庆祝。系统“减少动态效果”首次生效或运行中改变时立即收敛。统一节奏和完整操作盘点见 [Motion Spec](docs/game-motion.md)。当前 Esc 菜单、草稿确认与返回链见 [游戏菜单规则](docs/game-menu.md)，赛道本细节见 [交互规则](docs/trackbook-interactions.md)。
+菜单与抽屉采用有层次的纸片落位，退出更快；编辑/新建通过独立纸页交接，触笔立即收走旧页。按钮按下/释放、键盘铅笔标记、卡片选中与纪录印章各有明确反馈。真实状态和焦点立即更新，不等待动效；选择/保存成功后才庆祝。系统“减少动态效果”首次生效或运行中改变时立即收敛。统一节奏和完整操作盘点见 [Motion Spec](docs/game-motion.md)。当前 Esc 菜单、草稿确认与返回链见 [游戏菜单规则](docs/game-menu.md)，赛道本细节见 [交互规则](docs/trackbook-interactions.md)。
 
 ## 存档
 
@@ -74,6 +74,8 @@ npm run test:trackbook
 也可通过 `PAPERLAP_URL=http://127.0.0.1:4173 npm run test:browser` 验证生产预览。测试会修改自己的隔离浏览器上下文中的存档，不接触日常浏览器数据。自动化截图写入 `test-results/screenshots/`，结果写入 `test-results/browser-report.json`；`docs/screenshots/` 保留交付时选取的截图。
 
 `test:menu` 检查 ready/running/paused 的 Esc、Space 快捷暂停、菜单/说明/赛道本/编辑返回链、草稿放弃确认、原生按钮、重复键、失焦与存储/场景异常，以及三种桌面尺寸和 reduced-motion。报告及截图在 `test-results/menu/`。
+
+`test:focus` 单独检查鼠标、键盘与混合输入的非封闭式焦点、说明/草稿返回、赛道选中分离、三种桌面尺寸和 forced-colors/reduced-motion，保存修后截图及主流程无头录屏到 `test-results/focus-review/`。
 
 `test:motion` 覆盖菜单/编辑纸页、两种意图、快速路由、输入方式焦点、失败不庆祝、三尺寸、初始/运行中 reduced-motion、真实有效圈，并在正常/4× CPU 下测量事件处理完成延迟和 rAF 节奏。`PAPERLAP_URL=http://127.0.0.1:4175 npm run record:motion` 同时录制六段实际 WebM，生成 `test-results/motion/review.html`（手动打开观看，不自动播放/打开）。关键帧与 JSON 报告也在该目录；录制需先运行构建预览，见 [动效验证](docs/game-motion.md)。
 

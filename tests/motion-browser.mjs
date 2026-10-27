@@ -1,3 +1,4 @@
+import { keyboardFocus, pointerFocus } from "./fixtures/focus-feedback.mjs";
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -478,91 +479,73 @@ try {
     "reduce",
   );
   await isolated("06-focus-inputs", async (p) => {
-    const ring = () =>
-      p.evaluate(() => {
-        const el = document.activeElement,
-          css = getComputedStyle(el);
-        return {
-          id: el.id,
-          input: document.querySelector(".board").dataset.input,
-          width: parseFloat(css.outlineWidth),
-          style: css.outlineStyle,
-          color: css.outlineColor,
-        };
-      });
-    const pointerRing = async () => {
-      const r = await ring();
-      assert.equal(r.input, "pointer");
-      assert.ok(
-        r.style === "none" || r.color === "rgba(0, 0, 0, 0)",
-        JSON.stringify(r),
-      );
-    };
-    const keyboardRing = async () => {
-      const r = await ring();
-      assert.equal(r.input, "keyboard");
-      assert.equal(r.style, "solid");
-      assert.ok(r.width > 0 && r.width <= 2);
-      assert.notEqual(r.color, "rgba(0, 0, 0, 0)");
-    };
+    const pointerCue = () => pointerFocus(p);
+    const keyboardCue = () => keyboardFocus(p);
     await p.locator("#pause").click();
     await wait(p);
-    await pointerRing();
+    await pointerCue();
     assert.equal(await focus(p), "menu-continue");
     await p.screenshot({ path: `${output}focus-mouse.png` });
     await p.locator("#menu-controls").click();
     await wait(p);
-    await pointerRing();
+    await pointerCue();
     await p.keyboard.press("Tab");
-    await keyboardRing();
+    await keyboardCue();
     await p.keyboard.press("Shift+Tab");
-    await keyboardRing();
+    await keyboardCue();
     await p.keyboard.press("Enter");
     await wait(p);
-    await keyboardRing();
+    await keyboardCue();
     await p.keyboard.press("Escape");
     await p.keyboard.press("Escape");
     await wait(p);
-    await keyboardRing();
+    await keyboardCue();
     await p.screenshot({ path: `${output}focus-keyboard.png` });
+    await p.locator("#menu-book").click();
+    await wait(p);
+    await pointerCue();
+    await p.keyboard.press("Escape");
+    await wait(p);
+    assert.equal(await focus(p), "menu-book");
+    await keyboardCue();
     await p.keyboard.press("t");
     await wait(p);
-    await keyboardRing();
+    await keyboardCue();
     const selected = await p.locator("[aria-current]").getAttribute("data-uid");
     await p.locator("#new-track").click();
     await wait(p);
     await draw(p);
     await p.locator("#cancel-edit").click();
     await wait(p);
-    await pointerRing();
+    await pointerCue();
     assert.equal(await focus(p), "keep-drawing");
     await p.keyboard.press("Tab");
-    await keyboardRing();
+    await keyboardCue();
     await p.keyboard.press("Shift+Tab");
-    await keyboardRing();
+    await keyboardCue();
     await p.keyboard.press("Escape");
     assert.equal(await p.locator("#drive-drawing").isEnabled(), true);
     await p.locator("#cancel-edit").click();
     await p.locator("#discard-drawing").click();
     await wait(p);
-    await pointerRing();
+    await pointerCue();
     assert.equal(
       await p.locator("[aria-current]").getAttribute("data-uid"),
       selected,
     );
     await p.keyboard.press("Escape");
     await wait(p);
-    await keyboardRing();
+    await keyboardCue();
     await p.locator("#menu-back").click();
     await wait(p);
     await p.locator("#pause").click();
     await wait(p);
-    await pointerRing();
+    await pointerCue();
     await p.keyboard.press("Tab");
-    await keyboardRing();
+    await keyboardCue();
     await p.emulateMedia({ reducedMotion: "reduce" });
     await p.waitForFunction(() => window.paperlapDebug.motion.active === 0);
-    await keyboardRing();
+    await keyboardCue();
     await p.keyboard.press("Escape");
     await settled(p);
     check(

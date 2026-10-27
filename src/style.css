@@ -9,6 +9,8 @@
   --muted: #687479;
   --shadow: 0 3px 5px #58442b24;
   --focus: #3c667c;
+  --focus-wash: #efe1c7;
+  --focus-pencil: #935034;
   --layer-ui: 2;
   --layer-panel: 3;
   --layer-toast: 4;
@@ -1214,9 +1216,6 @@ button:disabled {
   scale: 1;
   translate: 0;
 }
-.board[data-input="keyboard"] .track-card:focus-within {
-  border-color: var(--focus);
-}
 .track-card[aria-current] {
   border-color: var(--accent);
 }
@@ -1306,13 +1305,27 @@ button:disabled {
   line-height: 1.7;
 }
 
-/* Focus is a temporary keyboard location; selection remains the saved track state. */
+/* Game buttons replace the ring with a local pencil mark; other focus outlines remain. */
 .board[data-input="keyboard"] button:focus {
-  outline: 1.5px solid #567184;
-  outline-offset: 2px;
+  position: relative;
+  outline: 0;
+  background-color: var(--focus-wash);
+}
+.board[data-input="keyboard"] button:focus::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  bottom: 3px;
+  width: 30px;
+  height: 3px;
+  background: var(--focus-pencil);
+  clip-path: polygon(0 35%, 94% 0, 100% 55%, 4% 100%);
+  transform: rotate(-1deg);
+  pointer-events: none;
 }
 .board[data-input="keyboard"] button.primary:focus {
-  outline-color: #7c5b42;
+  --focus-pencil: #fff4d8;
+  background-color: #b74422;
 }
 .board[data-input="pointer"] button:focus-visible {
   outline-color: transparent;
@@ -1320,4 +1333,11 @@ button:disabled {
 .trackbook input:focus-visible {
   outline-width: 1.5px;
   outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .board[data-input="keyboard"] button:focus::after {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
 }

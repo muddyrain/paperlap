@@ -330,3 +330,31 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 六段原始 WebM 与便于播放的 MP4 位于 `test-results/motion/`，`review.html` 是手动播放入口，无自动播放或自动打开：菜单 7.24s、编辑/新建与返回 5.52s、有效草稿保存/继续/放弃 39.16s、A/B 6.76s、新纪录 8s、鼠标/键盘焦点 21.64s。新纪录 MP4 从真实驾驶原片末尾截取 8s，未生成假的车辆或圈时；原片保留。录屏无需提交大文件到 Git，可靠重录命令见 Motion Spec。报告：`test-results/motion/report.json`，视频信息：`video-files.json`。
 
 已知限制：最终游戏手感仍需用户亲自试玩；Chromium 自动化和 CPU 降速不能代表 Safari/Firefox、真实低配 GPU 或高刷屏。4× CPU 时编辑恢复/重绘约 149–160ms、最长操作帧约 200–217ms，reduce 对照也存在，本轮保留原场景恢复实现；没有常驻新增动画。草稿仍只在当前页面保留。停在 Code Review，不自动合并。
+
+## PR #10 Review 修复：非封闭式键盘焦点
+
+2026-10-27，按最新 Review `5665212259` / inline `4387294631`，在原分支继续修复。修前基线 `ec8e7da`，先对该提交的生产构建采集相同键鼠路径和视口，再构建修后 CSS 对照。基线采集模式仅检查原有操作语义，不宣称旧的整圈 outline 满足新视觉标准。
+
+产品源码仅修改 `src/style.css`：游戏按钮的键盘焦点改为 30×3px 局部铅笔短线与暖纸色底，主按钮使用浅色笔迹；不再绘制完整外轮廓。去掉赛道卡片的 focus-within 蓝色边框，保留 aria-current 橙框及“当前赛道”。鼠标 hover、按压与释放仍用原来的样式/动画，DOM focus、GameMenu.show、MenuState、GameMotion、返回链和所有保存/驾驶逻辑均未修改。全局 fallback、输入框和非按钮焦点 outline 保留；forced-colors 下笔迹用系统 Highlight，reduce 下静态可见。
+
+测试新增 `tests/focus-browser.mjs`、共用 `tests/fixtures/focus-feedback.mjs`，`package.json` 增加 `test:focus`。`tests/motion-browser.mjs` 的强制 solid outline 断言改为检查可见的局部短线、受限宽高和无封闭外圈，并加入鼠标进入赛道本后 Esc 返回 menu-book 的路径。更新 README / Motion Spec / 本记录及截图，未改其它动效实现。
+
+| 本次验证 | 结果 |
+| --- | --- |
+| `test:focus` | 9/9，含三尺寸、鼠标/键盘/混合输入、selected 独立、原生 Enter/Space、说明/草稿确认、重新打开、reduce 与 forced-colors |
+| `npm test` | 63/63 |
+| `test:motion` / `test:menu` / `test:sound` | 14/14、13/13、4/4；本次受影响浏览器检查合计 40/40，控制台错误与失败请求均为 0 |
+| typecheck / build / 源码测试与规范格式 / diff whitespace | 全部通过 |
+
+两次采集均为独立 headless Chromium、明确 headless: true、清除 PWDEBUG、浏览器静音；截图与录屏使用真实页面键鼠，不激活系统应用。修前/修后录像和报告位于 `test-results/focus-review/{before,after}/`，不将大型视频入库。原完整 93 项回归属于 ec8e7da 的交付记录；本次按 CSS 焦点范围运行上述受影响套件。
+
+| 同视口实际画面 | 修前 | 修后 |
+| --- | --- | --- |
+| 鼠标打开菜单 1366×768 | [修前](screenshots/p1-04b-focus-mouse-menu-before.png) | [修后](screenshots/p1-04b-focus-mouse-menu-after.png) |
+| Tab 到“我的赛道本” | [修前](screenshots/p1-04b-focus-keyboard-menu-before.png) | [修后](screenshots/p1-04b-focus-keyboard-menu-after.png) |
+| 鼠标点赛道本 → Esc 返回 | [修前](screenshots/p1-04b-focus-mixed-return-before.png) | [修后](screenshots/p1-04b-focus-mixed-return-after.png) |
+| 焦点与选中赛道分离 | [修前](screenshots/p1-04b-focus-keyboard-book-before.png) | [修后](screenshots/p1-04b-focus-keyboard-book-after.png) |
+
+其它实拍：[说明页](screenshots/p1-04b-focus-keyboard-controls-after.png)、[草稿确认](screenshots/p1-04b-focus-keyboard-discard-after.png)、[1280×800](screenshots/p1-04b-focus-keyboard-1280-after.png)、[900×700](screenshots/p1-04b-focus-keyboard-900-after.png)、[forced-colors](screenshots/p1-04b-focus-forced-colors-after.png)。同路径短录屏见本地 before/after 的 `focus-flow.webm` / `focus-flow.mp4`（14.12s / 15.00s），另有 `test-results/focus-review/compare.html` 手动播放对照页。也刷新原 P1-04B 的交付截图为新焦点，避免旧轮廓被误认成修后；没有改变其它动效实现。测试浏览器、上下文和本任务预览服务均已释放。
+
+复现修后：构建并启动 `npm run preview -- --port 4175 --strictPort`，在另一终端执行 `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:focus`。修前对照需要让 URL 指向旧提交构建，再设置 `PAPERLAP_FOCUS_BASELINE=1`；该变量不会切换源码。保持 Code Review，等待用户视觉验收，不自动合并。
