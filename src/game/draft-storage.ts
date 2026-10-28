@@ -1,7 +1,6 @@
 import { ROAD, WORLD } from "./config";
-import { parseSave } from "./save";
+import { readTrackFingerprint, STORAGE_KEY } from "./storage";
 import {
-  draftSource,
   sameSource,
   type DraftCheckpoint,
   type DraftSnapshot,
@@ -111,18 +110,11 @@ export class DraftStorage {
     this.document = null;
     try {
       this.expected = this.storage.getItem(DRAFT_KEY);
-      this.official = this.storage.getItem("paperlap.save.v2");
+      this.official = this.storage.getItem(STORAGE_KEY);
       this.document = parse(this.expected);
       if (!this.document || !source(s)) return { ok: false, error: "invalid" };
-      const official = parseSave(this.official);
-      if (
-        official &&
-        (!official.tracks.some((e) => e.uid === s.uid) ||
-          !sameSource(
-            s,
-            draftSource({ ...official, activeTrackUid: s.uid }, s.intent),
-          ))
-      ) {
+      const official = readTrackFingerprint(this.storage, this.official, s.uid);
+      if (official.valid && official.fingerprint !== s.fingerprint) {
         this.document = null;
         this.failure = "conflict";
         return { ok: false, error: "conflict" };
@@ -151,8 +143,7 @@ export class DraftStorage {
     try {
       if (
         this.storage.getItem(DRAFT_KEY) !== this.expected ||
-        (!committed &&
-          this.storage.getItem("paperlap.save.v2") !== this.official)
+        (!committed && this.storage.getItem(STORAGE_KEY) !== this.official)
       )
         return { ok: false, error: "conflict" };
       const raw = JSON.stringify({ schemaVersion: 1, entries });

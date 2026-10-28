@@ -2,7 +2,7 @@
 
 基线 master `ac678a6`，实现 [Issue #7](https://github.com/muddyrain/paperlap/issues/7)。本轮只有静态纸片菜单及可靠状态/焦点，完整动效留给 #8。
 
-P1-05A 补充：R 清空后只要仍有可撤销笔迹，就仍算有草稿，Esc 必须确认放弃。放弃须先清理对应独立备份，失败留在编辑；“暂不处理”保留备份并沿原入口返回。下表“不写盘”均指正式 Save V2；独立恢复弹窗和备份生命周期见 [草稿安全](draft-safety.md)。
+P1-05A 补充：R 清空后只要仍有可撤销笔迹，就仍算有草稿，Esc 必须确认放弃。已确认备份的放弃须先可靠清理，失败留在编辑；初始备份无法确认时，确认页可“仅放弃本次绘制”并返回，不删除任何未知旧备份；“暂不处理”保留备份并沿原入口返回。下表“不写盘”均指正式 Save V2；独立恢复弹窗和备份生命周期见 [草稿安全](draft-safety.md)。
 
 赛车仍使用 ready / running / paused / editing；独立 MenuState 管理 none / menu / controls / trackbook / discard，不改变模拟时间和存档语义。
 

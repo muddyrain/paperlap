@@ -313,9 +313,14 @@ try {
     await isolated(async (p) => {
       await enter(p);
       await draw(p, wobblyLoop().slice(0, 75), async () => {
-        if (interruption === "resize")
+        if (interruption === "resize") {
           await p.setViewportSize({ width: 1280, height: 800 });
-        else if (interruption === "blur")
+          // Viewport emulation acknowledges before the native resize event.
+          // Keep the pointer down until the editor actually observes it.
+          await p.waitForFunction(
+            () => window.paperlapDebug.draft.phase === "interrupted",
+          );
+        } else if (interruption === "blur")
           await p.evaluate(() => window.dispatchEvent(new Event("blur")));
         else
           await p

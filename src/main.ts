@@ -149,6 +149,7 @@ const menu = new GameMenu(
     book: () => trackbook.open(),
     edit: applyEdit,
     draft: () => editor.hasDraft,
+    memoryOnlyDiscard: () => drafts.memoryOnlyDiscard,
     interrupt: () => editor.interrupt(),
     cancelEdit,
     focusEditor: () => editor.focus(),

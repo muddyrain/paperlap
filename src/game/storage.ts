@@ -33,6 +33,25 @@ function storageError(error: unknown): StorageError {
     : "unavailable";
 }
 
+// Read-only identity lookup for editor provenance. Reuse only exact bytes that
+// this store already validated via load/write; changed or cold input must pass
+// the same full parseSave checks before it can populate the existing cache.
+export function readTrackFingerprint(
+  storage: SaveStorage,
+  raw: string | null,
+  uid: string,
+): { valid: false } | { valid: true; fingerprint: string | undefined } {
+  if (raw === null) return { valid: false };
+  const save =
+    checkedV2.get(storage) === raw ? (JSON.parse(raw) as Save) : parseSave(raw);
+  if (!save) return { valid: false };
+  checkedV2.set(storage, raw);
+  return {
+    valid: true,
+    fingerprint: save.tracks.find((entry) => entry.uid === uid)?.track.id,
+  };
+}
+
 export function writeSave(storage: SaveStorage, save: Save): WriteResult {
   try {
     const result = validateSave(save);

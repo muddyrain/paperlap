@@ -77,12 +77,13 @@ export function evaluateDraft(s: DraftSnapshot): {
       };
 }
 
-// Whole strokes only. A checkpoint also carries one nonempty state when the
-// current page is blank, so R/undo cannot erase the only recoverable drawing.
+// Whole strokes only. Blank/incomplete checkpoints retain the last completed
+// stroke, independently of history eviction, until a replacement finishes.
 export class DraftHistory {
   current = emptyDraft();
   private past: DraftSnapshot[] = [];
   private future: DraftSnapshot[] = [];
+  private lastComplete: DraftSnapshot | null = null;
   get canUndo() {
     return this.past.length > 0;
   }
@@ -97,6 +98,7 @@ export class DraftHistory {
     this.past.push(copy(this.current));
     if (this.past.length > 24) this.past.shift();
     this.current = copy(s);
+    if (s.phase === "complete") this.lastComplete = copy(s);
     this.future = [];
   }
   undo() {
@@ -104,6 +106,7 @@ export class DraftHistory {
     if (!s) return false;
     this.future.push(copy(this.current));
     this.current = s;
+    if (s.phase === "complete") this.lastComplete = copy(s);
     return true;
   }
   redo() {
@@ -111,16 +114,21 @@ export class DraftHistory {
     if (!s) return false;
     this.past.push(copy(this.current));
     this.current = s;
+    if (s.phase === "complete") this.lastComplete = copy(s);
     return true;
   }
-  checkpoint(): DraftCheckpoint {
-    const retained = this.current.raw.length
-      ? null
-      : ([...this.past].reverse().find((s) => s.raw.length) ??
-        this.future.find((s) => s.raw.length) ??
-        null);
+  checkpoint(current = this.current): DraftCheckpoint {
+    const retained =
+      current.phase === "complete"
+        ? null
+        : (this.lastComplete ??
+          (current.raw.length
+            ? null
+            : ([...this.past].reverse().find((s) => s.raw.length) ??
+              this.future.find((s) => s.raw.length) ??
+              null)));
     return {
-      current: copy(this.current),
+      current: copy(current),
       retained: retained ? copy(retained) : null,
     };
   }
@@ -128,6 +136,7 @@ export class DraftHistory {
     this.past = [];
     this.future = [];
     this.current = emptyDraft();
+    this.lastComplete = null;
     if (checkpoint.retained) this.commit(checkpoint.retained);
     this.commit(checkpoint.current);
   }

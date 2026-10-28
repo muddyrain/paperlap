@@ -301,3 +301,48 @@ test("blocked reads retain the unavailable cause on later checkpoints and cleanu
   });
   assert.deepEqual(store.clear(), { ok: false, error: "unavailable" });
 });
+
+test("a partial replacement checkpoint retains the last completed stroke across repeated interruptions and reload", () => {
+  const h = new DraftHistory();
+  const a = complete();
+  h.commit(a);
+  h.commit(emptyDraft());
+  const b = {
+    phase: "interrupted" as const,
+    raw: [
+      { x: 400, y: 300 },
+      { x: 500, y: 350 },
+    ],
+    overflow: false,
+  };
+  assert.deepEqual(
+    h.checkpoint(b).retained,
+    a,
+    "sampling an active stroke also retains A",
+  );
+  h.commit(b);
+  const checkpoint = h.checkpoint();
+  assert.deepEqual(checkpoint.retained, a);
+  const reopened = new DraftHistory();
+  reopened.restore(checkpoint);
+  assert.equal(evaluateDraft(reopened.current).valid, false);
+  assert.equal(reopened.undo(), true);
+  assert.deepEqual(reopened.current, a);
+  assert.equal(evaluateDraft(reopened.current).valid, true);
+  h.commit(emptyDraft());
+  h.commit({ ...b, raw: [{ x: 420, y: 310 }] });
+  assert.deepEqual(h.checkpoint().retained, a);
+  for (let i = 0; i < 50; i++)
+    h.commit({ ...b, raw: [{ x: 450 + i, y: 320 }] });
+  assert.deepEqual(
+    h.checkpoint().retained,
+    a,
+    "history eviction cannot evict the sole completed fallback",
+  );
+  h.commit({ ...a, overflow: true });
+  assert.equal(
+    h.checkpoint().retained,
+    null,
+    "a completed B may replace the fallback, even when invalid",
+  );
+});

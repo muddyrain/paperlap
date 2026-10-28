@@ -16,7 +16,10 @@ export class DraftView {
   private storage: DraftStorage | null = null;
   private pending: DraftCheckpoint | null = null;
   private active = false;
-  private unreadable = false;
+  private unconfirmedBackup = false;
+  get memoryOnlyDiscard() {
+    return this.active && this.unconfirmedBackup;
+  }
   constructor(
     private editor: TrackEditor,
     private board: HTMLElement,
@@ -95,7 +98,9 @@ export class DraftView {
         !(checkpoint.current.raw.length || checkpoint.retained)
       )
         return;
-      this.result(this.storage!.write(checkpoint));
+      this.result(
+        this.storage?.write(checkpoint) ?? { ok: false, error: "unavailable" },
+      );
     };
     this.historyUI();
   }
@@ -125,13 +130,17 @@ export class DraftView {
   enter(source: DraftSource, name: string) {
     this.active = true;
     this.pending = null;
-    this.storage = new DraftStorage({
-      getItem: (key) => window.localStorage.getItem(key),
-      setItem: (key, value) => window.localStorage.setItem(key, value),
-      removeItem: (key) => window.localStorage.removeItem(key),
-    });
-    const loaded = this.storage.open(source);
-    this.unreadable = !loaded.ok && loaded.error === "invalid";
+    let loaded: DraftResult;
+    try {
+      this.storage = new DraftStorage(window.localStorage);
+      loaded = this.storage.open(source);
+    } catch {
+      this.storage = null;
+      loaded = { ok: false, error: "unavailable" };
+    }
+    // An initial failed read established no attributable backup to delete.
+    // Only the explicit memory-only discard confirmation may leave it untouched.
+    this.unconfirmedBackup = !loaded.ok;
     this.historyUI();
     this.status(
       loaded.ok
@@ -147,7 +156,9 @@ export class DraftView {
         : `这是“${name}”的编辑草稿。继续只恢复预览，正式路线和成绩不会改变。`;
     this.get("draft-range").textContent =
       loaded.checkpoint.current.phase === "interrupted"
-        ? "上次绘制中断：可查看保留的笔迹，需要重新画一圈，不能接着原手势绘制。"
+        ? loaded.checkpoint.retained?.phase === "complete"
+          ? "上次绘制中断：不能接着原手势绘制；已保留上一份完整笔迹，继续后按撤销找回。"
+          : "上次绘制中断：可查看保留的笔迹，需要重新画一圈，不能接着原手势绘制。"
         : loaded.checkpoint.retained
           ? "上次已清空画布；继续后可用撤销找回保留笔迹。"
           : "恢复后会重新检查路线；确认保存前不会修改正式赛道。";
@@ -166,14 +177,18 @@ export class DraftView {
     );
   }
   discard() {
-    if (!this.active || !this.storage) return true;
+    if (!this.active) return true;
     if (!this.editor.hasDraft && !this.pending) {
       this.active = false;
       return true;
     }
-    // A corrupt unknown document has no attributable draft to delete. Preserve
-    // its bytes while allowing the user to explicitly discard their local work.
-    if (!this.unreadable && !this.result(this.storage.clear())) return false;
+    // Without a confirmed read session, discard only the local drawing after
+    // confirmation; never call clear on an unknown backup.
+    if (
+      !this.unconfirmedBackup &&
+      (!this.storage || !this.result(this.storage.clear()))
+    )
+      return false;
     this.active = false;
     return true;
   }

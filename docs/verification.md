@@ -399,3 +399,40 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 实际无头页面录像保留在 `test-results/draft/`：`undo-redraw.webm`（21.72 秒）、`refresh-recovery.webm`（40.88 秒）、`discard-safety.webm`（20.52 秒）。对应 `.mp4` 用 H.264/yuv420p 编码，未改变帧顺序或速度；`review.html` 提供手动播放，`media.json` 记录时长与大小。录像与 JSON/日志为本地验收产物，不加入 Git；10 张原始 PNG 已入库。复现方式见草稿设计文档，运行 `npm run test:draft` 会重新生成实际操作录像。
 
 已知边界：撤销单位是整笔，刷新不持久化完整撤销栈；中断笔迹可查看但不能接续原 pointer capture。草稿最多 12 份 / 600,000 字符，不自动淘汰或合并其他标签的工作；UID/指纹不匹配的旧草稿保留原文。存储完全不可用时无法保证刷新找回未备份内容。来源沿用现有 Save V2 的 UID/指纹身份，不新增存档实例 ID，也不处理后续 #12 的几何指纹精度议题。真实浏览器验证为 Chromium，未宣称 Safari/Firefox 或人工试玩已通过。提交 PR 后停在 Code Review，等待用户试玩，不自动合并。
+
+## PR #13 Review 修复：初读失败退出、重画中断保留与进入性能
+
+对应本轮 Review 的三条评论（`draft-ui.ts`、`draft.ts`、`draft-storage.ts`），审查基线 `f178383`。本轮保留原草稿模块与版本，不开发 P1-05B。
+
+- **初始会话未确认：** 初始读取或归属检查失败时，确认页明确显示“仅放弃本次绘制”，说明浏览器里的旧备份不会删除，也不能确认清理。默认继续绘制，Esc 仍取消放弃；显式确认后仅放弃内存稿并沿游戏/菜单/赛道本返回。此路径不调用 setItem/removeItem。初始读取成功的已确认会话若后续清理失败，仍留在编辑器，不跳过安全保护。
+- **A→R→未完成 B：** 历史另保留一份最近完整笔迹；未完成 B 的周期采样和生命周期中断均携带 A，不再写入 retained:null。该安全副本独立于 24 层历史淘汰，保持原单键、12 份/600k 上限。恢复后先展示 B 残笔，可撤销一次找回 A；A 仍通过 fromDrawing 重新校验。新笔整次结束（允许几何无效）后可成为新的完整状态。
+- **精确原文复用：** storage.ts 新增只读 readTrackFingerprint，复用现有逐存储 checkedV2 原文缓存。只有同一存储且字节完全等于已严格验证的原文时，才从 JSON 提取 UID/指纹，避免重复全量几何验证。冷数据、外部原文变化仍调用完整 parseSave；不缓存可变 Save，不改 writeSave/loadSave 的验证和提交顺序。DraftView 持有原生 Storage 实例；getter 拒绝仍安全进入未确认会话。Save V2 schema、save.ts、几何、赛车、圈速、世界坐标和 GameMotion 均未修改。
+
+先添加回归并实际验证失败：初读拒绝后显式放弃仍为 editing；周期 B 的 retained 为 null；20×900 已加载存档的热进入仍耗费完整解析时间。修复后专项、原有完整回归及性能检查均通过。旧草稿 resize 用例还发现视口模拟返回早于原生 resize 事件的竞态；测试现等待实际中断后才释放鼠标，仍验证真实 resize，没有放宽断言。
+
+| 本轮检查                            | 最终结果                                                                                                                                             |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| typecheck / build / 格式 / diff     | 通过；仅保留原有 Phaser chunk 提示                                                                                                                   |
+| unit                                | 80/80，新增完整稿保留、近容量冷/热进入及原文复用安全检查                                                                                             |
+| 初读拒绝专项                        | 4/4；getItem/getter × 新建/编辑，保留默认焦点和取消确认；含真实驾驶→菜单→编辑→放弃→暂停返回，核对车辆、计时、键盘、声音与未知备份字节，写入/删除均 0 |
+| A/B 中断专项                        | 5/5；reload/pagehide/blur/resize/pointercancel，含 900×700 与 reduced-motion，真实鼠标 A→R→部分 B→恢复→键盘撤销回 A，正式赛道与纪录原文不变          |
+| 草稿主套件                          | 28/28，修正 resize 等待条件后完整重跑；仍含已确认备份清理失败留在编辑、正式保存失败保留、错误归属、三尺寸                                            |
+| editor / menu / trackbook / storage | 9/9、13/13、27/27、7/7                                                                                                                               |
+| motion / focus / sound              | 14/14、9/9、4/4                                                                                                                                      |
+| browser / handling                  | 15/15、4/4，真实有效圈、连续驾驶与规则隔离通过                                                                                                       |
+
+功能浏览器检查合计 **139/139**，另有一套真实页面近容量性能基准通过；报告记录的错误和失败请求为 0。所有浏览器继续使用隔离 headless Chromium、静音、页面输入 API 和 finally 清理；未打开用户 Chrome、抢占前台或使用系统鼠标。最终汇总 `test-results/draft-review/summary.json`，完整日志在同目录；主草稿和专项结果分别位于 `test-results/draft/report.json`、`read-rejection/report.json`、`interruption/report.json`。
+
+### 接近容量上限的实测
+
+使用真实 20 条 × 900 点、838,217 字符的有效 Save V2。Node 基准调用实际 DraftStorage.open；浏览器通过真实鼠标点击“编辑当前”，计量同步点击处理至编辑器就绪，reduced-motion 用于排除视觉等待。热路径复用 loadSave 的既有原文验证；冷路径使用新存储对象（Node）或外部变更后的有效原文（浏览器），始终完整验证。
+
+| 本机测量                   | 冷路径中位数 | 热路径中位数             |
+| -------------------------- | ------------ | ------------------------ |
+| 修前 Node                  | 758.35ms     | 741.11ms（重复几何验证） |
+| 修后 Node，最终 unit 运行  | 744.52ms     | 3.34ms                   |
+| 修后 Chromium 实际编辑点击 | 444.30ms     | 2.60ms                   |
+
+浏览器三次热进入为 26.0 / 2.6 / 2.5ms；首次冷页面加载含游戏初始化约 1144.5ms，不与编辑点击混算。性能守卫使用 hot < cold×0.5 的相对阈值。新增安全回归验证：已验证原文被改成非法几何、错误 ID 或非法成绩后，查询拒绝信任，正式写入也继续拒绝并保留原文；另一存储对象不共享验证证据。外部变更后的冷验证仍可能阻塞数百毫秒，保留这一安全成本。
+
+复现：构建并启动独立 `npm run preview -- --port 4185 --strictPort`；另一终端执行 `PAPERLAP_URL=http://127.0.0.1:4185 npm run test:draft-review` 与 `PAPERLAP_URL=http://127.0.0.1:4185 npm run bench:draft:browser`。Node 性能守卫包含在 npm test 中。实拍：[仅放弃内存的确认页](screenshots/p1-05a-review-memory-discard.png)、[恢复后撤销找回完整 A](screenshots/p1-05a-review-retained-a.png)。继续停在 Code Review，不自动合并。

@@ -136,10 +136,7 @@ export class TrackEditor {
   }
   checkpoint() {
     if (this.drawing)
-      this.onCheckpoint({
-        current: this.snapshot("interrupted"),
-        retained: null,
-      });
+      this.onCheckpoint(this.history.checkpoint(this.snapshot("interrupted")));
     else this.onCheckpoint(this.history.checkpoint());
   }
   restore(checkpoint: DraftCheckpoint) {
