@@ -1,3 +1,4 @@
+import { LocalEditor } from "./game/local-editor";
 import { SaveHistory } from "./game/save-history";
 import { GameMotion, type Feedback } from "./game/game-motion";
 import Phaser from "phaser";
@@ -10,6 +11,7 @@ import { TrackEditor } from "./game/editor";
 import { activeTrack, recordKey, setBest, type Save } from "./game/save-model";
 import {
   SaveSession,
+  storageMessage,
   acquireWriter,
   STORAGE_KEY,
   OLD_KEYS,
@@ -36,7 +38,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
  <div class="editor-caption" hidden><div class="editor-heading"><h2 id="editor-title">新建赛道</h2><span id="editor-target">目标赛道：<strong id="editor-track-name" tabindex="0"></strong></span></div><p id="editor-intent"></p><p id="draft-backup" role="status"></p><div class="editor-history"><button id="undo-drawing" class="paper" disabled></button><button id="redo-drawing" class="paper" disabled></button></div><div id="draw-intro" hidden>按住画一圈 · 起点附近松开 · 自动修圆</div></div>
  <div class="top-actions"><button id="trackbook-open" class="paper" aria-haspopup="dialog" aria-expanded="false" aria-controls="trackbook" aria-keyshortcuts="T" title="赛道本 (T)">${buttonContent("book", "赛道本", "T")}</button><button id="pause" class="paper" aria-keyshortcuts="Escape" aria-haspopup="dialog" aria-controls="game-menu" aria-expanded="false" title="游戏菜单 (Esc)">${buttonContent("pause", "菜单", "Esc")}</button></div></header>
  <div id="lap-status" class="lap-status" role="status"></div><div id="toast" class="toast" role="status"></div>
- <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 菜单</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-keyshortcuts="Space" title="开始试跑 (Space)" aria-describedby="start-hint">${buttonContent("play", "开始试跑", "Space")}</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-keyshortcuts="Space" title="继续试跑 (Space)" aria-describedby="pause-reason">${buttonContent("play", "继续试跑", "Space")}</button></section><div class="bottom-actions"><button id="sound" class="paper" aria-label="开启声音" title="开启声音">${buttonContent("mute", "声音")}</button><button id="edit" class="paper accent" aria-keyshortcuts="E" title="编辑当前赛道 (E)">${buttonContent("edit", "编辑当前", "E")}</button><button id="restart" class="paper" aria-keyshortcuts="R" title="重新开始 (R)">${buttonContent("reset", "重新开始", "R")}</button></div></footer>
+ <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 菜单</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-keyshortcuts="Space" title="开始试跑 (Space)" aria-describedby="start-hint">${buttonContent("play", "开始试跑", "Space")}</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-keyshortcuts="Space" title="继续试跑 (Space)" aria-describedby="pause-reason">${buttonContent("play", "继续试跑", "Space")}</button></section><div class="bottom-actions"><button id="sound" class="paper" aria-label="开启声音" title="开启声音">${buttonContent("mute", "声音")}</button><button id="local-edit" class="paper" aria-keyshortcuts="L" aria-describedby="storage-state" title="局部调整 (L)">${buttonContent("curve", "局部调整", "L")}</button><button id="edit" class="paper accent" aria-keyshortcuts="E" title="编辑当前赛道 (E)">${buttonContent("edit", "编辑当前", "E")}</button><button id="restart" class="paper" aria-keyshortcuts="R" title="重新开始 (R)">${buttonContent("reset", "重新开始", "R")}</button></div></footer>
  <footer id="editor-footer" class="editor-footer" hidden><button id="cancel-edit" class="paper" aria-keyshortcuts="Escape" title="取消编辑 (Esc)">${icon("close")}取消编辑<kbd class="button-key" aria-hidden="true">Esc</kbd></button><div id="editor-status" class="editor-status" role="status" hidden></div><div><button id="redraw" class="paper" aria-keyshortcuts="R" title="重新绘制 (R)">${icon("reset")}重新绘制<kbd class="button-key" aria-hidden="true">R</kbd></button><button id="drive-drawing" class="primary" aria-keyshortcuts="Enter" title="保存修改并试跑 (Enter)" disabled>${icon("check")}<span id="drawing-action">保存修改并试跑</span><kbd class="button-key" aria-hidden="true">Enter ↵</kbd></button></div></footer>
  <section id="recovery" class="center-note paper" role="alert" hidden><h2>画面加载失败</h2><p>请重新加载以恢复已保存的赛道。</p><button id="reload" class="primary">${buttonContent("reset", "重新加载")}</button></section>
  <div class="page-signature">DRAW A LITTLE. DRIVE A LITTLE.</div>
@@ -81,6 +83,7 @@ const motion = new GameMotion(board, (reduced) => {
 });
 const book = new Trackbook(save, {
   uid: () => crypto.randomUUID(),
+  check: () => session.check(),
   write: (candidate) => {
     const result =
       candidate.schemaVersion === 3
@@ -110,6 +113,7 @@ const book = new Trackbook(save, {
     game.loop.stop();
     sound.update(0, false);
     menu.block();
+    local.block();
     board.classList.add("recovering");
     board.querySelectorAll("dialog").forEach((dialog) => dialog.close());
     motion.interrupt();
@@ -122,6 +126,8 @@ const trackbook = new TrackbookView(
   board,
   {
     create: () => menu.edit("create"),
+    local: () => menu.local(),
+    localReason,
     open: () => pause(),
     close: () => menu.bookClosed(),
     beforeSelect: () => motion.capture(scene),
@@ -155,11 +161,15 @@ const menu = new GameMenu(
     restart,
     book: () => trackbook.open(),
     edit: applyEdit,
-    draft: () => editor.hasDraft,
-    memoryOnlyDiscard: () => drafts.memoryOnlyDiscard,
-    interrupt: () => editor.interrupt(),
+    local: applyLocal,
+    localReason,
+    localEditing: () => local.active,
+    draft: () => (local.active ? local.hasDraft : editor.hasDraft),
+    memoryOnlyDiscard: () =>
+      local.active ? local.memoryOnlyDiscard : drafts.memoryOnlyDiscard,
+    interrupt: () => (local.active ? local.interrupt() : editor.interrupt()),
     cancelEdit,
-    focusEditor: () => editor.focus(),
+    focusEditor: () => (local.active ? local.focus() : editor.focus()),
     sound: toggleSound,
   },
   motion,
@@ -171,6 +181,57 @@ const drafts = new DraftView(
   () => menu.deferEditing(),
   v3DraftPolicy(() => session.writable),
 );
+const local = new LocalEditor(scene, book, board, motion, backing, {
+  check: () => session.writable && session.check().ok,
+  cancel: () => menu.cancelEdit(),
+  later: () => menu.deferEditing(),
+  saved: (message) => {
+    menu.editFinished();
+    trackbook.render();
+    updateBest();
+    uiClock = 0;
+    scene.onChange();
+    area.focus({ preventScroll: true });
+    toast(
+      message ?? "局部修改已保存 · 等待开始试跑",
+      message ? "notice" : "saved",
+    );
+  },
+});
+function localReason() {
+  if (book.reloadRequired) return trackbookMessage("reload-required");
+  return book.save.schemaVersion !== 3 || !session.writable
+    ? storageMessage(session.error ?? "upgrade-required")
+    : null;
+}
+function updateLocalAccess() {
+  const reason = localReason();
+  el<HTMLButtonElement>("local-edit").disabled = !!reason;
+  el("local-edit").title = reason ?? "局部调整 (L)";
+  trackbook.updateLocalAccess();
+  local.accessChanged(reason);
+  el<HTMLButtonElement>("menu-local").disabled = !!reason;
+  if (reason && menu.state.layer === "menu")
+    el("menu-status").textContent = reason;
+}
+function applyLocal() {
+  const result = book.beginLocal();
+  if (!result.ok) {
+    toast(trackbookMessage(result.error), "error");
+    return result;
+  }
+  try {
+    uiClock = 0;
+    local.enter(book.localSource!, activeTrack(book.save).track);
+    return result;
+  } catch {
+    local.cancel(false);
+    book.cancelLocal();
+    area.focus({ preventScroll: true });
+    return { ok: false as const, error: "render" as const };
+  }
+}
+el("local-edit").onclick = () => menu.local();
 const saveHistory = new SaveHistory(
   board,
   () => book.save,
@@ -182,7 +243,11 @@ const saveHistory = new SaveHistory(
   motion,
 );
 saveHistory.status(session.error);
-session.onStatus = () => saveHistory.status(session.error);
+session.onStatus = () => {
+  saveHistory.status(session.error);
+  updateLocalAccess();
+};
+updateLocalAccess();
 el("trackbook-open").onclick = () => menu.openBook();
 el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -368,6 +433,13 @@ function redraw() {
 }
 el("redraw").onclick = redraw;
 function cancelEdit(discard = true) {
+  if (local.active) {
+    const cancelled = local.cancel(discard);
+    if (cancelled) area.focus({ preventScroll: true });
+    uiClock = 0;
+    scene.onChange();
+    return cancelled;
+  }
   if (discard && !drafts.discard()) return false;
   drafts.leave();
   const sheet = motion.capture(scene, editor.canvas);
@@ -413,6 +485,10 @@ function driveDrawing() {
 el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
   if (book.reloadRequired || menu.state.layer !== "none") return;
+  if (local.active) {
+    local.handleKey(e);
+    return;
+  }
   const target = shortcutTarget(e.target);
   const history = historyShortcut(e, scene.mode, target);
   if (history) {
@@ -431,6 +507,9 @@ function keydown(e: KeyboardEvent) {
         break;
       case "edit":
         menu.edit("replace");
+        break;
+      case "local":
+        menu.local();
         break;
       case "toggle":
         if (scene.mode === "running") pause();
@@ -475,6 +554,7 @@ function keydown(e: KeyboardEvent) {
 const keyup = (e: KeyboardEvent) => scene.keys.delete(e.code);
 function loseFocus() {
   menu.invalidate();
+  local.interrupt();
   editor.interrupt();
   scene.keys.clear();
   scene.pause();
@@ -498,6 +578,11 @@ function pointerFocus() {
 }
 const resizeMenu = () => menu.invalidate();
 const checkpointOnExit = () => {
+  if (local.active) {
+    local.interrupt();
+    local.checkpoint();
+    return;
+  }
   editor.interrupt();
   if (scene.mode === "editing") editor.checkpoint();
 };
@@ -553,6 +638,7 @@ if (debug)
       track: structuredClone(scene.trackData.track),
       offroad: scene.offroad,
       effects: scene.trail.length,
+      local: local.telemetry,
       draft: {
         rawLength: editor.raw.length,
         phase: editor.drawing ? "drawing" : editor.history.current.phase,
@@ -566,7 +652,9 @@ if (debug)
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     clearTimeout(toastTimer);
+    local.checkpoint();
     session.release();
+    local.destroy();
     window.removeEventListener("storage", checkExternal);
     window.removeEventListener("pageshow", restoreSession);
     window.removeEventListener("pagehide", releaseSession);

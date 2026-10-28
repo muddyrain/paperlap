@@ -10,7 +10,15 @@ import {
   type SaveResult,
   type TrackEntry,
 } from "./save-model";
-import type { Track } from "./geometry";
+import { fingerprint, type Track, type Point } from "./geometry";
+import * as v3 from "./save-v3";
+import {
+  localSource,
+  sameLocalSource,
+  samePoints,
+  checkLocalPoints,
+  type LocalSource,
+} from "./local-source";
 import type { StorageError, WriteResult } from "./storage-v3";
 
 export type EditIntent = "create" | "replace";
@@ -26,11 +34,16 @@ interface Dependencies {
   // Prepare without touching the live scene; apply only after write succeeds.
   prepare: (entry: TrackEntry) => () => void;
   recover: () => void;
+  check?: () => WriteResult;
 }
 
 export class Trackbook {
   intent: EditIntent | null = null;
   reloadRequired = false;
+  private local: LocalSource | null = null;
+  get localSource() {
+    return this.local ? { ...this.local } : null;
+  }
   constructor(
     public save: Save,
     private deps: Dependencies,
@@ -48,7 +61,7 @@ export class Trackbook {
   }
   beginEdit(intent: EditIntent): CommandResult {
     if (this.reloadRequired) return { ok: false, error: "reload-required" };
-    if (this.intent) return { ok: false, error: "editing" };
+    if (this.intent || this.local) return { ok: false, error: "editing" };
     if (intent === "create" && this.save.tracks.length >= SAVE_LIMITS.tracks)
       return { ok: false, error: "track-limit" };
     this.intent = intent;
@@ -57,9 +70,59 @@ export class Trackbook {
   cancelEdit() {
     this.intent = null;
   }
+  beginLocal(): CommandResult {
+    const blocked = this.available();
+    if (blocked) return blocked;
+    if (this.save.schemaVersion !== 3)
+      return { ok: false, error: "invalid-v3" };
+    const checked = this.deps.check?.() ?? {
+      ok: false as const,
+      error: "unavailable" as const,
+    };
+    if (!checked.ok) return checked;
+    this.local = localSource(v3.activeTrack(this.save));
+    return { ok: true, persisted: false, changed: false };
+  }
+  cancelLocal() {
+    this.local = null;
+  }
+  commitLocal(source: LocalSource, points: readonly Point[]): CommandResult {
+    if (this.reloadRequired) return { ok: false, error: "reload-required" };
+    if (this.intent || !this.local || this.save.schemaVersion !== 3)
+      return { ok: false, error: "editing" };
+    const entry = v3.activeTrack(this.save);
+    if (
+      !sameLocalSource(source, this.local) ||
+      !sameLocalSource(source, localSource(entry))
+    )
+      return { ok: false, error: "conflict" };
+    const checked = this.deps.check?.() ?? {
+      ok: false as const,
+      error: "unavailable" as const,
+    };
+    if (!checked.ok) return checked;
+    if (checkLocalPoints(entry.track.points, points))
+      return { ok: false, error: "invalid-track" };
+    if (samePoints(entry.track.points, points)) {
+      this.local = null;
+      return { ok: true, persisted: true, changed: false };
+    }
+    const track = {
+      ...entry.track,
+      points: points.map((p) => ({ ...p })),
+      id: fingerprint([...points], entry.track.width),
+    };
+    const result = this.commit(
+      v3.replaceTrack(this.save, entry.uid, track),
+      true,
+      true,
+    );
+    if (result.ok) this.local = null;
+    return result;
+  }
   private available(): CommandResult | null {
     if (this.reloadRequired) return { ok: false, error: "reload-required" };
-    if (this.intent) return { ok: false, error: "editing" };
+    if (this.intent || this.local) return { ok: false, error: "editing" };
     return null;
   }
   select(uid: string): CommandResult {

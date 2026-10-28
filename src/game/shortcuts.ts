@@ -34,6 +34,7 @@ export function shortcut(
   if (scope === "list") {
     if (key.code === "Escape") return "back";
     if (key.code === "KeyN") return "new";
+    if (key.code === "KeyL") return "local";
     if (navigation) return key.code === "ArrowUp" ? "previous" : "next";
     return null; // Enter/Space stay native button activation.
   }
@@ -44,10 +45,12 @@ export function shortcut(
     if (key.code === "Space") return target === "surface" ? "toggle" : null;
     return (
       (
-        { KeyR: "restart", KeyT: "book", KeyE: "edit" } as Record<
-          string,
-          string
-        >
+        {
+          KeyR: "restart",
+          KeyT: "book",
+          KeyE: "edit",
+          KeyL: "local",
+        } as Record<string, string>
       )[key.code] ?? null
     );
   }
@@ -65,6 +68,7 @@ export function shortcut(
       {
         KeyT: "book",
         KeyE: "edit",
+        KeyL: "local",
         Space: "toggle",
         KeyR: "restart",
       } as Record<string, string>

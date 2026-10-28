@@ -72,3 +72,11 @@ pointercancel、lostpointercapture、blur、visibilitychange、resize 均取消�
 同时确认限制：稀疏采样必须保护首尾整个线段；仅 64 弧长的顶点冻结不足以保证首段方向不动，因此原型采用 gL/gR 的完整线段保护。原有规则会拒绝部分稀疏折线，大拖动也可能非法，不做全圈再平滑来掩盖问题。旧 hash 的 0.001 微调反例已通过测试，独立几何身份必须先于正式保存集成。
 
 这只验证可行性，尚未获得玩家手感验收。B 保留为未来需要时的实验备选。完整操作、机器环境、测量范围、三组原/新/非法截图和录屏复现见 [验证记录](local-edit-verification.md)。下一步先试玩本 PR，再决定 P1-05B-02。
+
+## 正式集成 P1-05B-02B
+
+在 master `347d2eb3` 的 Save V3 基础上，正式游戏增加独立 L 入口，E 保持整圈重画。复用本 RFC 的 `prepareLocalDrag/deformLocal/LocalEditModel`，不改变变形公式、保护区或既有几何校验；原型本身仍只读，不提供正式写盘。
+
+实际状态/返回图、严格 Trackbook 局部事务、`paperlap.local-draft.v1` 精确快照协议与失败矩阵见 [集成合同](local-editor-integration.md)。采用只是编辑历史，Ctrl/Cmd+Enter 才保存；新 UID 不创建，实际改线由既有 V3 创建新几何身份，旧成绩保留，不恢复旧身份冒充 PB。源 UID/身份/摘要/算法不一致的草稿保留原文，刷新只恢复相邻历史，不重放浮点 delta。
+
+[正式游戏验证](local-editor-verification.md) 记录真实鼠标、场景/存储失败、三尺寸、200/450/900 点与 4× CPU、截图和录屏。独立原型与正式编辑器各自测试；此轮仍停在 Code Review，等待用户试玩。

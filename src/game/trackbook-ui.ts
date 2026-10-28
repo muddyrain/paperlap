@@ -27,6 +27,8 @@ export class TrackbookView {
     container: HTMLElement,
     private hooks: {
       create: () => CommandResult;
+      local: () => CommandResult;
+      localReason: () => string | null;
       beforeSelect: () => HTMLCanvasElement | null;
       change: (action: Operation, sheet?: HTMLCanvasElement | null) => void;
       open: () => void;
@@ -40,7 +42,7 @@ export class TrackbookView {
     this.dialog.setAttribute("aria-labelledby", "trackbook-title");
     this.dialog.innerHTML = `
       <div class="trackbook-heading"><div><span class="notebook-label">PAPERLAP / 路线收藏</span><h2 id="trackbook-title">我的赛道本</h2></div><button id="trackbook-close" class="paper" aria-keyshortcuts="Escape">${buttonContent("close", "关闭", "Esc")}</button></div>
-      <div id="trackbook-list"><div class="trackbook-toolbar"><span id="track-count"></span><button id="new-track" class="primary" aria-keyshortcuts="N" title="新建独立赛道 (N)">${buttonContent("add", "新建赛道", "N")}</button></div><p class="trackbook-hint"><kbd>↑</kbd><kbd>↓</kbd> 选路线 · <kbd>Enter</kbd> 使用 · 切换后等待开始</p><ol id="track-list" aria-label="已保存的赛道"></ol></div>
+      <div id="trackbook-list"><div class="trackbook-toolbar"><span id="track-count"></span><button id="new-track" class="primary" aria-keyshortcuts="N" title="新建独立赛道 (N)">${buttonContent("add", "新建赛道", "N")}</button></div><button id="trackbook-local" class="paper" aria-keyshortcuts="L">${buttonContent("curve", "局部调整当前赛道", "L")}</button><p id="trackbook-local-status" role="status"></p><p class="trackbook-hint"><kbd>↑</kbd><kbd>↓</kbd> 选路线 · <kbd>Enter</kbd> 使用 · 切换后等待开始</p><ol id="track-list" aria-label="已保存的赛道"></ol></div>
       <form id="rename-form" hidden><label for="track-name-input">赛道名称（最多 40 个字符）</label><input id="track-name-input" autocomplete="off"><div class="trackbook-actions"><button type="button" data-back class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "取消", "Esc")}</button><button type="submit" id="rename-save" class="primary" aria-keyshortcuts="Enter">${buttonContent("check", "保存名称", "Enter")}</button></div></form>
       <div id="delete-confirm" hidden><h3 id="delete-question"></h3><p>将删除这条赛道及其全部纪录，其他赛道和旧归档保留。</p><div class="trackbook-actions"><button data-back class="paper" id="delete-cancel" aria-keyshortcuts="Escape">${buttonContent("back", "取消", "Esc")}</button><button id="delete-track-confirm" class="primary">${buttonContent("trash", "确认删除")}</button></div></div>
       <p id="trackbook-status" role="status"></p>`;
@@ -75,6 +77,7 @@ export class TrackbookView {
         button.onclick = () => this.backOrClose();
       });
     this.get("new-track").onclick = () => this.create();
+    this.get("trackbook-local").onclick = () => this.local();
     this.get<HTMLFormElement>("rename-form").onsubmit = (event) => {
       event.preventDefault();
       this.settle();
@@ -103,7 +106,8 @@ export class TrackbookView {
     this.motion.settleOverlay(this.dialog);
   }
   open() {
-    if (this.book.reloadRequired || this.book.intent) return;
+    if (this.book.reloadRequired || this.book.intent || this.book.localSource)
+      return;
     this.settle();
     if (!this.dialog.open) {
       this.returnFocus =
@@ -180,6 +184,7 @@ export class TrackbookView {
     }
     this.settle();
     if (action === "new") this.create();
+    else if (action === "local") this.local();
     else {
       const buttons = [
         ...this.dialog.querySelectorAll<HTMLButtonElement>(
@@ -230,6 +235,24 @@ export class TrackbookView {
       this.status(trackbookMessage(result.error), "error");
     }
   }
+  private local() {
+    const reason = this.hooks.localReason();
+    if (reason) {
+      this.status(reason, "error");
+      return;
+    }
+    this.finishClose(false);
+    const result = this.hooks.local();
+    if (!result.ok) {
+      this.open();
+      this.status(trackbookMessage(result.error), "error");
+    }
+  }
+  updateLocalAccess() {
+    const reason = this.hooks.localReason();
+    this.get<HTMLButtonElement>("trackbook-local").disabled = !!reason;
+    this.get("trackbook-local-status").textContent = reason ?? "";
+  }
   private run(
     result: CommandResult,
     action: Operation,
@@ -273,6 +296,7 @@ export class TrackbookView {
     }
   }
   render() {
+    this.updateLocalAccess();
     const label = document.getElementById("track-name")!;
     label.textContent = trackName(activeTrack(this.book.save));
     label.title = label.textContent;
