@@ -117,3 +117,30 @@ save.ts、storage.ts、geometry.ts、vehicle.ts、laps.ts、config.ts、scene.ts
 - 浏览器验证为 Chromium，未宣称 Safari/Firefox 或用户人工试玩已通过。ES2022 与 Web Locks 是本轮兼容要求。
 
 推送后停在 Code Review，等待用户复审，不自动合并。
+
+## PR #17 第一轮 Review：修复顶部计时 HUD
+
+审查基线 `0c68ed9`。上一轮截图中的计时卡片确实偏到右上，被操作按钮遮挡；原浏览器断言没有检查 HUD 重叠，不能据此判断布局正确。本轮先新增真实页面回归，实际失败于 `1366x768 fresh ready: timing overlaps top actions`，原文记录在 `test-results/hud-review/red.log`。
+
+产品代码只修改 `src/style.css`：删除末尾 `.timing { position: relative; }`，恢复原有 absolute 居中；历史入口使用既有唯一 ID 定位，避免通用键盘焦点的 `position: relative` 在 Esc 返回时把按钮挤回文档流。原有铅笔焦点标记、Tab 和菜单返回行为保留，不修改任何 V3 数据、迁移、身份、锁或草稿逻辑。跨规则历史文案本轮保持原样。
+
+新增 `tests/hud-browser.mjs` 与 `npm run test:hud`。三视口分别测试空存档、旧纪录迁入、当前 PB＋旧纪录＋40 字长名、配额失败共 **12 个场景、48 次 DOM 布局采样**。每个场景检查 ready、历史返回、running、驾驶中打开历史并返回 paused：
+
+- `.timing` 与 `.top-actions`、左侧赛道名卡片不相交，水平中心与真实 Phaser canvas 相差不超过 1px。
+- 卡片、计时/PB 行、文本 Range 与历史入口均在游戏面板/视口内；文本无裁切，九点 `elementFromPoint` 检查没有被其他元素遮挡。
+- 历史入口不与本圈/PB 相交；Esc 返回后焦点仍在入口，ready 卡片边界逐项相同；驾驶返回后仍暂停、计时不继续。
+- 不关闭原有动效；中心与边界检查等待卡片实际 Web Animation 结束，避免把合法暂停缩放的中间帧误判成静态布局偏移。
+
+| 当前 PB＋长名场景 | 卡片中心误差 | 距右侧操作区间隔 | 实际修后截图                                      |
+| ----------------- | ------------ | ---------------- | ------------------------------------------------- |
+| 1366×768          | 0.008px      | 149.01px         | [HUD](screenshots/p1-05b-02a-review-hud-1366.png) |
+| 1280×800          | 0.008px      | 146.17px         | [HUD](screenshots/p1-05b-02a-review-hud-1280.png) |
+| 900×700           | 0.016px      | 56.37px          | [HUD](screenshots/p1-05b-02a-review-hud-900.png)  |
+
+三张截图同时展示本圈计时、当前 PB 00:34.56 和旧纪录提示。原有三尺寸 HUD/卡片/历史共 9 张截图也由本轮真实 storage 测试重新生成，替换错误布局版本。实际 running 截图、完整 DOM 边界与控制台/请求记录在 `test-results/hud-review/`。
+
+最终结果：**105/105 单元、64/64 浏览器检查**（HUD 12、storage 15、browser 15、menu 13、focus 9），typecheck/build、格式与 diff 检查通过；所有本轮报告的控制台/请求错误为 0，构建仅保留既有 Phaser chunk 提示。
+
+本轮执行：`npm test`、`npm run build`（含 typecheck）、`test:hud`、`test:storage`、`test:browser`、`test:menu`、`test:focus`。浏览器均使用隔离无头 Chromium，串行执行并释放资源，不接管日常浏览器或桌面。最终套件结果见同目录 `regressions.json` 与 `summary.json`；未将上一轮全部 170 项声称为本轮重跑。
+
+实际修改文件：`src/style.css`、`tests/hud-browser.mjs`、`package.json`、`README.md`、本报告、`docs/verification.md`，以及上表 3 张新截图和 9 张更新截图。不修改其他产品模块，继续停在 Code Review。

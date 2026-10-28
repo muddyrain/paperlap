@@ -444,3 +444,8 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 [完整验证与文件清单](save-v3-verification.md) 列出全部套件、20×900 冷/热性能、三桌面尺寸共 9 张截图及复现命令。[Save V3 RFC](save-v3-rfc.md) 固定 canonical、容量、单写入锁、迁移与回退合同。所有自动化使用隔离无头 Chromium，不影响用户桌面；控制台错误为 0，记录请求错误的套件均为 0。
 
 近上限真实页面冷加载约 1 秒；改名提交中位数 43.50ms、编辑进入 3.20ms。写入需要 Web Locks；第二标签只读，无自动分支合并。旧版回滚仅看到保留 V1/V2，不能看到 V3 新作品。旧草稿原文仍在，不按旧弱指纹自动恢复到新身份。不开发 Issue #16 的局部编辑 UI/局部草稿，停在 Code Review，不自动合并。
+
+
+## PR #17 第一轮 Review：计时 HUD 居中回归
+
+上一轮缺少 HUD 边界断言，截图中的确存在计时卡片被右上按钮遮挡的问题。本轮删除覆盖 absolute 的 relative 规则，并固定历史按钮在键盘焦点下的绝对定位，保留原有焦点/动效。新增 `npm run test:hud`，三尺寸×四类存档共 12 场景、48 次真实 DOM 边界/文本范围/命中采样，覆盖 ready、running、历史返回与 paused。本轮 105/105 单元、64/64 浏览器检查及 typecheck/build 通过，控制台与请求错误均为 0。具体结果、三张同时包含本圈/PB/旧纪录的修后截图、更新的原 9 张截图与复现说明见 [Save V3 Review 验证](save-v3-verification.md#pr-17-第一轮-review修复顶部计时-hud)。Save V3、迁移、身份、锁和草稿保护代码未修改，停在 Code Review，不自动合并。

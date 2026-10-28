@@ -15,6 +15,7 @@
     "test:handling": "node tests/handling-browser.mjs",
     "test:editor": "node tests/editor-browser.mjs",
     "test:storage": "node tests/storage-browser.mjs",
+    "test:hud": "node tests/hud-browser.mjs",
     "test:trackbook": "node tests/trackbook-browser.mjs",
     "bench:storage": "tsx tests/storage-performance.ts",
     "bench:storage:browser": "node tests/storage-performance-browser.mjs",

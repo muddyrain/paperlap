@@ -73,6 +73,7 @@ npm run test:handling
 npm run test:editor
 npm run test:draft
 npm run test:storage
+npm run test:hud
 npm run test:trackbook
 ```
 
@@ -95,6 +96,8 @@ npm run test:trackbook
 `test:editor` 用真实指针绘制接近报错截图的路线和带手抖的路线，检查闭合提示、R/Enter/Esc、输入焦点、拖画中断恢复和三种桌面尺寸。报告与截图保存在 `test-results/editor/`。
 
 `test:storage` 检查真实 localStorage 的 V1/V2→V3 迁移、全部旧纪录历史与原文字节、当前 PB 隔离、WebCrypto 摘要、整圈改线/改名/刷新、真实第二标签锁、旧客户端冲突、损坏/未知 V3、配额失败重试、受限存储驾驶及旧/新整笔草稿归属。报告与三尺寸截图保存在 `test-results/storage/`，本轮实测见 [Save V3 验证](docs/save-v3-verification.md)。
+
+`test:hud` 用真实 DOM 边界、文本范围和页面命中检查三桌面尺寸的计时卡片居中、顶部不重叠、计时/PB/历史完整可见，以及历史面板返回后的键盘焦点与布局；覆盖空存档、旧纪录、当前 PB、长名称及配额错误。截图与 48 次布局测量保存在 `test-results/hud-review/`。
 
 `test:trackbook` 从真实鼠标新建 B 开始，检查 A/B 切换与刷新恢复、车辆/圈速/HUD/输入/声音同步、改名、编辑取消、删除确认、容量上限、配额与存储拒绝下的失败重试，以及三种桌面尺寸与键盘焦点。还检查长/短赛道名、新建/编辑意图、暂停和通知的道路/车辆遮挡，并通过真实键盘有效圈触发新纪录截图。P1-03 扩展检查 T/E/N/Space/R、分层 Esc、输入/IME/组合键、原生按钮激活、真实 SVG 与成绩、20 条内部滚动、失败不闪成功、动画中断与 reduced motion。报告与截图保存在 `test-results/trackbook/`，`drawer-*.png`、`switch-ready-*.png` 为 P1-03 抽屉与切换验收画面，`ux-*.png` 保留名称、绘图和通知回归。
 

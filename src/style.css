@@ -1399,10 +1399,8 @@ button:disabled {
 }
 
 /* Save V3 history stays at the HUD edge; the detailed list is explicit. */
-.timing {
-  position: relative;
-}
-.record-history-open {
+/* Keep this anchor absolute when generic keyboard focus positions buttons. */
+#record-history-open {
   position: absolute;
   right: 4px;
   top: calc(100% + 4px);
