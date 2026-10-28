@@ -26,8 +26,9 @@ interface Hooks {
   book: () => void;
   edit: (intent: EditIntent) => CommandResult;
   draft: () => boolean;
+  memoryOnlyDiscard: () => boolean;
   interrupt: () => void;
-  cancelEdit: () => void;
+  cancelEdit: (discard?: boolean) => boolean | void;
   focusEditor: () => void;
   sound: () => boolean;
 }
@@ -58,9 +59,9 @@ export class GameMenu {
       <section id="menu-controls-page" hidden aria-label="操作说明"><dl>
         <dt>驾驶</dt><dd><kbd>↑</kbd> / <kbd>W</kbd> 加速 · <kbd>↓</kbd> / <kbd>S</kbd> 刹车<br><kbd>←</kbd> / <kbd>A</kbd>、<kbd>→</kbd> / <kbd>D</kbd> 转向</dd>
         <dt>游戏区域</dt><dd><kbd>Space</kbd> 开始 / 暂停 / 继续<br><kbd>R</kbd> 重新开始 · <kbd>T</kbd> 赛道本<br><kbd>E</kbd> 编辑当前 · <kbd>Esc</kbd> 游戏菜单</dd>
-        <dt>赛道本与绘图</dt><dd><kbd>N</kbd> 新建 · <kbd>↑</kbd><kbd>↓</kbd> 选择焦点 · <kbd>Enter</kbd> 使用赛道<br>绘图：<kbd>Enter</kbd> 保存 · <kbd>R</kbd> 重画 · <kbd>Esc</kbd> 取消 / 确认放弃</dd>
+        <dt>赛道本与绘图</dt><dd><kbd>N</kbd> 新建 · <kbd>↑</kbd><kbd>↓</kbd> 选择焦点 · <kbd>Enter</kbd> 使用赛道<br>绘图：<kbd>Ctrl / ⌘ Z</kbd> 撤销 · <kbd>Ctrl / ⌘ Shift Z</kbd> 重做<br><kbd>Enter</kbd> 保存 · <kbd>R</kbd> 重画 · <kbd>Esc</kbd> 取消 / 确认放弃</dd>
       </dl><p>按钮上的 Enter / Space 为原生操作。切换赛道等待开始；离开窗口会暂停，恢复焦点不会自动继续。</p><button id="controls-back" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回菜单", "Esc")}</button></section>
-      <section id="menu-discard" hidden><p>尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。</p><div class="menu-actions"><button id="keep-drawing" class="primary" aria-keyshortcuts="Escape">${buttonContent("edit", "继续绘制", "Esc")}</button><button id="discard-drawing" class="paper">${buttonContent("trash", "放弃修改")}</button></div></section>
+      <section id="menu-discard" hidden><p id="discard-description">尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。</p><div class="menu-actions"><button id="keep-drawing" class="primary" aria-keyshortcuts="Escape">${buttonContent("edit", "继续绘制", "Esc")}</button><button id="discard-drawing" class="paper">${buttonContent("trash", "放弃修改")}</button></div></section>
       <p id="menu-hint"></p><p id="menu-status" role="status"></p>`;
     container.append(this.dialog);
     this.get("menu-back").onclick = () => this.back();
@@ -119,6 +120,14 @@ export class GameMenu {
     this.get("menu-home").hidden = layer !== "menu";
     this.get("menu-controls-page").hidden = layer !== "controls";
     this.get("menu-discard").hidden = layer !== "discard";
+    const memoryOnly = this.hooks.memoryOnlyDiscard();
+    this.get("discard-description").textContent = memoryOnly
+      ? "本次绘制未能确认备份。仅放弃本次内存绘制并返回；浏览器中的旧备份不会删除，也无法确认是否已清理。"
+      : "尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。";
+    this.get("discard-drawing").innerHTML = buttonContent(
+      "trash",
+      memoryOnly ? "仅放弃本次绘制" : "放弃修改",
+    );
     this.get("menu-title").textContent =
       layer === "discard"
         ? "放弃本次修改？"
@@ -233,14 +242,22 @@ export class GameMenu {
       this.show("keep-drawing");
     } else this.cancelEditing();
   }
-  private cancelEditing() {
+  deferEditing() {
+    if (this.state.layer === "none") this.cancelEditing(false);
+  }
+  private cancelEditing(discard = true) {
     if (this.hooks.context().blocked || this.hooks.context().mode !== "editing")
       return;
+    if (this.hooks.cancelEdit(discard) === false) {
+      this.get("menu-status").textContent =
+        "草稿未能清理，仍在编辑；请继续绘制或稍后重试。";
+      return;
+    }
     const route = this.state.cancelEditing();
     this.hide();
-    this.hooks.cancelEdit();
     if (route === "menu") this.show("menu-edit");
     else if (route.startsWith("book")) this.hooks.book();
+    else this.game.focus({ preventScroll: true });
   }
   editFinished() {
     this.state.reset();

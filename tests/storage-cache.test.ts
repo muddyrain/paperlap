@@ -11,8 +11,14 @@ import {
   selectTrack,
   setBest,
   validateSave,
+  type Save,
 } from "../src/game/save.ts";
-import { loadSave, STORAGE_KEY, writeSave } from "../src/game/storage.ts";
+import {
+  loadSave,
+  STORAGE_KEY,
+  writeSave,
+  readTrackFingerprint,
+} from "../src/game/storage.ts";
 import { fingerprint } from "../src/game/geometry.ts";
 import { saved } from "./fixtures/storage-performance.ts";
 
@@ -163,4 +169,49 @@ test("failed writes never cause an invalid stored snapshot to become trusted", (
   storage.items.set(STORAGE_KEY, raw);
   assert.equal(writeSave(storage, next).ok, false);
   assert.equal(storage.getItem(STORAGE_KEY), raw);
+});
+
+test("draft identity reuse never trusts changed or different-store raw bytes", () => {
+  const save = freshSave();
+  const values = new Map([[STORAGE_KEY, JSON.stringify(save)]]);
+  const store = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, raw: string) => {
+      values.set(key, raw);
+    },
+  };
+  const loaded = loadSave(store);
+  assert.equal(loaded.persisted, true);
+  const raw = values.get(STORAGE_KEY)!;
+  assert.deepEqual(readTrackFingerprint(store, raw, save.activeTrackUid), {
+    valid: true,
+    fingerprint: save.tracks[0].track.id,
+  });
+  for (const modify of [
+    (s: Save) => {
+      s.tracks[0].track.points[1] = { ...s.tracks[0].track.points[0] };
+    },
+    (s: Save) => {
+      s.tracks[0].track.id = "track-deadbeef";
+    },
+    (s: Save) => {
+      s.records[`${s.activeTrackUid}:${s.tracks[0].track.id}:rules-2`] = -5;
+    },
+  ]) {
+    const bad = JSON.parse(raw) as Save;
+    modify(bad);
+    const changed = JSON.stringify(bad);
+    values.set(STORAGE_KEY, changed);
+    assert.deepEqual(
+      readTrackFingerprint(store, changed, save.activeTrackUid),
+      { valid: false },
+    );
+    assert.equal(writeSave(store, save).ok, false);
+    assert.equal(values.get(STORAGE_KEY), changed);
+  }
+  const other = { ...store };
+  assert.deepEqual(
+    readTrackFingerprint(other, values.get(STORAGE_KEY)!, save.activeTrackUid),
+    { valid: false },
+  );
 });

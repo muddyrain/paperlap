@@ -394,6 +394,13 @@ try {
     await p.keyboard.press("r");
     assert.equal(await p.locator(".motion-sheet").count(), 0);
     await p.keyboard.press("Escape");
+    await modal(p);
+    assert.equal(
+      await p.locator("#game-menu").getAttribute("data-layer"),
+      "discard",
+    );
+    assert.equal((await state(p)).draft.canUndo, true);
+    await p.locator("#discard-drawing").click();
     await p.keyboard.press("Escape");
     await modal(p);
     assert.equal(
