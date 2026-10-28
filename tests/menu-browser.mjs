@@ -519,7 +519,13 @@ try {
       await page.screenshot({ path: `${output}discard-${viewport.width}.png` });
       await page.keyboard.press("Escape");
       await page.keyboard.press("r");
-      await page.keyboard.press("Escape"); // Empty draft safely exits.
+      await page.keyboard.press("Escape"); // R retains protected undo history.
+      await page.locator('#game-menu[data-layer="discard"]').waitFor();
+      assert.equal((await state(page)).draft.rawLength, 0);
+      assert.equal((await state(page)).draft.canUndo, true);
+      assert.equal(await focus(page), "keep-drawing");
+      await page.locator("#discard-drawing").click();
+      assert.equal((await state(page)).mode, "ready");
       check(
         `${viewport.width}×${viewport.height}: long name, all menu buttons/keycaps, controls and discard confirmation fit without changing canvas`,
       );

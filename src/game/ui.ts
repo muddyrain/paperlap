@@ -10,6 +10,8 @@ export const icon = (name: string) => {
     pause: "M8 5v14M16 5v14",
     play: "m8 4 13 8-13 8Z",
     edit: "m4 16 12-12 4 4L8 20l-5 1 1-5Zm9-9 4 4",
+    undo: "M9 5 3 11l6 6M3 11h11a6 6 0 0 1 6 6",
+    redo: "m15 5 6 6-6 6m6-6H10a6 6 0 0 0-6 6",
     reset: "M20 7v5h-5M4 17a8 8 0 1 0 0-10",
     sound: "m11 5-6 4H2v6h3l6 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14",
     mute: "m11 5-6 4H2v6h3l6 4V5Zm5 4 5 6m0-6-5 6",

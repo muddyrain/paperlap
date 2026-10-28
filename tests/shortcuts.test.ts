@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { shortcut } from "../src/game/shortcuts.ts";
+import { shortcut, historyShortcut } from "../src/game/shortcuts.ts";
 
 test("game shortcuts are scoped to the surface and match every displayed state", () => {
   for (const mode of ["ready", "running", "paused"] as const) {
@@ -70,4 +70,30 @@ test("menu shortcuts preserve native buttons and protect child pages", () => {
   );
   assert.equal(shortcut({ code: "KeyT" }, "menu-child", "button"), null);
   assert.equal(shortcut({ code: "Escape" }, "menu-child", "button"), "back");
+});
+
+test("editor history modifiers never capture text, IME, repeats or game shortcuts", () => {
+  for (const modifier of ["ctrlKey", "metaKey"] as const) {
+    const key = { code: "KeyZ", [modifier]: true };
+    assert.equal(historyShortcut(key, "editing", "surface"), "undo");
+    assert.equal(
+      historyShortcut({ ...key, shiftKey: true }, "editing", "button"),
+      "redo",
+    );
+    assert.equal(historyShortcut(key, "editing", "text"), null);
+    for (const flag of ["isComposing", "repeat", "altKey"])
+      assert.equal(
+        historyShortcut({ ...key, [flag]: true }, "editing", "surface"),
+        null,
+      );
+    for (const scope of [
+      "ready",
+      "running",
+      "paused",
+      "list",
+      "form",
+      "menu",
+    ] as const)
+      assert.equal(historyShortcut(key, scope, "surface"), null);
+  }
 });

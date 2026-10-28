@@ -358,3 +358,44 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 其它实拍：[说明页](screenshots/p1-04b-focus-keyboard-controls-after.png)、[草稿确认](screenshots/p1-04b-focus-keyboard-discard-after.png)、[1280×800](screenshots/p1-04b-focus-keyboard-1280-after.png)、[900×700](screenshots/p1-04b-focus-keyboard-900-after.png)、[forced-colors](screenshots/p1-04b-focus-forced-colors-after.png)。同路径短录屏见本地 before/after 的 `focus-flow.webm` / `focus-flow.mp4`（14.12s / 15.00s），另有 `test-results/focus-review/compare.html` 手动播放对照页。也刷新原 P1-04B 的交付截图为新焦点，避免旧轮廓被误认成修后；没有改变其它动效实现。测试浏览器、上下文和本任务预览服务均已释放。
 
 复现修后：构建并启动 `npm run preview -- --port 4175 --strictPort`，在另一终端执行 `PAPERLAP_URL=http://127.0.0.1:4175 npm run test:focus`。修前对照需要让 URL 指向旧提交构建，再设置 `PAPERLAP_FOCUS_BASELINE=1`；该变量不会切换源码。保持 Code Review，等待用户视觉验收，不自动合并。
+
+## P1-05A：赛道草稿安全与撤销恢复
+
+基线 master `4eb52c81`，分支 `feat/p1-05a-draft-safety`，对应 Issue #11；未实现 P1-05B 的局部控制点编辑。先定义 [草稿状态表与失败策略](draft-safety.md)，再添加纯数据/存储测试并接入编辑器。
+
+本轮新增 `src/game/draft.ts`、`draft-storage.ts`、`draft-ui.ts`：整笔状态最多 24 次撤销；R/撤销清空后保留一份可找回的 raw；独立 `paperlap.draft.v1` 有严格版本、长度、点数、有限坐标与归属校验。新建/替换分别绑定源 UID 和原路线指纹；恢复只作用于编辑器，复用 `fromDrawing` 重新校验，不写正式存档或起跑。完成/中断/历史操作立即备份，拖画最多每秒一次；内容未变时不重复写入。写入和清理会比较会话读到的原始字符串，拒绝覆盖已变化的数据。
+
+`TrackEditor` 负责整笔历史、重新绘制和中断；`GameMenu` 保留返回链，并在对应草稿清理失败时继续编辑；`main.ts` 仅接入来源、组合键、页面退出 checkpoint、可靠正式保存后的清理。顶部提供图标、中文和平台键帽的撤销/重做按钮，继续沿用非封闭铅笔焦点与既有纸片动效。`save.ts`、`storage.ts`、`trackbook.ts`、`scene.ts`、`vehicle.ts`、`laps.ts`、`geometry.ts`、`config.ts`、`game-motion.ts` 均未修改。
+
+### 实测结果
+
+| 检查                                  | 结果                                                                                                                                                                                    |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| typecheck / build                     | 通过；保留既有 Phaser chunk 体积提示                                                                                                                                                    |
+| unit                                  | 77/77；新增 13 项草稿数据/存储、1 项历史组合键检查                                                                                                                                      |
+| 草稿主浏览器套件                      | 28/28；真实鼠标绘图、R/撤销/重做、reload/关闭页面、有效与无效恢复、中断、A/B 与意图/UID/几何归属、容量拒绝、两种正式保存失败、清理失败、真实第二标签冲突、节流、三尺寸与 reduced-motion |
+| 草稿读取受限补充套件                  | 2/2；draft getItem 拒绝与 localStorage getter 拒绝；空编辑器安全退出，非空仍可真实绘制和撤销，提示正确的未备份原因                                                                      |
+| test:editor / test:menu               | 9/9、13/13                                                                                                                                                                              |
+| test:trackbook / test:storage         | 27/27、7/7；含 V1 无损迁移、V2 原文保护、管理事务和场景故障                                                                                                                             |
+| test:motion / test:focus / test:sound | 14/14、9/9、4/4                                                                                                                                                                         |
+| test:browser / test:handling          | 15/15、4/4；真实有效圈、连续两圈和规则隔离仍通过                                                                                                                                        |
+| 格式 / diff                           | Prettier 与 git diff --check 通过                                                                                                                                                       |
+
+浏览器检查合计 **132/132**，所有套件记录的错误/失败请求均为 0。`test:draft` 依次运行主套件和读取受限补充套件；本轮最终两套分别执行，报告为 `test-results/draft/report.json`（28）和 `test-results/draft/read-rejection/report.json`（2）。总表为 `test-results/draft/summary.json`，其余最终日志位于 `test-results/draft/regression-*.log` 与 `final-*.log`。菜单和动效旧测试中“R 清空即可直接退出”的断言已改为验证保留的撤销内容与明确放弃确认；菜单完整重跑通过。
+
+全部浏览器串行运行，明确 `headless: true`、独立上下文、静音，清除 PWDEBUG；仅通过页面 API 发送鼠标/键盘与生命周期事件。测试的浏览器和上下文均由 finally 释放，不使用日常 Chrome、不抢占桌面焦点、不自动打开任何报告或预览窗口。
+
+### 实际截图和录像
+
+| 操作 / 视口              | 截图                                                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 有效预览 → R → 撤销恢复  | [1366×768](screenshots/p1-05a-undo-1366.png)                                                                                                       |
+| 刷新后恢复提示           | [1366×768](screenshots/p1-05a-recovery-1366.png)、[1280×800](screenshots/p1-05a-recovery-1280.png)、[900×700](screenshots/p1-05a-recovery-900.png) |
+| 编辑器与历史按钮         | [1366×768](screenshots/p1-05a-editor-1366.png)、[1280×800](screenshots/p1-05a-editor-1280.png)、[900×700](screenshots/p1-05a-editor-900.png)       |
+| 默认继续 / 明确放弃      | [确认页](screenshots/p1-05a-discard-1366.png)                                                                                                      |
+| 未备份 / 清理失败        | [失败提示](screenshots/p1-05a-backup-failure.png)                                                                                                  |
+| 无效笔迹恢复后仍不能保存 | [无效草稿](screenshots/p1-05a-invalid-recovered.png)                                                                                               |
+
+实际无头页面录像保留在 `test-results/draft/`：`undo-redraw.webm`（21.72 秒）、`refresh-recovery.webm`（40.88 秒）、`discard-safety.webm`（20.52 秒）。对应 `.mp4` 用 H.264/yuv420p 编码，未改变帧顺序或速度；`review.html` 提供手动播放，`media.json` 记录时长与大小。录像与 JSON/日志为本地验收产物，不加入 Git；10 张原始 PNG 已入库。复现方式见草稿设计文档，运行 `npm run test:draft` 会重新生成实际操作录像。
+
+已知边界：撤销单位是整笔，刷新不持久化完整撤销栈；中断笔迹可查看但不能接续原 pointer capture。草稿最多 12 份 / 600,000 字符，不自动淘汰或合并其他标签的工作；UID/指纹不匹配的旧草稿保留原文。存储完全不可用时无法保证刷新找回未备份内容。来源沿用现有 Save V2 的 UID/指纹身份，不新增存档实例 ID，也不处理后续 #12 的几何指纹精度议题。真实浏览器验证为 Chromium，未宣称 Safari/Firefox 或人工试玩已通过。提交 PR 后停在 Code Review，等待用户试玩，不自动合并。

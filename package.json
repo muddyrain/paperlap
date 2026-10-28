@@ -20,7 +20,8 @@
     "bench:storage:browser": "node tests/storage-performance-browser.mjs",
     "test:motion": "node tests/motion-browser.mjs",
     "record:motion": "PAPERLAP_RECORD=1 node tests/motion-browser.mjs",
-    "test:focus": "node tests/focus-browser.mjs"
+    "test:focus": "node tests/focus-browser.mjs",
+    "test:draft": "node tests/draft-browser.mjs && node tests/draft-storage-browser.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

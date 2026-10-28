@@ -78,3 +78,23 @@ export function shortcutTarget(target: EventTarget | null): ShortcutTarget {
   if (target.closest('[data-action="select"]')) return "card";
   return target.closest("button,a") ? "button" : "surface";
 }
+
+// Editor history is the only modified-key game command. Native text undo stays
+// with the browser, and key repeat/IME must never consume additional snapshots.
+export function historyShortcut(
+  key: Key & Partial<Pick<KeyboardEvent, "shiftKey">>,
+  scope: ShortcutScope,
+  target: ShortcutTarget,
+): "undo" | "redo" | null {
+  if (
+    scope !== "editing" ||
+    target === "text" ||
+    key.isComposing ||
+    key.repeat ||
+    key.altKey ||
+    !(key.ctrlKey || key.metaKey) ||
+    key.code !== "KeyZ"
+  )
+    return null;
+  return key.shiftKey ? "redo" : "undo";
+}

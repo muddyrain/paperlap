@@ -3,6 +3,8 @@ import Phaser from "phaser";
 import { GameMenu } from "./game/game-menu";
 import { RaceScene } from "./game/scene";
 import { WORLD } from "./game/config";
+import { draftSource } from "./game/draft";
+import { DraftView } from "./game/draft-ui";
 import { TrackEditor } from "./game/editor";
 import {
   activeTrack,
@@ -17,7 +19,12 @@ import { Trackbook, trackbookMessage, type EditIntent } from "./game/trackbook";
 import { TrackbookView, trackName } from "./game/trackbook-ui";
 import { formatTime as format } from "./game/time";
 import { icon, buttonContent } from "./game/ui";
-import { shortcut, shortcutTarget, ignoresShortcuts } from "./game/shortcuts";
+import {
+  shortcut,
+  shortcutTarget,
+  ignoresShortcuts,
+  historyShortcut,
+} from "./game/shortcuts";
 import "./style.css";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
@@ -25,7 +32,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
  <div id="game" tabindex="0" role="application" aria-label="赛车区域，方向键或 WASD 驾驶"></div>
  <header class="hud"><div class="mode-note paper"><span class="flag">${icon("flag")}</span><div class="mode-copy"><h1><span class="track-label">当前赛道：</span><span id="track-name" tabindex="0"></span></h1><span id="mode-label">自由试跑</span></div></div>
  <div class="timing paper"><div class="current"><span>本圈</span><output id="timer">00:00.00</output></div><div class="best"><span>个人最佳</span><output id="best">--:--.--</output><span class="best-star">☆</span></div></div>
- <div class="editor-caption" hidden><div class="editor-heading"><h2 id="editor-title">新建赛道</h2><span id="editor-target">目标赛道：<strong id="editor-track-name" tabindex="0"></strong></span></div><p id="editor-intent"></p><div id="draw-intro" hidden>按住画一圈 · 起点附近松开 · 自动修圆</div></div>
+ <div class="editor-caption" hidden><div class="editor-heading"><h2 id="editor-title">新建赛道</h2><span id="editor-target">目标赛道：<strong id="editor-track-name" tabindex="0"></strong></span></div><p id="editor-intent"></p><p id="draft-backup" role="status"></p><div class="editor-history"><button id="undo-drawing" class="paper" disabled></button><button id="redo-drawing" class="paper" disabled></button></div><div id="draw-intro" hidden>按住画一圈 · 起点附近松开 · 自动修圆</div></div>
  <div class="top-actions"><button id="trackbook-open" class="paper" aria-haspopup="dialog" aria-expanded="false" aria-controls="trackbook" aria-keyshortcuts="T" title="赛道本 (T)">${buttonContent("book", "赛道本", "T")}</button><button id="pause" class="paper" aria-keyshortcuts="Escape" aria-haspopup="dialog" aria-controls="game-menu" aria-expanded="false" title="游戏菜单 (Esc)">${buttonContent("pause", "菜单", "Esc")}</button></div></header>
  <div id="lap-status" class="lap-status" role="status"></div><div id="toast" class="toast" role="status"></div>
  <footer class="footer"><div class="controls"><span><kbd>↑</kbd> 加速</span><span><kbd>↓</kbd> 刹车</span><span><kbd>←</kbd><kbd>→</kbd> 转向</span><span class="extra-controls"><kbd>R</kbd> 重来 <span class="control-dot">·</span> <kbd>Esc</kbd> 菜单</span></div><section id="welcome" class="race-note paper" aria-labelledby="ready-title"><h2 id="ready-title">准备试跑</h2><p id="start-hint" class="sr-only">方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。</p><button id="start" class="primary" aria-keyshortcuts="Space" title="开始试跑 (Space)" aria-describedby="start-hint">${buttonContent("play", "开始试跑", "Space")}</button></section><section id="pause-panel" class="race-note paper" aria-labelledby="pause-title" hidden><h2 id="pause-title">已暂停</h2><p id="pause-reason" class="sr-only">车辆和计时都已暂停</p><button id="resume" class="primary" aria-keyshortcuts="Space" title="继续试跑 (Space)" aria-describedby="pause-reason">${buttonContent("play", "继续试跑", "Space")}</button></section><div class="bottom-actions"><button id="sound" class="paper" aria-label="开启声音" title="开启声音">${buttonContent("mute", "声音")}</button><button id="edit" class="paper accent" aria-keyshortcuts="E" title="编辑当前赛道 (E)">${buttonContent("edit", "编辑当前", "E")}</button><button id="restart" class="paper" aria-keyshortcuts="R" title="重新开始 (R)">${buttonContent("reset", "重新开始", "R")}</button></div></footer>
@@ -141,7 +148,7 @@ const menu = new GameMenu(
     restart,
     book: () => trackbook.open(),
     edit: applyEdit,
-    draft: () => editor.raw.length > 0 || !!editor.candidate || editor.drawing,
+    draft: () => editor.hasDraft,
     interrupt: () => editor.interrupt(),
     cancelEdit,
     focusEditor: () => editor.focus(),
@@ -149,6 +156,7 @@ const menu = new GameMenu(
   },
   motion,
 );
+const drafts = new DraftView(editor, board, motion, () => menu.deferEditing());
 el("trackbook-open").onclick = () => menu.openBook();
 el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -298,6 +306,10 @@ function applyEdit(intent: EditIntent) {
   editUI(true);
   editor.focus();
   motion.sheet(sheet, "enter");
+  drafts.enter(
+    draftSource(book.save, intent),
+    trackName(activeTrack(book.save)),
+  );
   return result;
 }
 el("edit").onclick = () => menu.edit("replace");
@@ -326,7 +338,9 @@ function redraw() {
   motion.sheet(sheet, "erase");
 }
 el("redraw").onclick = redraw;
-function cancelEdit() {
+function cancelEdit(discard = true) {
+  if (discard && !drafts.discard()) return false;
+  drafts.leave();
   const sheet = motion.capture(scene, editor.canvas);
   editor.cancel();
   book.cancelEdit();
@@ -347,6 +361,7 @@ function driveDrawing() {
     motion.emphasize("drawing-status", el("editor-status"), "error");
     return;
   }
+  const cleanupMessage = drafts.saved(result.persisted);
   editor.finish();
   menu.editFinished();
   editUI(false);
@@ -357,19 +372,26 @@ function driveDrawing() {
   else start();
   motion.sheet(sheet, "return");
   toast(
-    result.persisted
-      ? create
-        ? "新赛道已保存，点击开始试跑。"
-        : "你的赛道，你来破纪录。"
-      : "本次未能保存，仍可继续试跑",
+    cleanupMessage ??
+      (result.persisted
+        ? create
+          ? "新赛道已保存，点击开始试跑。"
+          : "你的赛道，你来破纪录。"
+        : "本次未能保存，仍可继续试跑；草稿已保留"),
     result.persisted ? "saved" : "error",
   );
 }
 el("drive-drawing").onclick = driveDrawing;
 function keydown(e: KeyboardEvent) {
-  if (book.reloadRequired || ignoresShortcuts(e) || menu.state.layer !== "none")
-    return;
+  if (book.reloadRequired || menu.state.layer !== "none") return;
   const target = shortcutTarget(e.target);
+  const history = historyShortcut(e, scene.mode, target);
+  if (history) {
+    e.preventDefault();
+    drafts.action(history);
+    return;
+  }
+  if (ignoresShortcuts(e)) return;
   const inEditor = scene.mode === "editing";
   const action = shortcut(e, scene.mode, target);
   if (action && (inEditor || e.target === area || action === "menu")) {
@@ -446,6 +468,11 @@ function pointerFocus() {
   if (scene.mode === "running") area.focus();
 }
 const resizeMenu = () => menu.invalidate();
+const checkpointOnExit = () => {
+  editor.interrupt();
+  if (scene.mode === "editing") editor.checkpoint();
+};
+window.addEventListener("pagehide", checkpointOnExit);
 window.addEventListener("resize", resizeMenu);
 board.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
@@ -474,6 +501,13 @@ if (debug)
       track: structuredClone(scene.trackData.track),
       offroad: scene.offroad,
       effects: scene.trail.length,
+      draft: {
+        rawLength: editor.raw.length,
+        phase: editor.drawing ? "drawing" : editor.history.current.phase,
+        valid: !!editor.candidate,
+        canUndo: editor.history.canUndo,
+        canRedo: editor.history.canRedo,
+      },
       motion: { active: motion.active, reduced: motion.reduced },
     }),
   });
@@ -483,6 +517,8 @@ if (import.meta.hot)
     menu.destroy();
     window.removeEventListener("resize", resizeMenu);
     editor.destroy();
+    drafts.destroy();
+    window.removeEventListener("pagehide", checkpointOnExit);
     trackbook.destroy();
     motion.destroy();
     sound.destroy();

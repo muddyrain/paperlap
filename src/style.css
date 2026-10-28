@@ -1341,3 +1341,59 @@ button:disabled {
     forced-color-adjust: none;
   }
 }
+
+/* Draft controls stay in the top margin, outside the road's drawing bounds. */
+.editor-history {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  display: flex;
+  gap: 8px;
+}
+.editor-history button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+.editor-history svg {
+  width: 17px;
+  height: 17px;
+}
+.editor-caption #draft-backup {
+  max-width: calc(100% - 340px);
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #405e4c;
+}
+#draft-backup[data-kind="error"],
+#draft-error {
+  color: #a33f2b;
+}
+.draft-recovery h2 {
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+.draft-recovery p {
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.draft-recovery #draft-range {
+  color: #5d6b70;
+  font-size: 12px;
+}
+@media (max-width: 1000px) {
+  .editor-history {
+    top: 52px;
+    gap: 5px;
+  }
+  .editor-history button {
+    padding: 6px 7px;
+    font-size: 11px;
+    gap: 5px;
+  }
+  .editor-caption #draft-backup {
+    max-width: calc(100% - 315px);
+    font-size: 10px;
+  }
+}

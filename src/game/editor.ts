@@ -1,11 +1,25 @@
 import { ROAD, WORLD } from "./config";
-import { dist, fromDrawing, type Point, type Track } from "./geometry";
+import { dist, type Point, type Track } from "./geometry";
 import type { RaceScene } from "./scene";
 import type { Car } from "./vehicle";
 import type { LapState } from "./laps";
+import {
+  DraftHistory,
+  emptyDraft,
+  evaluateDraft,
+  type DraftCheckpoint,
+  type DraftSnapshot,
+} from "./draft";
 import type { EditIntent } from "./trackbook";
 export class TrackEditor {
   private intent: EditIntent = "replace";
+  history = new DraftHistory();
+  private checkpointAt = 0;
+  onCheckpoint: (checkpoint: DraftCheckpoint) => void = () => {};
+  onHistory: () => void = () => {};
+  get hasDraft() {
+    return this.drawing || this.raw.length > 0 || this.history.dirty;
+  }
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   raw: Point[] = [];
@@ -56,11 +70,16 @@ export class TrackEditor {
     name = this.scene.trackData.track.name,
   ) {
     this.intent = intent;
+    const historyHint = "Ctrl 或 Cmd Z 撤销，Ctrl 或 Cmd Shift Z 重做，";
     this.canvas.setAttribute(
       "aria-label",
       intent === "create"
         ? "新建赛道，原有赛道保留，R 重画，Enter 保存新赛道，Esc 取消"
         : `编辑当前赛道“${name.trim() || "未命名赛道"}”，保存将替换当前赛道路线，取消不会影响原赛道，R 重画，Enter 保存修改并试跑，Esc 取消`,
+    );
+    this.canvas.setAttribute(
+      "aria-label",
+      `${this.canvas.getAttribute("aria-label")}，${historyHint}`,
     );
     this.previous = {
       track: this.scene.trackData.track,
@@ -73,16 +92,75 @@ export class TrackEditor {
     this.scene.stepper.reset();
     this.scene.mode = "editing";
     this.canvas.hidden = false;
-    this.redraw();
+    this.history = new DraftHistory();
+    this.renderSnapshot();
+    this.onHistory();
   }
   redraw() {
+    this.interrupt();
+    this.history.commit(emptyDraft());
+    this.renderSnapshot();
+    this.changed();
+  }
+  private renderSnapshot() {
+    const snapshot = this.history.current;
     this.release();
-    this.raw = [];
+    this.raw = snapshot.raw.map((p) => ({ ...p }));
+    this.overflow = snapshot.overflow;
     this.strokeLength = 0;
-    this.candidate = null;
-    this.scene.preview(null);
-    this.paint();
-    this.onStatus("在虚线范围内画一个大圈，回到起点圆圈内松开", false, "hint");
+    const result = evaluateDraft(snapshot);
+    this.candidate = result.track;
+    this.scene.preview(result.track);
+    if (this.candidate) this.ctx.clearRect(0, 0, WORLD.width, WORLD.height);
+    else this.paint(result.point);
+    this.onStatus(
+      result.valid
+        ? this.intent === "create"
+          ? "赛道画好了！按 Enter 保存新赛道，或按 R 重新绘制。"
+          : "路线画好了！按 Enter 保存修改并试跑，或按 R 重新绘制。"
+        : result.message,
+      result.valid,
+      result.kind,
+    );
+  }
+  private changed() {
+    this.onHistory();
+    this.onCheckpoint(this.history.checkpoint());
+  }
+  private snapshot(phase: DraftSnapshot["phase"]): DraftSnapshot {
+    return {
+      phase,
+      raw: this.raw.map((p) => ({ ...p })),
+      overflow: this.overflow,
+    };
+  }
+  checkpoint() {
+    if (this.drawing)
+      this.onCheckpoint({
+        current: this.snapshot("interrupted"),
+        retained: null,
+      });
+    else this.onCheckpoint(this.history.checkpoint());
+  }
+  restore(checkpoint: DraftCheckpoint) {
+    this.release();
+    this.history.restore(checkpoint);
+    this.renderSnapshot();
+    this.changed();
+  }
+  undo() {
+    this.interrupt();
+    if (!this.history.undo()) return;
+    this.renderSnapshot();
+    this.changed();
+    this.focus();
+  }
+  redo() {
+    this.interrupt();
+    if (!this.history.redo()) return;
+    this.renderSnapshot();
+    this.changed();
+    this.focus();
   }
   focus() {
     this.canvas.focus({ preventScroll: true });
@@ -90,13 +168,11 @@ export class TrackEditor {
   interrupt() {
     if (!this.drawing) return;
     this.release();
-    this.paint();
-    this.onStatus(
-      "绘制已中断，可以重新按住鼠标画一圈，或按 R 清空",
-      false,
-      "hint",
-    );
+    this.history.commit(this.snapshot("interrupted"));
+    this.renderSnapshot();
+    this.changed();
   }
+
   cancel() {
     this.release();
     if (!this.previous) return;
@@ -164,30 +240,19 @@ export class TrackEditor {
       );
     }
     this.paint();
+    if (performance.now() - this.checkpointAt >= 1000) {
+      this.checkpointAt = performance.now();
+      this.checkpoint();
+    }
   };
   private up = (e: PointerEvent) => {
     if (!this.drawing || e.pointerId !== this.pointer) return;
     const p = this.point(e);
     if (this.raw.length < ROAD.maxRaw) this.raw.push(p);
     this.release();
-    const result = this.overflow
-      ? { ok: false as const, reason: "路线画得太久了，请重新画一个简洁的圈" }
-      : fromDrawing(this.raw);
-    if (result.ok) {
-      this.candidate = result.track;
-      this.scene.preview(result.track);
-      this.ctx.clearRect(0, 0, WORLD.width, WORLD.height);
-      this.onStatus(
-        this.intent === "create"
-          ? "赛道画好了！按 Enter 保存新赛道，或按 R 重新绘制。"
-          : "路线画好了！按 Enter 保存修改并试跑，或按 R 重新绘制。",
-        true,
-        "success",
-      );
-    } else {
-      this.paint(result.point);
-      this.onStatus(result.reason, false, "error");
-    }
+    this.history.commit(this.snapshot("complete"));
+    this.renderSnapshot();
+    this.changed();
   };
   private cancelPointer = () => {
     this.interrupt();
@@ -266,6 +331,7 @@ export class TrackEditor {
     }
   }
   destroy() {
+    this.interrupt();
     this.canvas.removeEventListener("pointerdown", this.down);
     this.canvas.removeEventListener("pointermove", this.move);
     this.canvas.removeEventListener("pointerup", this.up);
