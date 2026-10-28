@@ -19,8 +19,8 @@ const checks = [],
   failedRequests = [];
 const state = (p) => p.evaluate(() => window.paperlapDebug);
 const backup = (p) =>
-  p.evaluate(() => JSON.parse(localStorage.getItem("paperlap.draft.v1")));
-const saved = (p) => p.evaluate(() => localStorage.getItem("paperlap.save.v2"));
+  p.evaluate(() => JSON.parse(localStorage.getItem("paperlap.draft.v2")));
+const saved = (p) => p.evaluate(() => localStorage.getItem("paperlap.save.v3"));
 async function ready(p, reload = false) {
   if (reload) await p.reload();
   else await p.goto(`${base}/?debug=1`);

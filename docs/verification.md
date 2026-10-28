@@ -436,3 +436,11 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 浏览器三次热进入为 26.0 / 2.6 / 2.5ms；首次冷页面加载含游戏初始化约 1144.5ms，不与编辑点击混算。性能守卫使用 hot < cold×0.5 的相对阈值。新增安全回归验证：已验证原文被改成非法几何、错误 ID 或非法成绩后，查询拒绝信任，正式写入也继续拒绝并保留原文；另一存储对象不共享验证证据。外部变更后的冷验证仍可能阻塞数百毫秒，保留这一安全成本。
 
 复现：构建并启动独立 `npm run preview -- --port 4185 --strictPort`；另一终端执行 `PAPERLAP_URL=http://127.0.0.1:4185 npm run test:draft-review` 与 `PAPERLAP_URL=http://127.0.0.1:4185 npm run bench:draft:browser`。Node 性能守卫包含在 npm test 中。实拍：[仅放弃内存的确认页](screenshots/p1-05a-review-memory-discard.png)、[恢复后撤销找回完整 A](screenshots/p1-05a-review-retained-a.png)。继续停在 Code Review，不自动合并。
+
+## P1-05B-02A：Save V3 几何身份与旧纪录保护
+
+基线 `0058e52e`，先提交 RFC `c109b69` 再实现。105/105 单元、147/147 正式游戏无头浏览器功能检查、23/23 独立原型检查全部通过，typecheck、正式/原型构建通过。旧 V1/V2 原文不写入或删除，完整旧纪录以未验证历史展示，新 PB 绑定独立几何修订；真实两个标签、旧客户端冲突、配额/损坏、严格正式保存和新旧整笔草稿隔离均有回归。
+
+[完整验证与文件清单](save-v3-verification.md) 列出全部套件、20×900 冷/热性能、三桌面尺寸共 9 张截图及复现命令。[Save V3 RFC](save-v3-rfc.md) 固定 canonical、容量、单写入锁、迁移与回退合同。所有自动化使用隔离无头 Chromium，不影响用户桌面；控制台错误为 0，记录请求错误的套件均为 0。
+
+近上限真实页面冷加载约 1 秒；改名提交中位数 43.50ms、编辑进入 3.20ms。写入需要 Web Locks；第二标签只读，无自动分支合并。旧版回滚仅看到保留 V1/V2，不能看到 V3 新作品。旧草稿原文仍在，不按旧弱指纹自动恢复到新身份。不开发 Issue #16 的局部编辑 UI/局部草稿，停在 Code Review，不自动合并。

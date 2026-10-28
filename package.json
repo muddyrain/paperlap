@@ -28,7 +28,8 @@
     "build:local-edit": "npm run typecheck && vite build --config vite.local-edit.config.ts",
     "test:local-edit": "node tests/local-edit-browser.mjs",
     "bench:local-edit": "tsx tests/local-edit-performance.ts",
-    "record:local-edit": "PAPERLAP_RECORD=1 node tests/local-edit-browser.mjs"
+    "record:local-edit": "PAPERLAP_RECORD=1 node tests/local-edit-browser.mjs",
+    "bench:v3:browser": "node tests/save-v3-performance-browser.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

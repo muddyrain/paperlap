@@ -19,7 +19,7 @@ await mkdir(output, { recursive: true });
 const checks = [],
   errors = [],
   failedRequests = [];
-const key = "paperlap.save.v2";
+const key = "paperlap.save.v3";
 const check = (name) => {
   checks.push(name);
   console.log(`PASS ${name}`);
@@ -102,7 +102,7 @@ async function blockWrites(page, error = "QuotaExceededError") {
       Storage.prototype.setItem = set;
     };
     Storage.prototype.setItem = function (key, value) {
-      if (key === "paperlap.save.v2")
+      if (key === "paperlap.save.v3")
         throw new DOMException("injected storage failure", error);
       return set.call(this, key, value);
     };
@@ -231,8 +231,8 @@ try {
     );
 
     const b = save.tracks[1];
-    save.records[`${a.uid}:${a.track.id}:rules-2`] = 24.68;
-    save.records[`${b.uid}:${b.track.id}:rules-2`] = 35;
+    save.records[`${a.uid}:${a.geometryIdentity}:rules-2`] = 24.68;
+    save.records[`${b.uid}:${b.geometryIdentity}:rules-2`] = 35;
     save.legacyRecords["track-deadbeef:rules-1"] = 40;
     await seed(page, save);
     await page.locator("#sound").click();
@@ -372,7 +372,7 @@ try {
     const remaining = JSON.parse(await read(page));
     assert.equal(remaining.activeTrackUid, b.uid);
     assert.deepEqual(remaining.records, {
-      [`${b.uid}:${b.track.id}:rules-2`]: 35,
+      [`${b.uid}:${b.geometryIdentity}:rules-2`]: 35,
     });
     assert.deepEqual(remaining.legacyRecords, save.legacyRecords);
     assert.deepEqual((await state(page)).car, beforeDelete.car);
@@ -474,21 +474,24 @@ try {
         await draw(page, wobblyLoop(Math.PI / 2));
         await blockWrites(page, error);
         await page.keyboard.press("Enter");
-        assert.equal((await state(page)).mode, "running");
+        assert.equal((await state(page)).mode, "editing");
         assert.equal((await state(page)).activeTrackUid, b.uid);
-        assert.notEqual((await state(page)).trackId, b.track.id);
-        assert.match(await page.locator("#toast").innerText(), /未能保存/);
+        assert.equal(await page.locator("#drive-drawing").isEnabled(), true);
+        assert.match(
+          await page.locator("#editor-status").innerText(),
+          /未能保存/,
+        );
         assert.equal(await read(page), old);
         await restoreWrites(page);
       }
       check(
-        `${error}: select/rename/delete/create failures preserve prior state; create can retry/cancel, replace remains playable`,
+        `${error}: select/rename/delete/create failures preserve prior state; create can retry/cancel, V3 replace retains its editable candidate without claiming a save`,
       );
     });
 
   await isolated(async (page) => {
     await page.evaluate(() =>
-      localStorage.setItem("paperlap.save.v2", "{broken"),
+      localStorage.setItem("paperlap.save.v3", "{broken"),
     );
     await ready(page);
     const original = await state(page);
@@ -514,15 +517,17 @@ try {
     assert.equal(await read(page), "{broken");
     assert.equal((await state(page)).trackId, original.trackId);
     check(
-      "corrupt V2 remains protected through failed rename/create and cancellation",
+      "corrupt V3 remains protected through failed rename/create and cancellation",
     );
   });
 
   await isolated(async (page) => {
     const same = structuredClone(ab);
     same.tracks[1].track = { ...same.tracks[0].track, name: "" };
-    same.records[`${same.tracks[1].uid}:${same.tracks[1].track.id}:rules-2`] =
-      32;
+    same.tracks[1].geometryDigest = same.tracks[0].geometryDigest;
+    same.records[
+      `${same.tracks[1].uid}:${same.tracks[1].geometryIdentity}:rules-2`
+    ] = 32;
     await seed(page, same);
     assert.equal(await page.locator("#track-name").innerText(), "未命名赛道");
     assert.equal(JSON.parse(await read(page)).tracks[1].track.name, "");
@@ -533,6 +538,7 @@ try {
     full.tracks = Array.from({ length: 20 }, (_, i) => ({
       ...full.tracks[0],
       uid: `entry-${i}`,
+      geometryIdentity: `g-${(i + 1).toString(16).padStart(32, "0")}`,
     }));
     full.activeTrackUid = "entry-0";
     full.records = {};

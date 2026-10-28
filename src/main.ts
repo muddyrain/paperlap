@@ -1,3 +1,4 @@
+import { SaveHistory } from "./game/save-history";
 import { GameMotion, type Feedback } from "./game/game-motion";
 import Phaser from "phaser";
 import { GameMenu } from "./game/game-menu";
@@ -6,14 +7,14 @@ import { WORLD } from "./game/config";
 import { draftSource } from "./game/draft";
 import { DraftView } from "./game/draft-ui";
 import { TrackEditor } from "./game/editor";
+import { activeTrack, recordKey, setBest, type Save } from "./game/save-model";
 import {
-  activeTrack,
-  freshSave,
-  recordKey,
-  setBest,
-  type Save,
-} from "./game/save";
-import { loadSave, writeSave } from "./game/storage";
+  SaveSession,
+  acquireWriter,
+  STORAGE_KEY,
+  OLD_KEYS,
+} from "./game/storage-v3";
+import { v3DraftPolicy } from "./game/draft-storage-v3";
 import { Sound } from "./game/audio";
 import { Trackbook, trackbookMessage, type EditIntent } from "./game/trackbook";
 import { TrackbookView, trackName } from "./game/trackbook-ui";
@@ -41,16 +42,15 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
  <div class="page-signature">DRAW A LITTLE. DRIVE A LITTLE.</div>
 </main>`;
 const scene = new RaceScene();
-let save: Save;
-let loadFailed = false;
+let backing: Storage | null = null;
 try {
-  const loaded = loadSave(window.localStorage);
-  save = loaded.save;
-  loadFailed = !!loaded.error;
+  backing = window.localStorage;
 } catch {
-  save = freshSave();
-  loadFailed = true;
+  /* Read-only fallback below. */
 }
+const session = new SaveSession(backing, await acquireWriter());
+const loaded = session.open();
+const save: Save = loaded.save;
 scene.setTrack(activeTrack(save).track);
 const sound = new Sound();
 sound.muted = save.muted;
@@ -81,7 +81,14 @@ const motion = new GameMotion(board, (reduced) => {
 });
 const book = new Trackbook(save, {
   uid: () => crypto.randomUUID(),
-  write: (candidate) => writeSave(window.localStorage, candidate),
+  write: (candidate) => {
+    const result =
+      candidate.schemaVersion === 3
+        ? session.write(candidate)
+        : { ok: false as const, error: "invalid-save" as const };
+    saveHistory.status(result.ok ? session.error : result.error);
+    return result;
+  },
   stop: () => {
     scene.keys.clear();
     scene.pause();
@@ -137,7 +144,7 @@ const menu = new GameMenu(
   {
     context: () => ({
       mode: scene.mode,
-      identity: `${book.save.activeTrackUid}:${scene.trackData.track.id}`,
+      identity: recordKey(activeTrack(book.save)),
       name: trackName(activeTrack(book.save)),
       elapsed: editor.previous?.lap.elapsed ?? scene.lap.elapsed,
       muted: sound.muted,
@@ -157,7 +164,25 @@ const menu = new GameMenu(
   },
   motion,
 );
-const drafts = new DraftView(editor, board, motion, () => menu.deferEditing());
+const drafts = new DraftView(
+  editor,
+  board,
+  motion,
+  () => menu.deferEditing(),
+  v3DraftPolicy(() => session.writable),
+);
+const saveHistory = new SaveHistory(
+  board,
+  () => book.save,
+  session,
+  () => {
+    menu.invalidate();
+    pause();
+  },
+  motion,
+);
+saveHistory.status(session.error);
+session.onStatus = () => saveHistory.status(session.error);
 el("trackbook-open").onclick = () => menu.openBook();
 el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -175,6 +200,7 @@ function persist() {
 function updateBest() {
   const best = book.save.records[recordKey(activeTrack(book.save))];
   el("best").textContent = best ? format(best) : "--:--.--";
+  saveHistory.update();
 }
 function soundUI() {
   el("sound").innerHTML = buttonContent(
@@ -187,7 +213,7 @@ function soundUI() {
 }
 soundUI();
 updateBest();
-if (loadFailed) toast("存档未能更新，仍可继续试跑", "error");
+
 let uiClock = 0;
 scene.onChange = () => {
   const now = performance.now();
@@ -220,8 +246,10 @@ scene.onLap = (time, valid) => {
       toast("成绩未能保存，仍可继续试跑", "error");
       return;
     }
+    const previous = book.save;
     book.save = result.save;
     const persisted = persist();
+    if (!persisted) book.save = previous;
     updateBest();
     toast(
       persisted ? `新纪录！ ${format(time)}` : "本次未能保存，仍可继续试跑",
@@ -473,7 +501,19 @@ const checkpointOnExit = () => {
   editor.interrupt();
   if (scene.mode === "editing") editor.checkpoint();
 };
+const releaseSession = () => session.release();
+const checkExternal = (event: StorageEvent) => {
+  if ([STORAGE_KEY, OLD_KEYS.v1, OLD_KEYS.v2, null].includes(event.key)) {
+    session.check();
+  }
+};
+const restoreSession = (event: PageTransitionEvent) => {
+  if (event.persisted) location.reload();
+};
+window.addEventListener("storage", checkExternal);
+window.addEventListener("pageshow", restoreSession);
 window.addEventListener("pagehide", checkpointOnExit);
+window.addEventListener("pagehide", releaseSession);
 window.addEventListener("resize", resizeMenu);
 board.addEventListener("keydown", keydown);
 window.addEventListener("keyup", keyup);
@@ -492,6 +532,17 @@ if (debug)
       car: { ...scene.car },
       lap: { ...scene.lap },
       trackId: scene.trackData.track.id,
+      geometryIdentity:
+        "geometryIdentity" in activeTrack(book.save)
+          ? (activeTrack(book.save) as import("./game/save-v3").TrackEntry)
+              .geometryIdentity
+          : null,
+      storage: {
+        writable: session.writable,
+        error: session.error,
+        source: loaded.source,
+        persisted: loaded.persisted,
+      },
       activeTrackUid: book.save.activeTrackUid,
       keys: [...scene.keys],
       sound: {
@@ -515,6 +566,11 @@ if (debug)
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     clearTimeout(toastTimer);
+    session.release();
+    window.removeEventListener("storage", checkExternal);
+    window.removeEventListener("pageshow", restoreSession);
+    window.removeEventListener("pagehide", releaseSession);
+    saveHistory.destroy();
     menu.destroy();
     window.removeEventListener("resize", resizeMenu);
     editor.destroy();

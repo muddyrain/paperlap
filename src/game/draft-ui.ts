@@ -1,4 +1,9 @@
-import { draftMessage, DraftStorage, type DraftResult } from "./draft-storage";
+import {
+  draftMessage,
+  DraftStorage,
+  type DraftResult,
+  type DraftPolicy,
+} from "./draft-storage";
 import type { DraftCheckpoint, DraftSource } from "./draft";
 import type { TrackEditor } from "./editor";
 import type { GameMotion } from "./game-motion";
@@ -17,6 +22,7 @@ export class DraftView {
   private pending: DraftCheckpoint | null = null;
   private active = false;
   private unconfirmedBackup = false;
+  private legacyHint = "";
   get memoryOnlyDiscard() {
     return this.active && this.unconfirmedBackup;
   }
@@ -25,6 +31,7 @@ export class DraftView {
     private board: HTMLElement,
     private motion: GameMotion,
     private defer: () => void,
+    private policy?: DraftPolicy,
   ) {
     const keys = historyKeys();
     for (const [id, label, glyph, key] of [
@@ -114,6 +121,7 @@ export class DraftView {
       !this.editor.history.canRedo;
   }
   private status(message: string, error: boolean) {
+    message = this.legacyHint + message;
     const status = document.getElementById("draft-backup")!;
     if (status.textContent !== message) status.textContent = message;
     status.dataset.kind = error ? "error" : "hint";
@@ -132,7 +140,12 @@ export class DraftView {
     this.pending = null;
     let loaded: DraftResult;
     try {
-      this.storage = new DraftStorage(window.localStorage);
+      this.legacyHint =
+        this.policy?.version === 2 &&
+        window.localStorage.getItem("paperlap.draft.v1") !== null
+          ? "旧版整笔草稿原文保留，未自动套用；请在旧版备份后恢复。 "
+          : "";
+      this.storage = new DraftStorage(window.localStorage, this.policy);
       loaded = this.storage.open(source);
     } catch {
       this.storage = null;

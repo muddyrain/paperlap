@@ -26,7 +26,7 @@ const check = (name) => {
   checks.push(name);
   console.log(`PASS ${name}`);
 };
-const raw = (p) => p.evaluate(() => localStorage.getItem("paperlap.save.v2"));
+const raw = (p) => p.evaluate(() => localStorage.getItem("paperlap.save.v3"));
 const wait = (p, ms = 440) => p.waitForTimeout(ms);
 async function load(p) {
   await p.goto(`${base}/?debug=1`);
@@ -36,7 +36,7 @@ async function load(p) {
 }
 async function seed(p, save) {
   await p.evaluate(
-    (s) => localStorage.setItem("paperlap.save.v2", JSON.stringify(s)),
+    (s) => localStorage.setItem("paperlap.save.v3", JSON.stringify(s)),
     save,
   );
   await load(p);
@@ -73,14 +73,13 @@ async function isolated(
     }
   }
 }
-async function draw(p) {
+async function draw(p, points = wobblyLoop()) {
   const r = await p.locator(".draw-surface").boundingBox();
   const at = (a) => ({
     x: r.x + (a.x * r.width) / 1440,
     y: r.y + (a.y * r.height) / 860,
   });
-  const points = wobblyLoop(),
-    start = at(points[0]);
+  const start = at(points[0]);
   await p.mouse.move(start.x, start.y);
   await p.mouse.down();
   for (const point of points.slice(1)) {
@@ -130,10 +129,13 @@ async function keyframes(p, name, selector, duration) {
 }
 async function blockWrites(p) {
   await p.evaluate(() => {
+    window.motionRejectedWrites = 0;
     window.motionSetItem = Storage.prototype.setItem;
     Storage.prototype.setItem = function (k, v) {
-      if (k === "paperlap.save.v2")
+      if (k === "paperlap.save.v3") {
+        window.motionRejectedWrites++;
         throw new DOMException("full", "QuotaExceededError");
+      }
       return window.motionSetItem.call(this, k, v);
     };
   });
@@ -294,13 +296,17 @@ try {
     await restoreWrites(p);
     await p.keyboard.press("Escape");
     await p.keyboard.press("e");
-    await draw(p);
+    await draw(p, wobblyLoop(Math.PI / 2));
     await blockWrites(p);
-    await p.keyboard.press("Enter"); // Existing replacement failure is playable but must not claim success.
+    await p.keyboard.press("Enter"); // V3 failure retains the editable candidate.
     assert.equal(
-      await p.locator("#toast").getAttribute("data-feedback"),
+      await p.locator("#editor-status").getAttribute("data-kind"),
       "error",
     );
+    assert.equal((await state(p)).mode, "editing");
+    assert.ok(await p.evaluate(() => window.motionRejectedWrites > 0));
+    assert.match(await p.locator("#editor-status").innerText(), /未能保存/);
+    assert.equal(await p.locator(".motion-sheet").count(), 0);
     assert.equal(
       await p
         .locator("#toast")

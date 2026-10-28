@@ -1,11 +1,13 @@
 import { fromDrawing, type Point, type Track } from "./geometry";
-import { activeTrack, type Save } from "./save";
+import { activeTrack, type Save } from "./save-model";
 import type { EditIntent } from "./trackbook";
 
 export interface DraftSource {
   intent: EditIntent;
   uid: string;
   fingerprint: string;
+  geometryIdentity?: string;
+  geometryDigest?: string;
 }
 export interface DraftSnapshot {
   phase: "empty" | "complete" | "interrupted";
@@ -31,10 +33,20 @@ export function draftSource(save: Save, intent: EditIntent): DraftSource {
     intent,
     uid: entry.uid,
     fingerprint: entry.track.id,
+    ...("geometryIdentity" in entry
+      ? {
+          geometryIdentity: entry.geometryIdentity,
+          geometryDigest: entry.geometryDigest,
+        }
+      : {}),
   };
 }
 export const sameSource = (a: DraftSource, b: DraftSource) =>
-  a.intent === b.intent && a.uid === b.uid && a.fingerprint === b.fingerprint;
+  a.intent === b.intent &&
+  a.uid === b.uid &&
+  a.fingerprint === b.fingerprint &&
+  a.geometryIdentity === b.geometryIdentity &&
+  a.geometryDigest === b.geometryDigest;
 
 export function evaluateDraft(s: DraftSnapshot): {
   valid: boolean;

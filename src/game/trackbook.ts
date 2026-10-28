@@ -9,17 +9,13 @@ import {
   type Save,
   type SaveResult,
   type TrackEntry,
-} from "./save";
+} from "./save-model";
 import type { Track } from "./geometry";
-import type { StorageError, WriteResult } from "./storage";
+import type { StorageError, WriteResult } from "./storage-v3";
 
 export type EditIntent = "create" | "replace";
 export type TrackbookError =
-  | StorageError
-  | "editing"
-  | "no-draft"
-  | "render"
-  | "reload-required";
+  StorageError | "editing" | "no-draft" | "render" | "reload-required";
 export type CommandResult =
   | { ok: true; persisted: boolean; changed: boolean; error?: StorageError }
   | { ok: false; error: TrackbookError };
@@ -93,7 +89,11 @@ export class Trackbook {
     const candidate = create
       ? addTrack(this.save, track, this.deps.uid())
       : replaceTrack(this.save, this.save.activeTrackUid, track);
-    const result = this.commit(candidate, true, create);
+    const result = this.commit(
+      candidate,
+      true,
+      create || this.save.schemaVersion === 3,
+    );
     if (result.ok) this.intent = null;
     return result;
   }
@@ -137,6 +137,10 @@ export class Trackbook {
 
 export function trackbookMessage(error: TrackbookError): string {
   const messages: Partial<Record<TrackbookError, string>> = {
+    "invalid-v3": "新存档损坏或摘要不匹配，原文已保留，未能保存。",
+    conflict: "其他标签或旧版数据已变化，保存已停止；请导出备份并重新加载。",
+    "writer-busy": "另一个标签持有写入权限，本标签只读。关闭该标签后刷新重试。",
+    "lock-unavailable": "浏览器不支持安全保存锁，本次只读。",
     "invalid-name": "名称不能为空，且最多 40 个字符。",
     "track-limit": "最多保存 20 条赛道，请先删除不需要的赛道。",
     "last-track": "至少保留一条赛道，不能删除最后一条。",

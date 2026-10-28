@@ -11,6 +11,7 @@ import {
   type LocalDrag,
 } from "../game/local-edit";
 import { parseSave } from "../game/save";
+import { parseSave as parseV3 } from "../game/save-v3";
 import { ellipseTrack, localFixtures } from "./local-edit-fixtures";
 
 const $ = <T extends HTMLElement>(id: string) =>
@@ -448,10 +449,14 @@ function options() {
 route.addEventListener("change", () => load(Number(route.value)));
 $("read-saved").addEventListener("click", () => {
   try {
-    const saved = parseSave(window.localStorage.getItem("paperlap.save.v2"));
+    const rawV3 = window.localStorage.getItem("paperlap.save.v3");
+    const saved =
+      rawV3 === null
+        ? parseSave(window.localStorage.getItem("paperlap.save.v2"))
+        : parseV3(rawV3);
     if (!saved) {
       status(
-        "此网址与端口没有可读取的有效 Save V2。可继续体验样例；未修改存档。",
+        "此网址与端口没有可读取的有效 Save V2/V3。可继续体验样例；未修改存档。",
       );
       return;
     }
