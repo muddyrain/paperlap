@@ -438,6 +438,16 @@ try {
       .locator(`[data-uid="${ab.tracks[0].uid}"] [data-action="select"]`)
       .click();
     assert.equal(await page.locator("#recovery").isVisible(), true);
+    assert.equal(
+      await page.locator(".motion-sheet,.motion-crease,.motion-echo").count(),
+      0,
+    );
+    assert.equal(
+      await page
+        .locator(".motion-shade")
+        .evaluate((el) => getComputedStyle(el).opacity),
+      "0",
+    );
     assert.equal(await page.locator("dialog[open]").count(), 0);
     // Space on the focused reload button is an explicit native reload, not a game shortcut.
     for (const key of ["Escape", "r", "t", "e"]) await page.keyboard.press(key);

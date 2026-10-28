@@ -9,6 +9,8 @@
   --muted: #687479;
   --shadow: 0 3px 5px #58442b24;
   --focus: #3c667c;
+  --focus-wash: #efe1c7;
+  --focus-pencil: #935034;
   --layer-ui: 2;
   --layer-panel: 3;
   --layer-toast: 4;
@@ -50,8 +52,8 @@ button:active {
   box-shadow: 0 1px 2px #58442b24;
 }
 button:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 5px;
+  outline: 1.5px solid #567184;
+  outline-offset: 2px;
 }
 button:disabled {
   cursor: default;
@@ -474,29 +476,6 @@ button .button-label {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-.trackbook::backdrop {
-  background: #37455320;
-  animation: veil-in 220ms ease-out;
-}
-.trackbook[data-motion="closing"]::backdrop {
-  animation: veil-out 200ms ease-in forwards;
-}
-@keyframes veil-in {
-  from {
-    background: transparent;
-  }
-  to {
-    background: #37455320;
-  }
-}
-@keyframes veil-out {
-  from {
-    background: #37455320;
-  }
-  to {
-    background: transparent;
-  }
 }
 .trackbook-heading,
 .trackbook-toolbar,
@@ -1033,14 +1012,14 @@ button .button-label {
   }
 }
 
-/* P1-04A stays immediate; coordinated game motion belongs to P1-04B. */
+/* Real menu geometry remains fixed; GameMotion animates presentation only. */
 .game-menu {
   position: fixed;
   left: max(16px, calc((100vw - min(100vw, 167.44186vh)) / 2 + 24px));
   right: auto;
   top: 50%;
   margin: 0;
-  transform: translateY(-50%);
+  translate: 0 -50%;
   width: 300px;
   max-width: calc(100vw - 32px);
   max-height: min(calc(100vh - 32px), calc(59.72222vw - 32px));
@@ -1150,4 +1129,215 @@ button .button-label {
 .menu-open #welcome,
 .menu-open #pause-panel {
   visibility: hidden;
+}
+
+/* Paper motion: one shared shade; native top-layer dialogs still own input. */
+:root {
+  --motion-focus: 160ms;
+  --motion-settle: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.game-menu::backdrop,
+.trackbook::backdrop {
+  background: transparent;
+  animation: none;
+}
+.motion-shade {
+  position: absolute;
+  inset: 0;
+  z-index: var(--layer-panel);
+  background: #37455326;
+  opacity: 0;
+  pointer-events: none;
+}
+.motion-sheet {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: left center;
+}
+.motion-sheet[data-motion-sheet="return"] {
+  transform-origin: right center;
+}
+.motion-echo {
+  z-index: var(--layer-panel);
+  pointer-events: none;
+  overflow: hidden;
+}
+.motion-echo.trackbook {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.motion-echo [data-echo-id="trackbook-list"] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.motion-echo [data-echo-id="track-list"] {
+  list-style: none;
+  padding: 5px;
+  margin: 0 -5px;
+  min-height: 0;
+  overflow: hidden;
+}
+.motion-echo [data-echo-id="menu-track"] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.game-menu::after,
+.trackbook::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  background: #d9cbb2;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  pointer-events: none;
+}
+button {
+  transition:
+    transform var(--motion-focus) var(--motion-settle),
+    background var(--motion-focus),
+    box-shadow var(--motion-focus);
+}
+button[data-pressed="true"]:not(:disabled) {
+  scale: 0.97;
+  translate: 0 1px;
+  box-shadow: 0 1px 0 #58442b30;
+}
+button:disabled {
+  scale: 1;
+  translate: 0;
+}
+.track-card[aria-current] {
+  border-color: var(--accent);
+}
+.track-card[aria-current] .track-choice {
+  font-weight: 800;
+}
+.editor-heading::after {
+  content: "";
+  flex: 1;
+  max-width: 80px;
+  height: 2px;
+  background: var(--accent);
+  align-self: center;
+  transform: rotate(-1deg);
+}
+.toast[data-feedback="saved"] {
+  color: #405e4c;
+  border-color: #567d6280;
+}
+.toast[data-feedback="lap"] {
+  color: #374553;
+  border-color: #72879080;
+}
+.toast[data-feedback="record"] {
+  border: 2px solid var(--accent);
+  font-weight: 800;
+}
+.toast[data-feedback="error"] {
+  border-style: dashed;
+}
+.best-star {
+  display: inline-block;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  button[data-pressed="true"]:not(:disabled) {
+    scale: 1;
+    translate: 0;
+  }
+  .motion-sheet,
+  .motion-echo {
+    display: none;
+  }
+}
+
+.motion-crease {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -8px;
+  width: 18px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #b8a78b40 40%,
+    #fff9e960 70%,
+    transparent
+  );
+  border-right: 1px solid #a7997d30;
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-crease {
+    display: none;
+  }
+}
+.motion-echo [data-echo-id="menu-hint"],
+.motion-echo [data-echo-id="menu-status"] {
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+.motion-echo [data-echo-id="menu-hint"]:empty,
+.motion-echo [data-echo-id="menu-status"]:empty {
+  display: none;
+}
+.motion-echo [data-echo-id="menu-controls-page"] {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.motion-echo [data-echo-id="menu-controls-page"] dd {
+  margin-left: 0;
+}
+.motion-echo [data-echo-id="menu-discard"] {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Game buttons replace the ring with a local pencil mark; other focus outlines remain. */
+.board[data-input="keyboard"] button:focus {
+  position: relative;
+  outline: 0;
+  background-color: var(--focus-wash);
+}
+.board[data-input="keyboard"] button:focus::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  bottom: 3px;
+  width: 30px;
+  height: 3px;
+  background: var(--focus-pencil);
+  clip-path: polygon(0 35%, 94% 0, 100% 55%, 4% 100%);
+  transform: rotate(-1deg);
+  pointer-events: none;
+}
+.board[data-input="keyboard"] button.primary:focus {
+  --focus-pencil: #fff4d8;
+  background-color: #b74422;
+}
+.board[data-input="pointer"] button:focus-visible {
+  outline-color: transparent;
+}
+.trackbook input:focus-visible {
+  outline-width: 1.5px;
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .board[data-input="keyboard"] button:focus::after {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
 }

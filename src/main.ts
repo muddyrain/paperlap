@@ -1,3 +1,4 @@
+import { GameMotion, type Feedback } from "./game/game-motion";
 import Phaser from "phaser";
 import { GameMenu } from "./game/game-menu";
 import { RaceScene } from "./game/scene";
@@ -64,6 +65,13 @@ const el = <T extends HTMLElement = HTMLElement>(id: string) =>
 const area = el("game");
 const board = document.querySelector<HTMLElement>(".board")!;
 const editor = new TrackEditor(scene, board);
+const motion = new GameMotion(board, (reduced) => {
+  scene.reducedMotion = reduced;
+  if (reduced) {
+    scene.effects?.clear();
+    scene.trail = [];
+  }
+});
 const book = new Trackbook(save, {
   uid: () => crypto.randomUUID(),
   write: (candidate) => writeSave(window.localStorage, candidate),
@@ -90,66 +98,66 @@ const book = new Trackbook(save, {
     menu.block();
     board.classList.add("recovering");
     board.querySelectorAll("dialog").forEach((dialog) => dialog.close());
+    motion.interrupt();
     el("recovery").hidden = false;
     el("reload").focus();
   },
 });
-const trackbook = new TrackbookView(book, board, {
-  create: () => menu.edit("create"),
-  open: () => pause(),
-  close: () => menu.bookClosed(),
-  change: (action) => {
-    updateBest();
-    if (action === "select") {
-      toast("赛道已切换 · 等待开始试跑");
-      el("track-name")
-        .getAnimations()
-        .forEach((motion) => motion.cancel());
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-        el("track-name").animate([{ opacity: 0.5 }, { opacity: 1 }], {
-          duration: 220,
-        });
-    }
+const trackbook = new TrackbookView(
+  book,
+  board,
+  {
+    create: () => menu.edit("create"),
+    open: () => pause(),
+    close: () => menu.bookClosed(),
+    beforeSelect: () => motion.capture(scene),
+    change: (action, sheet) => {
+      updateBest();
+      if (action === "select") {
+        toast("赛道已切换 · 等待开始试跑");
+        motion.sheet(sheet ?? null, "switch");
+        motion.emphasize("track-name", el("track-name"), "page");
+      } else if (action === "rename") {
+        motion.emphasize("track-name", el("track-name"), "page");
+      }
+    },
   },
-});
-const menu = new GameMenu(board, area, {
-  context: () => ({
-    mode: scene.mode,
-    identity: `${book.save.activeTrackUid}:${scene.trackData.track.id}`,
-    name: trackName(activeTrack(book.save)),
-    elapsed: editor.previous?.lap.elapsed ?? scene.lap.elapsed,
-    muted: sound.muted,
-    blocked: book.reloadRequired,
-  }),
-  pause,
-  start,
-  restart,
-  book: () => trackbook.open(),
-  edit: applyEdit,
-  draft: () => editor.raw.length > 0 || !!editor.candidate || editor.drawing,
-  interrupt: () => editor.interrupt(),
-  cancelEdit,
-  focusEditor: () => editor.focus(),
-  sound: toggleSound,
-});
+  motion,
+);
+const menu = new GameMenu(
+  board,
+  area,
+  {
+    context: () => ({
+      mode: scene.mode,
+      identity: `${book.save.activeTrackUid}:${scene.trackData.track.id}`,
+      name: trackName(activeTrack(book.save)),
+      elapsed: editor.previous?.lap.elapsed ?? scene.lap.elapsed,
+      muted: sound.muted,
+      blocked: book.reloadRequired,
+    }),
+    pause,
+    start,
+    restart,
+    book: () => trackbook.open(),
+    edit: applyEdit,
+    draft: () => editor.raw.length > 0 || !!editor.candidate || editor.drawing,
+    interrupt: () => editor.interrupt(),
+    cancelEdit,
+    focusEditor: () => editor.focus(),
+    sound: toggleSound,
+  },
+  motion,
+);
 el("trackbook-open").onclick = () => menu.openBook();
 el("reload").onclick = () => location.reload();
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
-let toastMotion: Animation | null = null;
-function toast(message: string, stamp = false) {
+function toast(message: string, kind: Feedback = "notice") {
   clearTimeout(toastTimer);
   el("toast").textContent = message;
   el("toast").title = message;
-  el("toast").classList.toggle("stamp", stamp);
-  toastMotion?.cancel();
-  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-    toastMotion = el("toast").animate(
-      [
-        { opacity: 0.5, transform: "translateY(-3px)" },
-        { opacity: 1, transform: "translateY(0)" },
-      ],
-      { duration: 220, easing: "ease-out" },
-    );
+  el("toast").classList.toggle("stamp", kind === "record");
+  motion.feedback(kind);
   toastTimer = setTimeout(() => (el("toast").textContent = ""), 3000);
 }
 function persist() {
@@ -170,7 +178,7 @@ function soundUI() {
 }
 soundUI();
 updateBest();
-if (loadFailed) toast("存档未能更新，仍可继续试跑");
+if (loadFailed) toast("存档未能更新，仍可继续试跑", "error");
 let uiClock = 0;
 scene.onChange = () => {
   const now = performance.now();
@@ -191,6 +199,7 @@ scene.onChange = () => {
         : scene.offroad
           ? "驶离道路 · 回到赛道继续"
           : "";
+  motion.mode(scene.mode, el("lap-status").textContent ?? "");
   sound.update(scene.car.speed, scene.mode === "running");
 };
 scene.onLap = (time, valid) => {
@@ -199,7 +208,7 @@ scene.onLap = (time, valid) => {
   if (valid && (!best || time < best)) {
     const result = setBest(book.save, book.save.activeTrackUid, time);
     if (!result.ok) {
-      toast("成绩未能保存，仍可继续试跑");
+      toast("成绩未能保存，仍可继续试跑", "error");
       return;
     }
     book.save = result.save;
@@ -207,12 +216,13 @@ scene.onLap = (time, valid) => {
     updateBest();
     toast(
       persisted ? `新纪录！ ${format(time)}` : "本次未能保存，仍可继续试跑",
-      persisted,
+      persisted ? "record" : "error",
     );
-    sound.stamp();
+    if (persisted) sound.stamp();
   } else
     toast(
       valid ? `完成一圈 · ${format(time)}` : `上圈 ${format(time)} · 未计成绩`,
+      valid ? "lap" : "error",
     );
 };
 function start() {
@@ -235,6 +245,7 @@ function restart() {
   if (book.reloadRequired || scene.mode === "editing") return;
   scene.reset();
   start();
+  motion.emphasize("restart", document.querySelector(".timing"), "saved");
 }
 // Keep game focus so opening the menu can capture the actual running source.
 el("pause").onpointerdown = (event) => {
@@ -252,7 +263,8 @@ function toggleSound() {
   void sound.unlock();
   soundUI();
   const saved = persist();
-  if (!saved) toast("本次未能保存，仍可继续试跑");
+  if (!saved) toast("本次未能保存，仍可继续试跑", "error");
+  motion.emphasize("sound", el("sound").querySelector("svg"));
   if (scene.mode === "running") area.focus();
   return saved;
 }
@@ -281,37 +293,58 @@ function editUI(editing: boolean) {
 function applyEdit(intent: EditIntent) {
   const result = book.beginEdit(intent);
   if (!result.ok) return result;
+  const sheet = motion.capture(scene);
   editor.enter(intent, trackName(activeTrack(book.save)));
   editUI(true);
   editor.focus();
+  motion.sheet(sheet, "enter");
   return result;
 }
 el("edit").onclick = () => menu.edit("replace");
 editor.onStatus = (message, valid, kind) => {
+  const changed = el("editor-status").textContent !== message;
   el("editor-status").textContent = message;
   el("editor-status").dataset.kind = kind;
   el<HTMLButtonElement>("drive-drawing").disabled = !valid;
   el("draw-intro").hidden = editor.raw.length > 0;
+  if (changed)
+    motion.emphasize(
+      "drawing-status",
+      el("editor-status"),
+      kind === "error"
+        ? "error"
+        : valid || message.startsWith("已回到")
+          ? "page"
+          : "notice",
+    );
+  if (valid) motion.emphasize("drawing-save", el("drive-drawing"), "saved");
 };
-el("redraw").onclick = () => {
+function redraw() {
+  const sheet = motion.capture(scene, editor.canvas);
   editor.redraw();
   editor.focus();
-};
+  motion.sheet(sheet, "erase");
+}
+el("redraw").onclick = redraw;
 function cancelEdit() {
+  const sheet = motion.capture(scene, editor.canvas);
   editor.cancel();
   book.cancelEdit();
   editUI(false);
   el("draw-intro").hidden = true;
   area.focus({ preventScroll: true });
+  motion.sheet(sheet, "return");
 }
 el("cancel-edit").onclick = () => menu.cancelEdit();
 function driveDrawing() {
   if (!editor.candidate) return;
   const create = book.intent === "create";
+  const sheet = motion.capture(scene, editor.canvas);
   const result = book.acceptDrawing(editor.candidate);
   if (!result.ok) {
     el("editor-status").textContent = trackbookMessage(result.error);
     el("editor-status").dataset.kind = "error";
+    motion.emphasize("drawing-status", el("editor-status"), "error");
     return;
   }
   editor.finish();
@@ -322,12 +355,14 @@ function driveDrawing() {
   updateBest();
   if (create) area.focus();
   else start();
+  motion.sheet(sheet, "return");
   toast(
     result.persisted
       ? create
         ? "新赛道已保存，点击开始试跑。"
         : "你的赛道，你来破纪录。"
       : "本次未能保存，仍可继续试跑",
+    result.persisted ? "saved" : "error",
   );
 }
 el("drive-drawing").onclick = driveDrawing;
@@ -357,8 +392,7 @@ function keydown(e: KeyboardEvent) {
         menu.open();
         break;
       case "redraw":
-        editor.redraw();
-        editor.focus();
+        redraw();
         break;
       case "accept":
         driveDrawing();
@@ -440,16 +474,17 @@ if (debug)
       track: structuredClone(scene.trackData.track),
       offroad: scene.offroad,
       effects: scene.trail.length,
+      motion: { active: motion.active, reduced: motion.reduced },
     }),
   });
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     clearTimeout(toastTimer);
-    toastMotion?.cancel();
     menu.destroy();
     window.removeEventListener("resize", resizeMenu);
     editor.destroy();
     trackbook.destroy();
+    motion.destroy();
     sound.destroy();
     board.removeEventListener("keydown", keydown);
     window.removeEventListener("keyup", keyup);

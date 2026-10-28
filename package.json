@@ -17,7 +17,10 @@
     "test:storage": "node tests/storage-browser.mjs",
     "test:trackbook": "node tests/trackbook-browser.mjs",
     "bench:storage": "tsx tests/storage-performance.ts",
-    "bench:storage:browser": "node tests/storage-performance-browser.mjs"
+    "bench:storage:browser": "node tests/storage-performance-browser.mjs",
+    "test:motion": "node tests/motion-browser.mjs",
+    "record:motion": "PAPERLAP_RECORD=1 node tests/motion-browser.mjs",
+    "test:focus": "node tests/focus-browser.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"
