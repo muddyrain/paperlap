@@ -23,7 +23,12 @@
     "test:focus": "node tests/focus-browser.mjs",
     "test:draft": "node tests/draft-browser.mjs && node tests/draft-storage-browser.mjs && node tests/draft-interruption-browser.mjs",
     "test:draft-review": "node tests/draft-storage-browser.mjs && node tests/draft-interruption-browser.mjs",
-    "bench:draft:browser": "node tests/draft-performance-browser.mjs"
+    "bench:draft:browser": "node tests/draft-performance-browser.mjs",
+    "demo:local-edit": "vite --config vite.local-edit.config.ts --host 127.0.0.1 --port 5174 --strictPort",
+    "build:local-edit": "npm run typecheck && vite build --config vite.local-edit.config.ts",
+    "test:local-edit": "node tests/local-edit-browser.mjs",
+    "bench:local-edit": "tsx tests/local-edit-performance.ts",
+    "record:local-edit": "PAPERLAP_RECORD=1 node tests/local-edit-browser.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"
