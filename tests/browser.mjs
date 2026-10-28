@@ -230,7 +230,7 @@ try {
   await page.setViewportSize({ width: 1366, height: 768 });
   // Restore the default via storage deletion, through the real reload path.
   await page.evaluate(() => {
-    localStorage.removeItem("paperlap.save.v2");
+    localStorage.removeItem("paperlap.save.v3");
     localStorage.removeItem("paperlap.save.v1");
   });
   await ready();
@@ -358,7 +358,7 @@ try {
   assert.ok((await state()).effects <= 140);
   check("repeated editing/restart keeps one engine canvas and bounded effects");
   await page.evaluate(() => {
-    localStorage.setItem("paperlap.save.v2", "broken json");
+    localStorage.setItem("paperlap.save.v3", "broken json");
     localStorage.setItem("paperlap.save.v1", "broken json");
   });
   await ready();

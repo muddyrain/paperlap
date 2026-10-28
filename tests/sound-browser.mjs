@@ -20,7 +20,7 @@ const state = (page) => page.evaluate(() => window.paperlapDebug);
 const focus = (page) => page.evaluate(() => document.activeElement?.id);
 const muted = (page) =>
   page.evaluate(
-    () => JSON.parse(localStorage.getItem("paperlap.save.v2")).muted,
+    () => JSON.parse(localStorage.getItem("paperlap.save.v3")).muted,
   );
 const check = (name) => {
   checks.push(name);

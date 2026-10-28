@@ -171,7 +171,7 @@ export async function verifyTrackbookUX(h) {
         Storage.prototype.setItem = set;
       };
       Storage.prototype.setItem = function (key, value) {
-        if (key === "paperlap.save.v2") window.renameWrites++;
+        if (key === "paperlap.save.v3") window.renameWrites++;
         return set.call(this, key, value);
       };
     });
@@ -293,10 +293,11 @@ export async function verifyTrackbookUX(h) {
     assert.equal(await page.locator("#best").innerText(), "--:--.--");
     const same = structuredClone(ab);
     same.tracks[1].track = { ...a.track, name: "相同路线独立作品" };
+    same.tracks[1].geometryDigest = a.geometryDigest;
     same.records = {
       ...same.records,
-      [`${b.uid}:${a.track.id}:rules-2`]: 32,
-      [`${a.uid}:${a.track.id}:rules-1`]: 12,
+      [`${b.uid}:${same.tracks[1].geometryIdentity}:rules-2`]: 32,
+      [`${a.uid}:${a.geometryIdentity}:rules-1`]: 12,
     };
     await close(page);
     await seed(page, same);
@@ -450,6 +451,7 @@ export async function verifyTrackbookUX(h) {
     full.tracks = Array.from({ length: 20 }, (_, i) => ({
       ...full.tracks[i % 2],
       uid: `entry-${i}`,
+      geometryIdentity: `g-${(i + 1).toString(16).padStart(32, "0")}`,
       track: {
         ...full.tracks[i % 2].track,
         name: `${i + 1} 号 · 清晨绕湖的纸上飞驰练习赛道`.repeat(3).slice(0, 40),

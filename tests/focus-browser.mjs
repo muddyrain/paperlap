@@ -68,16 +68,17 @@ async function isolated(
 try {
   await isolated(
     async (p) => {
-      // Real Save V2 with two equivalent routes: focus movement must never select one.
+      // Real Save V3 with two equivalent routes: focus movement must never select one.
       await p.locator("#sound").click();
       await p.evaluate(() => {
-        const s = JSON.parse(localStorage.getItem("paperlap.save.v2"));
+        const s = JSON.parse(localStorage.getItem("paperlap.save.v3"));
         s.tracks.push({
           ...structuredClone(s.tracks[0]),
           uid: "focus-second",
+          geometryIdentity: `g-${crypto.randomUUID().replaceAll("-", "")}`,
           track: { ...s.tracks[0].track, name: "弯道练习" },
         });
-        localStorage.setItem("paperlap.save.v2", JSON.stringify(s));
+        localStorage.setItem("paperlap.save.v3", JSON.stringify(s));
       });
       await p.reload();
       await p.waitForFunction(

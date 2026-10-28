@@ -46,7 +46,7 @@ try {
   const oldKey = `${track.id}:rules-1`;
   await page.evaluate(
     ({ track, oldKey }) => {
-      localStorage.removeItem("paperlap.save.v2");
+      localStorage.removeItem("paperlap.save.v3");
       localStorage.setItem(
         "paperlap.save.v1",
         JSON.stringify({
@@ -168,13 +168,20 @@ try {
   assert.ok(maxSpeed > 210);
   assert.ok(coastSamples > 0);
   const { saved, legacy } = await page.evaluate(() => ({
-    saved: JSON.parse(localStorage.getItem("paperlap.save.v2")),
+    saved: JSON.parse(localStorage.getItem("paperlap.save.v3")),
     legacy: JSON.parse(localStorage.getItem("paperlap.save.v1")),
   }));
   assert.equal(legacy.records[oldKey], 24.68);
   assert.equal(legacy.muted, false);
-  assert.equal(saved.records[`${saved.activeTrackUid}:${oldKey}`], 24.68);
-  assert.ok(saved.records[`${saved.activeTrackUid}:${track.id}:rules-2`] > 5);
+  assert.equal(
+    saved.legacy.records[`${saved.activeTrackUid}:${oldKey}`],
+    24.68,
+  );
+  assert.ok(
+    saved.records[
+      `${saved.activeTrackUid}:${saved.tracks.find((e) => e.uid === saved.activeTrackUid).geometryIdentity}:rules-2`
+    ] > 5,
+  );
   assert.equal(errors.length, 0);
   await page.screenshot({ path: `${root}handling-v2.png` });
   await page.keyboard.press("Escape");

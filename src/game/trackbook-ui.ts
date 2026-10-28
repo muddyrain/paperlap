@@ -1,5 +1,11 @@
+import { legacyLabel } from "./save-history";
 import type { GameMotion } from "./game-motion";
-import { activeTrack, recordKey, SAVE_LIMITS, type TrackEntry } from "./save";
+import {
+  activeTrack,
+  recordKey,
+  SAVE_LIMITS,
+  type TrackEntry,
+} from "./save-model";
 import { Trackbook, trackbookMessage, type CommandResult } from "./trackbook";
 import { shortcut, shortcutTarget, ignoresShortcuts } from "./shortcuts";
 import { trackThumbnail } from "./thumbnail";
@@ -291,11 +297,15 @@ export class TrackbookView {
         `${current ? "当前赛道" : "使用赛道"}：${trackName(entry)}，${best ? `个人最佳 ${formatTime(best)}` : "暂无纪录"}`,
       );
       use.title = trackName(entry);
-      use.innerHTML = `<span class="track-thumb">${trackThumbnail(entry.track)}</span><span class="track-card-copy"><span class="track-entry-name"></span><span class="track-best"></span><span class="track-choice">${buttonContent(current ? "check" : "arrow", current ? "当前赛道" : "使用赛道", "Enter")}</span></span>`;
+      use.innerHTML = `<span class="track-thumb">${trackThumbnail(entry.track)}</span><span class="track-card-copy"><span class="track-entry-name"></span><span class="track-best"></span><span class="track-legacy"></span><span class="track-choice">${buttonContent(current ? "check" : "arrow", current ? "当前赛道" : "使用赛道", "Enter")}</span></span>`;
       use.querySelector(".track-entry-name")!.textContent = trackName(entry);
       use.querySelector(".track-best")!.textContent = best
         ? `个人最佳 ${formatTime(best)}`
         : "暂无纪录";
+      use.querySelector(".track-legacy")!.textContent = legacyLabel(
+        this.book.save,
+        entry.uid,
+      );
       use.onclick = () => {
         this.settle();
         this.target = entry.uid;

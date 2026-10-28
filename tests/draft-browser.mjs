@@ -20,9 +20,9 @@ const checks = [],
   failedRequests = [];
 const state = (p) => p.evaluate(() => window.paperlapDebug);
 const official = (p) =>
-  p.evaluate(() => localStorage.getItem("paperlap.save.v2"));
+  p.evaluate(() => localStorage.getItem("paperlap.save.v3"));
 const backup = (p) =>
-  p.evaluate(() => localStorage.getItem("paperlap.draft.v1"));
+  p.evaluate(() => localStorage.getItem("paperlap.draft.v2"));
 const draft = async (p) => JSON.parse(await backup(p));
 const check = (name) => {
   checks.push(name);
@@ -125,12 +125,14 @@ async function keep(p) {
 }
 async function seedTwo(p) {
   await p.evaluate(() => {
-    const s = JSON.parse(localStorage.getItem("paperlap.save.v2"));
+    const s = JSON.parse(localStorage.getItem("paperlap.save.v3"));
     s.tracks.push({
       uid: "draft-second",
+      geometryIdentity: `g-${crypto.randomUUID().replaceAll("-", "")}`,
+      geometryDigest: s.tracks[0].geometryDigest,
       track: { ...structuredClone(s.tracks[0].track), name: "B 赛道" },
     });
-    localStorage.setItem("paperlap.save.v2", JSON.stringify(s));
+    localStorage.setItem("paperlap.save.v3", JSON.stringify(s));
   });
   await load(p, true);
 }
@@ -373,10 +375,10 @@ try {
     );
     await load(p, true);
     await p.evaluate((a) => {
-      const s = JSON.parse(localStorage.getItem("paperlap.save.v2"));
+      const s = JSON.parse(localStorage.getItem("paperlap.save.v3"));
       s.tracks = s.tracks.filter((e) => e.uid !== a);
       s.activeTrackUid = "draft-second";
-      localStorage.setItem("paperlap.save.v2", JSON.stringify(s));
+      localStorage.setItem("paperlap.save.v3", JSON.stringify(s));
     }, a);
     await load(p, true);
     await enter(p);
@@ -391,10 +393,10 @@ try {
     await draw(p);
     await load(p, true);
     await p.evaluate(() => {
-      const s = JSON.parse(localStorage.getItem("paperlap.save.v2"));
+      const s = JSON.parse(localStorage.getItem("paperlap.save.v3"));
       s.tracks[0].uid = "imported-entry";
       s.activeTrackUid = "imported-entry";
-      localStorage.setItem("paperlap.save.v2", JSON.stringify(s));
+      localStorage.setItem("paperlap.save.v3", JSON.stringify(s));
     });
     await load(p, true);
     const raw = await backup(p);
@@ -412,15 +414,12 @@ try {
       await enter(p, intent);
       await draw(p);
       const raw = await backup(p);
-      await block(p, "paperlap.save.v2");
+      await block(p, "paperlap.save.v3");
       await p.keyboard.press("Enter");
       await settle(p);
       assert.equal(await official(p), original);
       assert.equal(await backup(p), raw);
-      assert.equal(
-        (await state(p)).mode,
-        intent === "create" ? "editing" : "running",
-      );
+      assert.equal((await state(p)).mode, "editing");
       await load(p, true);
       await enter(p, intent);
       await keep(p);
@@ -433,7 +432,7 @@ try {
         intent === "create" ? "ready" : "running",
       );
       check(
-        `${intent} official save failure retains backup (including ok:true/persisted:false); reload recovery and successful retry clean it`,
+        `${intent} official save failure retains backup (including strict V3 replacement); reload recovery and successful retry clean it`,
       );
     });
 
@@ -442,7 +441,7 @@ try {
       await enter(p);
       await draw(p);
       const raw = await backup(p);
-      await block(p, "paperlap.draft.v1", true);
+      await block(p, "paperlap.draft.v2", true);
       await p.keyboard.press("r");
       assert.equal((await state(p)).draft.rawLength, 0);
       assert.equal(await backup(p), raw);
@@ -471,7 +470,7 @@ try {
     await enter(p);
     await draw(p);
     const raw = await backup(p);
-    await block(p, "paperlap.draft.v1", true);
+    await block(p, "paperlap.draft.v2", true);
     await p.keyboard.press("Enter");
     await settle(p);
     assert.equal((await state(p)).mode, "running");
@@ -488,9 +487,9 @@ try {
     const other = await context.newPage();
     await other.goto(`${base}/`);
     await other.evaluate(() => {
-      const d = JSON.parse(localStorage.getItem("paperlap.draft.v1"));
+      const d = JSON.parse(localStorage.getItem("paperlap.draft.v2"));
       d.entries[0].updatedAt++;
-      localStorage.setItem("paperlap.draft.v1", JSON.stringify(d));
+      localStorage.setItem("paperlap.draft.v2", JSON.stringify(d));
     });
     const competing = await backup(p);
     await p.locator(".draw-surface").focus();
@@ -512,7 +511,7 @@ try {
   ])
     await isolated(async (p) => {
       await p.evaluate(
-        (raw) => localStorage.setItem("paperlap.draft.v1", raw),
+        (raw) => localStorage.setItem("paperlap.draft.v2", raw),
         raw,
       );
       const original = await official(p);
@@ -533,18 +532,20 @@ try {
 
   await isolated(async (p) => {
     await p.evaluate(() =>
-      localStorage.setItem("paperlap.save.v2", "{official-corrupt"),
+      localStorage.setItem("paperlap.save.v3", "{official-corrupt"),
     );
     await load(p, true);
     await enter(p);
     await draw(p);
-    assert.ok(await backup(p));
+    assert.equal(await backup(p), null);
+    assert.match(await p.locator("#draft-backup").innerText(), /只读|未备份/);
     await p.keyboard.press("Enter");
     await settle(p);
     assert.equal(await official(p), "{official-corrupt");
-    assert.ok(await backup(p));
+    assert.equal(await backup(p), null);
+    assert.equal((await state(p)).mode, "editing");
     check(
-      "damaged official Save V2 remains untouched while recoverable drawing is independently backed up",
+      "damaged V3 remains untouched; unverified source drawing stays in memory with an explicit no-backup warning",
     );
   });
 
@@ -694,11 +695,16 @@ try {
     const preserved = await backup(p);
     await p.evaluate(
       ({ a, b }) => {
-        const save = JSON.parse(localStorage.getItem("paperlap.save.v2"));
+        const save = JSON.parse(localStorage.getItem("paperlap.save.v3"));
         save.tracks.find((e) => e.uid === a).track = structuredClone(
           save.tracks.find((e) => e.uid === b).track,
         );
-        localStorage.setItem("paperlap.save.v2", JSON.stringify(save));
+        save.tracks.find((e) => e.uid === a).geometryDigest = save.tracks.find(
+          (e) => e.uid === b,
+        ).geometryDigest;
+        save.tracks.find((e) => e.uid === a).geometryIdentity =
+          `g-${crypto.randomUUID().replaceAll("-", "")}`;
+        localStorage.setItem("paperlap.save.v3", JSON.stringify(save));
       },
       { a, b },
     );
@@ -716,7 +722,7 @@ try {
       window.draftWrites = 0;
       const set = Storage.prototype.setItem;
       Storage.prototype.setItem = function (k, v) {
-        if (k === "paperlap.draft.v1") window.draftWrites++;
+        if (k === "paperlap.draft.v2") window.draftWrites++;
         return set.call(this, k, v);
       };
     });

@@ -74,9 +74,9 @@ try {
     for (let i = 0; i < 3; i++) {
       if (kind === "cold")
         await p.evaluate((i) => {
-          const s = JSON.parse(localStorage.getItem("paperlap.save.v2"));
+          const s = JSON.parse(localStorage.getItem("paperlap.save.v3"));
           s.tracks[1].track.name = `external valid metadata ${i}`;
-          localStorage.setItem("paperlap.save.v2", JSON.stringify(s));
+          localStorage.setItem("paperlap.save.v3", JSON.stringify(s));
         }, i);
       await p.locator("#edit").click();
       assert.equal(
@@ -99,7 +99,7 @@ try {
     JSON.stringify(report),
   );
   assert.equal(
-    await p.evaluate(() => localStorage.getItem("paperlap.draft.v1")),
+    await p.evaluate(() => localStorage.getItem("paperlap.draft.v2")),
     null,
   );
   assert.deepEqual(report.errors, []);

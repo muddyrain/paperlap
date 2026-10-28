@@ -17,7 +17,7 @@ const checks = [],
   failedRequests = [];
 const state = (page) => page.evaluate(() => window.paperlapDebug);
 const raw = (page) =>
-  page.evaluate(() => localStorage.getItem("paperlap.save.v2"));
+  page.evaluate(() => localStorage.getItem("paperlap.save.v3"));
 const focus = (page) => page.evaluate(() => document.activeElement?.id);
 const check = (name) => {
   checks.push(name);
@@ -31,7 +31,7 @@ async function load(page) {
 }
 async function seed(page, save) {
   await page.evaluate(
-    (save) => localStorage.setItem("paperlap.save.v2", JSON.stringify(save)),
+    (save) => localStorage.setItem("paperlap.save.v3", JSON.stringify(save)),
     save,
   );
   await load(page);
@@ -155,8 +155,8 @@ try {
     assert.equal((await state(page)).mode, "ready");
     ab = JSON.parse(await raw(page));
     const [a, b] = ab.tracks;
-    ab.records[`${a.uid}:${a.track.id}:rules-2`] = 24.68;
-    ab.records[`${b.uid}:${b.track.id}:rules-2`] = 35;
+    ab.records[`${a.uid}:${a.geometryIdentity}:rules-2`] = 24.68;
+    ab.records[`${b.uid}:${b.geometryIdentity}:rules-2`] = 35;
     await seed(page, ab);
     await page.keyboard.press("Space");
     await page.keyboard.down("ArrowUp");
@@ -388,7 +388,7 @@ try {
         Storage.prototype.setItem = set;
       };
       Storage.prototype.setItem = function (key, value) {
-        if (key === "paperlap.save.v2")
+        if (key === "paperlap.save.v3")
           throw new DOMException("injected", "QuotaExceededError");
         return set.call(this, key, value);
       };

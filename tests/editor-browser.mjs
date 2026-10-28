@@ -57,7 +57,7 @@ try {
   );
   const original = (await state()).trackId;
   const originalSave = await page.evaluate(() =>
-    localStorage.getItem("paperlap.save.v2"),
+    localStorage.getItem("paperlap.save.v3"),
   );
   await page.locator("#edit").click();
   await page.keyboard.press("Enter");
@@ -144,7 +144,7 @@ try {
   await page.keyboard.press("Enter");
   assert.equal((await state()).mode, "editing");
   assert.equal(
-    await page.evaluate(() => localStorage.getItem("paperlap.save.v2")),
+    await page.evaluate(() => localStorage.getItem("paperlap.save.v3")),
     originalSave,
   );
   await page.keyboard.press("r");

@@ -1,5 +1,7 @@
 # P1-05A 草稿生命周期与撤销恢复
 
+V3 接入补充：正式游戏现在使用 `paperlap.draft.v2` / schemaVersion 2，整笔快照/历史不变，来源额外绑定 geometryIdentity 与 geometryDigest。通过策略适配读取正式 V3；原 draft.v1 保留只读，不能仅凭旧 UID/指纹恢复。只读/损坏正式来源时仅保留内存绘制并显示未备份，仍可明确确认放弃内存稿退出。`DraftStorage` 默认参数继续保留旧 V1 协议供兼容测试，实际游戏传入 V3 策略。详见 [Save V3 RFC](save-v3-rfc.md)。
+
 基线：master `4eb52c81`。草稿是整次单笔绘制状态，不是逐点编辑历史。
 
 ## 状态与操作

@@ -35,7 +35,7 @@ try {
           () => window.paperlapDebug && document.querySelector("#game canvas"),
         );
         const official = await p.evaluate(() =>
-          localStorage.getItem("paperlap.save.v2"),
+          localStorage.getItem("paperlap.save.v3"),
         );
         await context.addInitScript((denied) => {
           window.testStorage = window.localStorage;
@@ -44,17 +44,17 @@ try {
             originalRemove = Storage.prototype.removeItem;
           originalSet.call(
             window.testStorage,
-            "paperlap.draft.v1",
+            "paperlap.draft.v2",
             '{"schemaVersion":99,"unknown":"keep original bytes"}',
           );
           window.draftWrites = 0;
           window.draftDeletes = 0;
           Storage.prototype.setItem = function (k, v) {
-            if (k === "paperlap.draft.v1") window.draftWrites++;
+            if (k === "paperlap.draft.v2") window.draftWrites++;
             return originalSet.call(this, k, v);
           };
           Storage.prototype.removeItem = function (k) {
-            if (k === "paperlap.draft.v1") window.draftDeletes++;
+            if (k === "paperlap.draft.v2") window.draftDeletes++;
             return originalRemove.call(this, k);
           };
           if (denied === "storage-getter")
@@ -66,7 +66,7 @@ try {
           else {
             const get = Storage.prototype.getItem;
             Storage.prototype.getItem = function (k) {
-              if (k === "paperlap.draft.v1")
+              if (k === "paperlap.draft.v2")
                 throw new DOMException("test denied", "SecurityError");
               return get.call(this, k);
             };
@@ -186,8 +186,8 @@ try {
         assert.equal(restored.sound.running, false);
         assert.equal(await p.evaluate(() => document.activeElement.id), "game");
         const retained = await p.evaluate(() => ({
-          official: window.testGet.call(window.testStorage, "paperlap.save.v2"),
-          unknown: window.testGet.call(window.testStorage, "paperlap.draft.v1"),
+          official: window.testGet.call(window.testStorage, "paperlap.save.v3"),
+          unknown: window.testGet.call(window.testStorage, "paperlap.draft.v2"),
           writes: window.draftWrites,
           deletes: window.draftDeletes,
         }));
