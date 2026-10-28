@@ -110,7 +110,7 @@ export class DraftView {
   }
   private status(message: string, error: boolean) {
     const status = document.getElementById("draft-backup")!;
-    status.textContent = message;
+    if (status.textContent !== message) status.textContent = message;
     status.dataset.kind = error ? "error" : "hint";
     if (this.dialog.open)
       this.get("draft-error").textContent = error ? message : "";
