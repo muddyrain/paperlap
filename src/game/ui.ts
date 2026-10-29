@@ -10,6 +10,7 @@ export const icon = (name: string) => {
     pause: "M8 5v14M16 5v14",
     play: "m8 4 13 8-13 8Z",
     edit: "m4 16 12-12 4 4L8 20l-5 1 1-5Zm9-9 4 4",
+    curve: "M4 19c0-9 16-5 16-14M3 16l1 3 3-1M17 6l3-1 1 3",
     undo: "M9 5 3 11l6 6M3 11h11a6 6 0 0 1 6 6",
     redo: "m15 5 6 6-6 6m6-6H10a6 6 0 0 0-6 6",
     reset: "M20 7v5h-5M4 17a8 8 0 1 0 0-10",

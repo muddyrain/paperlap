@@ -874,7 +874,8 @@ button .button-label {
     transition: none !important;
   }
 }
-.draw-surface {
+.draw-surface,
+.local-surface {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -883,7 +884,8 @@ button .button-label {
   touch-action: none;
   cursor: crosshair;
 }
-.draw-surface:focus-visible {
+.draw-surface:focus-visible,
+.local-surface:focus-visible {
   outline: 2px solid #72879066;
   outline-offset: -2px;
 }
@@ -1449,4 +1451,105 @@ button:disabled {
   display: block;
   overflow-wrap: anywhere;
   font-size: 11px;
+}
+
+.local-heading,
+.local-footer {
+  position: absolute;
+  left: 2.4%;
+  right: 2.4%;
+  z-index: var(--layer-ui);
+  pointer-events: none;
+}
+.local-heading {
+  top: 2.4%;
+}
+.local-heading p {
+  margin: 5px 0;
+  font-size: 13px;
+  color: #56646a;
+}
+.local-title {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+.local-title h2 {
+  margin: 0;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.local-title > span {
+  display: flex;
+  min-width: 0;
+  max-width: 65%;
+  font-size: 14px;
+}
+#local-track-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.local-footer {
+  bottom: 3.4%;
+}
+.local-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.local-actions button {
+  pointer-events: auto;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+#local-status {
+  font-size: 14px;
+  margin: 0 0 10px;
+  min-height: 20px;
+}
+#local-status[data-kind="error"],
+#local-backup[data-kind="error"] {
+  color: #a33f2b;
+}
+#trackbook-local {
+  padding: 8px;
+  font-size: 13px;
+  justify-content: center;
+}
+#trackbook-local-status {
+  margin: 0;
+  color: #a33f2b;
+  font-size: 12px;
+}
+#trackbook-local-status:empty {
+  display: none;
+}
+@media (max-width: 1000px) {
+  .local-title h2 {
+    font-size: 20px;
+  }
+  .local-heading p {
+    font-size: 11px;
+  }
+  .local-title > span {
+    font-size: 12px;
+  }
+  .local-actions {
+    gap: 6px;
+  }
+  .local-actions button {
+    font-size: 11px;
+    padding: 8px;
+    gap: 5px;
+  }
+  .local-actions button svg {
+    width: 18px;
+    height: 18px;
+  }
+  #local-status {
+    font-size: 12px;
+  }
 }

@@ -92,3 +92,9 @@ V1 迁入还保留原 sourceRulesVersion；拒绝原解析器的有损规范化�
 单写入锁解决合作新版标签的互斥；旧键冲突刷新不会自动解决。此阶段提供完整原文导出、只读保护与一致备份恢复说明，不实现分支合并或危险的一键覆盖。canonical 与同步 SHA256 的测试参考 [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final) 和 [NIST 测试向量说明](https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing)，并与 Node crypto / WebCrypto 对照；不宣称获得密码模块认证。
 
 来源原文摘要采用 UTF-16BE 逐码元编码（无归一化/BOM），覆盖 localStorage 字符串的完整值；不能用会替换未配对代理项的 UTF-8 TextEncoder 作为“原文未变”的证明。迁入 identity 的 JSON 编码使用 UTF-8，几何 canonical 则固定为上文的版本化二进制。三者用途和编码分开，均由测试向量固定。
+
+## P1-05B-02B 接入边界
+
+本 RFC 的 V3 schema、canonical、迁移、身份、旧纪录、Web Locks 与回退合同保持不变。正式局部编辑经 Trackbook 独立 beginLocal/commitLocal/cancelLocal 进入同一严格事务，不扩大整笔 EditIntent；新几何仍调用既有 replaceTrack 建立修订，保存与场景提交后回 ready。
+
+新增 `paperlap.local-draft.v1` 是独立精确中心线草稿，绑定 UID/geometryIdentity/geometryDigest/algorithmVersion；不复用或修改 draft.v1/v2。SaveSession.backup 仅新增原文字段 localDraftV1，包含局部草稿，不改 V3 迁移或写入路径。具体协议见 [局部集成合同](local-editor-integration.md)，实测见 [正式局部验证](local-editor-verification.md)。

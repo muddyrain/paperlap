@@ -54,3 +54,7 @@ PAPERLAP_URL=http://127.0.0.1:4185 npm run test:draft
 输出：`test-results/draft/report.json`、三尺寸 PNG、`undo-redraw.webm` / `refresh-recovery.webm` / `discard-safety.webm`。录像由测试页面自动录制，保留真实鼠标绘图和键盘操作，不录制用户桌面。验收结果与交付截图见 [验证记录](verification.md)。
 
 Review 专项：`PAPERLAP_URL=http://127.0.0.1:4185 npm run test:draft-review`（4 项读取/确认退出 + 5 项 A/B 中断恢复）。近容量性能：`PAPERLAP_URL=http://127.0.0.1:4185 npm run bench:draft:browser`，使用 20×900 点真实隔离存档和鼠标点击，分别测量既有验证热路径与外部有效原文变更后的完整验证路径。
+
+## 正式局部调整的独立草稿
+
+局部编辑另用 `paperlap.local-draft.v1`，保存已采用合法中心线及相邻撤销/重做快照，绑定 V3 UID/身份/摘要和算法版本。不调用本模块的整笔 raw，也不写入 draft.v1/v2；未完成或非法局部预览不覆盖已采用快照。初读失败的仅内存放弃、已确认清理失败继续编辑、写盘后场景失败保留备份的原则相同。协议、限额与恢复语义见 [局部集成合同](local-editor-integration.md)。

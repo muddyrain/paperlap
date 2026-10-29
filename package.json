@@ -16,6 +16,8 @@
     "test:editor": "node tests/editor-browser.mjs",
     "test:storage": "node tests/storage-browser.mjs",
     "test:hud": "node tests/hud-browser.mjs",
+    "test:local-game": "node tests/local-game-browser.mjs",
+    "bench:local-game": "node tests/local-game-performance.mjs",
     "test:trackbook": "node tests/trackbook-browser.mjs",
     "bench:storage": "tsx tests/storage-performance.ts",
     "bench:storage:browser": "node tests/storage-performance-browser.mjs",

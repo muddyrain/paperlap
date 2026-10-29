@@ -449,3 +449,11 @@ Save V2 schema、V1 迁移、UID/几何/规则纪录绑定、`trackbook.ts` 的�
 ## PR #17 第一轮 Review：计时 HUD 居中回归
 
 上一轮缺少 HUD 边界断言，截图中的确存在计时卡片被右上按钮遮挡的问题。本轮删除覆盖 absolute 的 relative 规则，并固定历史按钮在键盘焦点下的绝对定位，保留原有焦点/动效。新增 `npm run test:hud`，三尺寸×四类存档共 12 场景、48 次真实 DOM 边界/文本范围/命中采样，覆盖 ready、running、历史返回与 paused。本轮 105/105 单元、64/64 浏览器检查及 typecheck/build 通过，控制台与请求错误均为 0。具体结果、三张同时包含本圈/PB/旧纪录的修后截图、更新的原 9 张截图与复现说明见 [Save V3 Review 验证](save-v3-verification.md#pr-17-第一轮-review修复顶部计时-hud)。Save V3、迁移、身份、锁和草稿保护代码未修改，停在 Code Review，不自动合并。
+
+## P1-05B-02B：游戏内局部弯道编辑
+
+基线 `347d2eb3`，分支 `feat/p1-05b-02b-local-editor`。117 项单元、204 项隔离无头浏览器检查（原有正式游戏 159＋局部编辑 22＋独立原型 23）、6 组正式游戏性能检查全部通过；正式与原型构建通过。浏览器覆盖三尺寸、连续两弯、非法拒绝、撤销重做、采用/保存、刷新恢复、旧 PB 归档、配额/读回/场景失败、真实双标签锁和冲突、入口返回焦点、驾驶/计时/声音冻结及原有全部游戏回归。
+
+900 点预览 JS/Canvas 提交 P95：正常 0.40ms，4× CPU 1.80ms；4× 下严格采用中位 128.90ms、正式保存 444ms，仍可能有可见停顿。未修改物理、圈速、RULES_VERSION、几何校验或 Save V3 数据规则。
+
+[完整报告、文件清单、兼容边界与复现方法](local-editor-verification.md) · [三尺寸截图](local-editor-verification.md#真实截图与录像) · [31.84 秒实际键盘/鼠标录屏](videos/p1-05b-02b-playthrough.mp4)。先提交的[状态图和失败恢复合同](local-editor-integration.md)。本轮停在 Code Review，等待玩家试玩，不自动合并。

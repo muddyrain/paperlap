@@ -88,14 +88,14 @@ export class GameMotion {
   settleOverlay(dialog: HTMLDialogElement) {
     if (this.overlay !== dialog) return;
     this.slots.cancel("overlay");
-    for (let i = 0; i < 6; i++) this.slots.cancel(`item-${i}`);
+    for (let i = 0; i < 7; i++) this.slots.cancel(`item-${i}`);
     dialog.dataset.motion = "open";
   }
   overlayOpen(dialog: HTMLDialogElement, drawer = false, child = false) {
     this.overlay = dialog;
     if (this.exiting === dialog) this.slots.cancel("overlay-exit");
     this.slots.cancel("overlay");
-    for (let i = 0; i < 6; i++) this.slots.cancel(`item-${i}`);
+    for (let i = 0; i < 7; i++) this.slots.cancel(`item-${i}`);
     dialog.dataset.motion = this.reduced ? "open" : "opening";
     dialog.style.transformOrigin = drawer ? "right top" : "left top";
     const frames = child
@@ -134,7 +134,7 @@ export class GameMotion {
           drawer ? ".track-card" : "#menu-home > button",
         ),
       ]
-        .slice(0, 6)
+        .slice(0, 7)
         .forEach((el, i) => {
           this.animate(
             `item-${i}`,
@@ -213,7 +213,7 @@ export class GameMotion {
       );
     }
     this.slots.cancel("overlay");
-    for (let i = 0; i < 6; i++) this.slots.cancel(`item-${i}`);
+    for (let i = 0; i < 7; i++) this.slots.cancel(`item-${i}`);
     dialog.dataset.motion = "open";
     if (this.overlay === dialog) this.overlay = null;
     queueMicrotask(this.syncShade);

@@ -25,6 +25,9 @@ interface Hooks {
   restart: () => void;
   book: () => void;
   edit: (intent: EditIntent) => CommandResult;
+  local: () => CommandResult;
+  localReason: () => string | null;
+  localEditing: () => boolean;
   draft: () => boolean;
   memoryOnlyDiscard: () => boolean;
   interrupt: () => void;
@@ -35,6 +38,7 @@ interface Hooks {
 export class GameMenu {
   readonly state = new MenuState();
   private dialog: HTMLDialogElement;
+  private editingFocus = "menu-edit";
   constructor(
     private container: HTMLElement,
     private game: HTMLElement,
@@ -53,14 +57,15 @@ export class GameMenu {
         <button id="menu-restart" class="paper" aria-keyshortcuts="R">${buttonContent("reset", "重新开始", "R")}</button>
         <button id="menu-book" class="paper" aria-keyshortcuts="T">${buttonContent("book", "我的赛道本", "T")}</button>
         <button id="menu-edit" class="paper" aria-keyshortcuts="E">${buttonContent("edit", "编辑当前赛道", "E")}</button>
+        <button id="menu-local" class="paper" aria-keyshortcuts="L">${buttonContent("curve", "局部调整", "L")}</button>
         <button id="menu-sound" class="paper"></button>
         <button id="menu-controls" class="paper">${buttonContent("help", "操作说明")}</button>
       </div>
       <section id="menu-controls-page" hidden aria-label="操作说明"><dl>
         <dt>驾驶</dt><dd><kbd>↑</kbd> / <kbd>W</kbd> 加速 · <kbd>↓</kbd> / <kbd>S</kbd> 刹车<br><kbd>←</kbd> / <kbd>A</kbd>、<kbd>→</kbd> / <kbd>D</kbd> 转向</dd>
-        <dt>游戏区域</dt><dd><kbd>Space</kbd> 开始 / 暂停 / 继续<br><kbd>R</kbd> 重新开始 · <kbd>T</kbd> 赛道本<br><kbd>E</kbd> 编辑当前 · <kbd>Esc</kbd> 游戏菜单</dd>
+        <dt>游戏区域</dt><dd><kbd>Space</kbd> 开始 / 暂停 / 继续<br><kbd>R</kbd> 重新开始 · <kbd>T</kbd> 赛道本<br><kbd>E</kbd> 整圈重画 · <kbd>L</kbd> 局部调整 · <kbd>Esc</kbd> 游戏菜单</dd>
         <dt>赛道本与绘图</dt><dd><kbd>N</kbd> 新建 · <kbd>↑</kbd><kbd>↓</kbd> 选择焦点 · <kbd>Enter</kbd> 使用赛道<br>绘图：<kbd>Ctrl / ⌘ Z</kbd> 撤销 · <kbd>Ctrl / ⌘ Shift Z</kbd> 重做<br><kbd>Enter</kbd> 保存 · <kbd>R</kbd> 重画 · <kbd>Esc</kbd> 取消 / 确认放弃</dd>
-      </dl><p>按钮上的 Enter / Space 为原生操作。切换赛道等待开始；离开窗口会暂停，恢复焦点不会自动继续。</p><button id="controls-back" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回菜单", "Esc")}</button></section>
+      <dt>局部调整</dt><dd>拖动弯道，松手校验；<kbd>Enter</kbd> 采用到历史<br><kbd>Ctrl / ⌘ Enter</kbd> 正式保存；撤销/重做同绘图<br><kbd>Esc</kbd> 先取消预览，再确认放弃；保存后等待开始</dd></dl><p>按钮上的 Enter / Space 为原生操作。切换赛道等待开始；离开窗口会暂停，恢复焦点不会自动继续。</p><button id="controls-back" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回菜单", "Esc")}</button></section>
       <section id="menu-discard" hidden><p id="discard-description">尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。</p><div class="menu-actions"><button id="keep-drawing" class="primary" aria-keyshortcuts="Escape">${buttonContent("edit", "继续绘制", "Esc")}</button><button id="discard-drawing" class="paper">${buttonContent("trash", "放弃修改")}</button></div></section>
       <p id="menu-hint"></p><p id="menu-status" role="status"></p>`;
     container.append(this.dialog);
@@ -69,6 +74,7 @@ export class GameMenu {
     this.get("menu-restart").onclick = () => this.run("restart");
     this.get("menu-book").onclick = () => this.openBook();
     this.get("menu-edit").onclick = () => this.edit("replace");
+    this.get("menu-local").onclick = () => this.local();
     this.get("menu-sound").onclick = () => {
       if (this.hooks.context().blocked) return;
       const saved = this.hooks.sound();
@@ -121,12 +127,22 @@ export class GameMenu {
     this.get("menu-controls-page").hidden = layer !== "controls";
     this.get("menu-discard").hidden = layer !== "discard";
     const memoryOnly = this.hooks.memoryOnlyDiscard();
+    const local = this.hooks.localEditing();
+    this.get("keep-drawing").innerHTML = buttonContent(
+      "edit",
+      local ? "继续调整" : "继续绘制",
+      "Esc",
+    );
     this.get("discard-description").textContent = memoryOnly
-      ? "本次绘制未能确认备份。仅放弃本次内存绘制并返回；浏览器中的旧备份不会删除，也无法确认是否已清理。"
-      : "尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。";
+      ? local
+        ? "局部草稿未能确认备份。仅放弃本次内存调整并返回，不删除浏览器中的未知旧备份。"
+        : "本次绘制未能确认备份。仅放弃本次内存绘制并返回；浏览器中的旧备份不会删除，也无法确认是否已清理。"
+      : local
+        ? "尚未正式保存局部修改。确认放弃将清理本赛道局部草稿；原路线、车辆和圈时保持。"
+        : "尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。";
     this.get("discard-drawing").innerHTML = buttonContent(
       "trash",
-      memoryOnly ? "仅放弃本次绘制" : "放弃修改",
+      memoryOnly ? (local ? "仅放弃本次调整" : "仅放弃本次绘制") : "放弃修改",
     );
     this.get("menu-title").textContent =
       layer === "discard"
@@ -150,6 +166,10 @@ export class GameMenu {
       "Esc",
     );
     this.get("menu-status").textContent = "";
+    (this.get("menu-local") as HTMLButtonElement).disabled =
+      !!this.hooks.localReason();
+    if (layer === "menu")
+      this.get("menu-status").textContent = this.hooks.localReason() ?? "";
     this.get("menu-hint").textContent =
       layer !== "menu"
         ? ""
@@ -218,16 +238,31 @@ export class GameMenu {
     return false;
   }
   edit(intent: EditIntent): CommandResult {
+    return this.enterEditor(() => this.hooks.edit(intent), "menu-edit");
+  }
+  local(): CommandResult {
+    const reason = this.hooks.localReason();
+    if (reason) {
+      this.get("menu-status").textContent = reason;
+      return { ok: false, error: "unavailable" };
+    }
+    return this.enterEditor(this.hooks.local, "menu-local");
+  }
+  private enterEditor(
+    enter: () => CommandResult,
+    focus: string,
+  ): CommandResult {
     const context = this.hooks.context();
     if (context.blocked) return { ok: false, error: "reload-required" };
     if (context.mode === "editing" || !this.state.beginEdit())
       return { ok: false, error: "editing" };
     this.hide();
-    const result = this.hooks.edit(intent);
+    this.editingFocus = focus;
+    const result = enter();
     if (!result.ok) {
       const route = this.state.cancelEditing();
       if (route === "menu" && !this.hooks.context().blocked) {
-        this.show("menu-edit");
+        this.show(focus);
         this.get("menu-status").textContent = trackbookMessage(result.error);
       }
     }
@@ -255,7 +290,7 @@ export class GameMenu {
     }
     const route = this.state.cancelEditing();
     this.hide();
-    if (route === "menu") this.show("menu-edit");
+    if (route === "menu") this.show(this.editingFocus);
     else if (route.startsWith("book")) this.hooks.book();
     else this.game.focus({ preventScroll: true });
   }
@@ -338,6 +373,7 @@ export class GameMenu {
     else if (action === "restart") this.run("restart");
     else if (action === "book") this.openBook();
     else if (action === "edit") this.edit("replace");
+    else if (action === "local") this.local();
   };
   destroy() {
     this.block();

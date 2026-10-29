@@ -1,4 +1,9 @@
-// Experimental only: no production editor, storage or scene imports.
+// Shared finite-support geometry and history; no DOM, storage or scene imports.
+import {
+  checkLocalPoints,
+  samePoints,
+  type LocalCheckpoint,
+} from "./local-source";
 import { dist, nearest, validate, type Point } from "./geometry";
 import { ROAD, WORLD } from "./config";
 
@@ -114,6 +119,31 @@ export class LocalEditModel {
   }
   get historySize() {
     return this.past.length;
+  }
+  get dirty() {
+    return !samePoints(this.accepted, this.original);
+  }
+  get checkpoint(): LocalCheckpoint {
+    return {
+      current: copy(this.accepted),
+      previous: this.past.length ? copy(this.past.at(-1)!) : null,
+      next: this.future.length ? copy(this.future.at(-1)!) : null,
+    };
+  }
+  restore(checkpoint: LocalCheckpoint) {
+    for (const points of [
+      checkpoint.current,
+      checkpoint.previous,
+      checkpoint.next,
+    ]) {
+      if (!points) continue;
+      const error = checkLocalPoints(this.original, points);
+      if (error) throw Error(error);
+    }
+    this.accepted = copy(checkpoint.current);
+    this.past = checkpoint.previous ? [copy(checkpoint.previous)] : [];
+    this.future = checkpoint.next ? [copy(checkpoint.next)] : [];
+    this.cancelPreview();
   }
   preview(points: readonly Point[]) {
     const snapshot = copy(points);

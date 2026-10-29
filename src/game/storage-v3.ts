@@ -304,6 +304,7 @@ export class SaveSession {
         ...data,
         draftV1: this.storage!.getItem("paperlap.draft.v1"),
         draftV2: this.storage!.getItem("paperlap.draft.v2"),
+        localDraftV1: this.storage!.getItem("paperlap.local-draft.v1"),
       },
       null,
       2,
