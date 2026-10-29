@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import {
   activeTrack,
   addTrack,
@@ -101,7 +102,11 @@ export class Trackbook {
       error: "unavailable" as const,
     };
     if (!checked.ok) return checked;
-    if (checkLocalPoints(entry.track.points, points))
+    if (
+      profile("local.commitValidate", () =>
+        checkLocalPoints(entry.track.points, points),
+      )
+    )
       return { ok: false, error: "invalid-track" };
     if (samePoints(entry.track.points, points)) {
       this.local = null;
@@ -113,7 +118,9 @@ export class Trackbook {
       id: fingerprint([...points], entry.track.width),
     };
     const result = this.commit(
-      v3.replaceTrack(this.save, entry.uid, track),
+      profile("local.candidate", () =>
+        v3.replaceTrack(this.save as v3.Save, entry.uid, track),
+      ),
       true,
       true,
     );
@@ -171,17 +178,19 @@ export class Trackbook {
     if (sceneChange) {
       this.deps.stop();
       try {
-        apply = this.deps.prepare(activeTrack(candidate.save));
+        apply = profile("scene.prepare", () =>
+          this.deps.prepare(activeTrack(candidate.save)),
+        );
       } catch {
         return { ok: false, error: "render" };
       }
     }
-    const written = this.write(candidate.save);
+    const written = profile("storage.write", () => this.write(candidate.save));
     if (!written.ok && strict) return written;
     const previous = this.save;
     this.save = candidate.save;
     try {
-      apply?.();
+      profile("scene.apply", () => apply?.());
     } catch {
       // Reload the durable state; never operate a half-rendered scene.
       if (!written.ok) this.save = previous;

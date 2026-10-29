@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 // Shared finite-support geometry and history; no DOM, storage or scene imports.
 import {
   checkLocalPoints,
@@ -100,7 +101,7 @@ export class LocalEditModel {
     error: ReturnType<typeof validate>;
   } | null = null;
   constructor(points: readonly Point[]) {
-    const error = validate(copy(points));
+    const error = profile("local.baseValidate", () => validate(copy(points)));
     if (error) throw new Error(error.reason);
     this.original = copy(points);
     this.accepted = copy(points);
@@ -150,7 +151,7 @@ export class LocalEditModel {
     const error =
       snapshot.length !== this.accepted.length
         ? { reason: "局部调整不能改变采样点数量" }
-        : validate(snapshot);
+        : profile("local.releaseValidate", () => validate(snapshot));
     this.candidate = { points: snapshot, error };
     return error;
   }

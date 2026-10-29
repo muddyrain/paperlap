@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import { RULES_VERSION } from "./config";
 import * as v2 from "./save";
 import type { Track } from "./geometry";
@@ -53,6 +54,9 @@ export function activeTrack(save: Save): TrackEntry {
   return e;
 }
 export function validateSave(value: unknown): SaveResult {
+  return profile("v3.validate", () => validateSaveImpl(value));
+}
+function validateSaveImpl(value: unknown): SaveResult {
   if (
     !object(value) ||
     value.schemaVersion !== 3 ||
@@ -110,8 +114,9 @@ export function validateSave(value: unknown): SaveResult {
       return fail("invalid-identity");
     if (
       !validDigest(raw.geometryDigest) ||
-      geometryDigest(entry.track.points, entry.track.width) !==
-        raw.geometryDigest
+      profile("v3.digest", () =>
+        geometryDigest(entry.track.points, entry.track.width),
+      ) !== raw.geometryDigest
     )
       return fail("invalid-digest");
     ids.add(raw.geometryIdentity);

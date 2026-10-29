@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import { WORLD } from "./config";
 import { paperArt } from "./art";
 import {
@@ -261,7 +262,9 @@ export class LocalEditor {
   checkpoint() {
     if (this.active && this.model && !this.recovery && this.hasDraft)
       this.backupStatus(
-        this.backup?.write(this.model.checkpoint) ?? {
+        profile("local.checkpoint", () =>
+          this.backup?.write(this.model!.checkpoint),
+        ) ?? {
           ok: false,
           error: "unavailable",
         },
@@ -412,7 +415,7 @@ export class LocalEditor {
       this.model.pending.error
     )
       return;
-    if (!this.model.adopt()) {
+    if (!profile("local.adoptHistory", () => this.model!.adopt())) {
       this.visible = null;
       this.selection = null;
       this.status("没有几何变化，不会产生新修订或写入。");
@@ -510,7 +513,9 @@ export class LocalEditor {
     )
       return;
     const sheet = this.motion.capture(this.scene, this.canvas),
-      result = this.book.commitLocal(this.source, this.model.current);
+      result = profile("local.commit", () =>
+        this.book.commitLocal(this.source!, this.model!.current),
+      );
     if (!result.ok) {
       this.status(trackbookMessage(result.error), true);
       if (this.book.reloadRequired) this.root.inert = true;

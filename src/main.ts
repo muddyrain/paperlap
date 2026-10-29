@@ -1,3 +1,4 @@
+import { localProfile } from "./game/local-profile";
 import { LocalEditor } from "./game/local-editor";
 import { SaveHistory } from "./game/save-history";
 import { GameMotion, type Feedback } from "./game/game-motion";
@@ -639,6 +640,7 @@ if (debug)
       offroad: scene.offroad,
       effects: scene.trail.length,
       local: local.telemetry,
+      profile: localProfile(),
       draft: {
         rawLength: editor.raw.length,
         phase: editor.drawing ? "drawing" : editor.history.current.phase,

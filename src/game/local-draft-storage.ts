@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import { ROAD } from "./config";
 import type { Point } from "./geometry";
 import {
@@ -111,7 +112,8 @@ export class LocalDraftStorage {
       if (!p) continue;
       const raw = JSON.stringify(p);
       if (this.proofs.has(raw)) continue;
-      if (checkLocalPoints(this.base, p)) return false;
+      if (profile("draft.validate", () => checkLocalPoints(this.base, p)))
+        return false;
       this.proofs.add(raw);
       if (this.proofs.size > 6)
         this.proofs.delete(this.proofs.values().next().value!);
@@ -131,7 +133,9 @@ export class LocalDraftStorage {
         return { ok: false, error: "conflict" };
       }
       this.official = this.store.getItem(STORAGE_KEY);
-      const found = readV3Identity(this.store, this.official, source.uid);
+      const found = profile("draft.source", () =>
+        readV3Identity(this.store, this.official, source.uid),
+      );
       if (
         !found.valid ||
         found.geometryIdentity !== source.geometryIdentity ||
@@ -143,7 +147,7 @@ export class LocalDraftStorage {
         return { ok: false, error: "conflict" };
       }
       this.expected = this.store.getItem(LOCAL_DRAFT_KEY);
-      const doc = parse(this.expected);
+      const doc = profile("draft.parse", () => parse(this.expected));
       if (!doc) return { ok: false, error: "invalid" };
       const matching = doc.entries.find((e) =>
         sameLocalSource(e.source, source),
@@ -174,19 +178,28 @@ export class LocalDraftStorage {
       )
         return { ok: false, error: "conflict" };
       const raw = entries.length
-        ? JSON.stringify({ schemaVersion: 1, entries })
+        ? profile("draft.serialize", () =>
+            JSON.stringify({ schemaVersion: 1, entries }),
+          )
         : null;
       if (
         entries.length > LOCAL_DRAFT_LIMITS.entries ||
         (raw?.length ?? 0) > LOCAL_DRAFT_LIMITS.characters
       )
         return { ok: false, error: "limit" };
-      if (raw !== null && !parse(raw)) return { ok: false, error: "invalid" };
+      if (raw !== null && !profile("draft.roundtrip", () => parse(raw)))
+        return { ok: false, error: "invalid" };
       if (raw !== this.expected) {
         if (raw === null) this.store.removeItem(LOCAL_DRAFT_KEY);
-        else this.store.setItem(LOCAL_DRAFT_KEY, raw);
+        else
+          profile("draft.setItem", () =>
+            this.store.setItem(LOCAL_DRAFT_KEY, raw),
+          );
       }
-      if (this.store.getItem(LOCAL_DRAFT_KEY) !== raw)
+      if (
+        profile("draft.readback", () => this.store.getItem(LOCAL_DRAFT_KEY)) !==
+        raw
+      )
         return { ok: false, error: "conflict" };
       this.expected = raw;
       this.document = { schemaVersion: 1, entries };
