@@ -95,3 +95,7 @@ PAPERLAP_URL=http://127.0.0.1:4186 npm run bench:local-game
 ```
 
 原型仍独立构建/预览，单独运行 test:local-edit。全部日志、原始 WebM、边界/性能 JSON 在 `test-results/local-game/`。停在 Code Review，不自动合并，等待用户真实试玩。
+
+## P1-06A 性能与反馈后续
+
+本页保留P1-05B-02B历史数据。局部验证证据复用、可见忙碌状态、排队取消、连续失败反馈，以及新的阶段对照与回归见 [P1-06A性能报告](p1-06-performance.md)。整笔/局部草稿协议与Save V3不变。

@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import {
   activeTrack,
   addTrack,
@@ -17,6 +18,7 @@ import {
   sameLocalSource,
   samePoints,
   checkLocalPoints,
+  LocalGeometryProof,
   type LocalSource,
 } from "./local-source";
 import type { StorageError, WriteResult } from "./storage-v3";
@@ -86,7 +88,11 @@ export class Trackbook {
   cancelLocal() {
     this.local = null;
   }
-  commitLocal(source: LocalSource, points: readonly Point[]): CommandResult {
+  commitLocal(
+    source: LocalSource,
+    points: readonly Point[],
+    proof?: LocalGeometryProof,
+  ): CommandResult {
     if (this.reloadRequired) return { ok: false, error: "reload-required" };
     if (this.intent || !this.local || this.save.schemaVersion !== 3)
       return { ok: false, error: "editing" };
@@ -101,7 +107,13 @@ export class Trackbook {
       error: "unavailable" as const,
     };
     if (!checked.ok) return checked;
-    if (checkLocalPoints(entry.track.points, points))
+    if (
+      profile("local.commitValidate", () =>
+        proof?.matches(source, entry.track.points)
+          ? proof.check(points)?.reason
+          : checkLocalPoints(entry.track.points, points),
+      )
+    )
       return { ok: false, error: "invalid-track" };
     if (samePoints(entry.track.points, points)) {
       this.local = null;
@@ -113,7 +125,9 @@ export class Trackbook {
       id: fingerprint([...points], entry.track.width),
     };
     const result = this.commit(
-      v3.replaceTrack(this.save, entry.uid, track),
+      profile("local.candidate", () =>
+        v3.replaceTrack(this.save as v3.Save, entry.uid, track),
+      ),
       true,
       true,
     );
@@ -171,17 +185,19 @@ export class Trackbook {
     if (sceneChange) {
       this.deps.stop();
       try {
-        apply = this.deps.prepare(activeTrack(candidate.save));
+        apply = profile("scene.prepare", () =>
+          this.deps.prepare(activeTrack(candidate.save)),
+        );
       } catch {
         return { ok: false, error: "render" };
       }
     }
-    const written = this.write(candidate.save);
+    const written = profile("storage.write", () => this.write(candidate.save));
     if (!written.ok && strict) return written;
     const previous = this.save;
     this.save = candidate.save;
     try {
-      apply?.();
+      profile("scene.apply", () => apply?.());
     } catch {
       // Reload the durable state; never operate a half-rendered scene.
       if (!written.ok) this.save = previous;

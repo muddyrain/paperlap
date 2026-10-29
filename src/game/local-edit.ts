@@ -1,6 +1,9 @@
+import { profile } from "./local-profile";
 // Shared finite-support geometry and history; no DOM, storage or scene imports.
 import {
   checkLocalPoints,
+  LocalGeometryProof,
+  type LocalSource,
   samePoints,
   type LocalCheckpoint,
 } from "./local-source";
@@ -91,6 +94,7 @@ export function deformLocal(drag: LocalDrag, delta: Point): Point[] {
 // Only immutable, validated candidates can enter accepted history. A pending
 // invalid preview cannot replace the last good route, even during interruption.
 export class LocalEditModel {
+  private proof?: LocalGeometryProof;
   private original: Point[];
   private accepted: Point[];
   private past: Point[][] = [];
@@ -99,8 +103,17 @@ export class LocalEditModel {
     points: Point[];
     error: ReturnType<typeof validate>;
   } | null = null;
-  constructor(points: readonly Point[]) {
-    const error = validate(copy(points));
+  constructor(
+    points: readonly Point[],
+    evidence?: { source: LocalSource; proof: LocalGeometryProof },
+  ) {
+    const proof = evidence?.proof;
+    if (proof && !proof.matches(evidence!.source, points))
+      throw Error("局部校验证据来源不匹配");
+    this.proof = proof;
+    const error = profile("local.baseValidate", () =>
+      proof ? proof.check(points) : validate(copy(points)),
+    );
     if (error) throw new Error(error.reason);
     this.original = copy(points);
     this.accepted = copy(points);
@@ -137,7 +150,9 @@ export class LocalEditModel {
       checkpoint.next,
     ]) {
       if (!points) continue;
-      const error = checkLocalPoints(this.original, points);
+      const error = this.proof
+        ? this.proof.check(points)?.reason
+        : checkLocalPoints(this.original, points);
       if (error) throw Error(error);
     }
     this.accepted = copy(checkpoint.current);
@@ -150,7 +165,9 @@ export class LocalEditModel {
     const error =
       snapshot.length !== this.accepted.length
         ? { reason: "局部调整不能改变采样点数量" }
-        : validate(snapshot);
+        : profile("local.releaseValidate", () =>
+            this.proof ? this.proof.check(snapshot) : validate(snapshot),
+          );
     this.candidate = { points: snapshot, error };
     return error;
   }

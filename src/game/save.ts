@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import { ROAD, RULES_VERSION } from "./config";
 import {
   defaultTrack,
@@ -41,8 +42,7 @@ export type SaveError =
   | "legacy-record-limit"
   | "data-limit";
 export type SaveResult =
-  | { ok: true; save: Save }
-  | { ok: false; error: SaveError };
+  { ok: true; save: Save } | { ok: false; error: SaveError };
 
 export const recordKey = (entry: TrackEntry, rules = RULES_VERSION) =>
   `${entry.uid}:${entry.track.id}:rules-${rules}`;
@@ -111,7 +111,10 @@ function readTrack(
       (p, i) => p.x === geometry!.points[i].x && p.y === geometry!.points[i].y,
     )
   ) {
-    if (validate(points, value.width)) return null;
+    if (
+      profile("geometry.strict", () => validate(points, value.width as number))
+    )
+      return null;
     geometry = {
       width: value.width,
       id: fingerprint(points, value.width),

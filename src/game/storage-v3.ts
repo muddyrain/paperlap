@@ -1,3 +1,4 @@
+import { profile } from "./local-profile";
 import {
   freshSave,
   migrateSave,
@@ -246,10 +247,10 @@ export class SaveSession {
     const state = this.check();
     if (!state.ok) return state;
     try {
-      const result = validateSave(candidate);
+      const result = profile("storage.validate", () => validateSave(candidate));
       if (!result.ok) return result;
       const save = result.save;
-      if (this.archive(save) !== this.history)
+      if (profile("storage.archive", () => this.archive(save)) !== this.history)
         return { ok: false, error: "invalid-save" };
       // A revision identity cannot be rebound to different coordinates, even if
       // its old 32-bit fingerprint is unchanged or its digest was forged anew.
@@ -277,9 +278,16 @@ export class SaveSession {
         )
           return { ok: false, error: "invalid-identity" };
       }
-      const raw = JSON.stringify(save);
-      if (raw !== this.expected.v3) this.storage!.setItem(STORAGE_KEY, raw);
-      if (this.storage!.getItem(STORAGE_KEY) !== raw)
+      const raw = profile("storage.serialize", () => JSON.stringify(save));
+      if (raw !== this.expected.v3)
+        profile("storage.setItem", () =>
+          this.storage!.setItem(STORAGE_KEY, raw),
+        );
+      if (
+        profile("storage.readback", () =>
+          this.storage!.getItem(STORAGE_KEY),
+        ) !== raw
+      )
         return this.block("conflict");
       this.expected.v3 = raw;
       this.baseline = structuredClone(save);

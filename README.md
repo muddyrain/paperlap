@@ -53,6 +53,8 @@ npm run preview
 
 采用、撤销或重做后备份到独立 `paperlap.local-draft.v1`，不混用整笔草稿。刷新后重新进入 L，匹配同一作品/几何修订/算法时提供“继续局部调整 / 放弃草稿 / 暂不处理”，不会自动覆盖正式赛道。刷新恢复最近一步撤销/重做；草稿最多 8 份 / 1,200,000 字符，不自动淘汰。初读失败时明确提示未备份，可确认仅放弃内存；已确认备份清理失败则留在编辑器。旧修订或其他作品的草稿保留原文，不自动套用。全部存档备份也包含局部草稿。
 
+局部校验、采用和保存会先显示处理状态；处理中可按 Esc 取消等待，已采用路线与备份保留。高点数严格校验与纹理提交仍可能停顿，实测和等待成本见 [P1-06A 性能报告](docs/p1-06-performance.md)。
+
 [状态与失败恢复合同](docs/local-editor-integration.md) · [测试、性能、截图和真实录屏](docs/local-editor-verification.md)。不提供自由贝塞尔手柄或云同步。
 
 ## 存档
@@ -87,6 +89,7 @@ npm run test:draft
 npm run test:storage
 npm run test:hud
 npm run test:local-game
+npm run test:local-response
 npm run test:trackbook
 ```
 
@@ -167,3 +170,5 @@ npm run demo:local-edit
 “读取此站赛道（只读）”只读取同 origin 的有效 Save V2/V3；端口不同读不到正式赛道时可继续用四种样例。也可在运行正式开发服务的相同网址下手动访问 `/prototypes/local-edit.html`，读取该网址的已有赛道进行内存实验。默认生产构建不包含原型；独立构建使用 `npm run build:local-edit`，输出到 `dist-prototype/`。
 
 `npm run test:local-edit` 用隔离无头浏览器重新生成三尺寸截图、真实操作录像及浏览器性能/资源报告；`npm run record:local-edit` 增加对比画面停留，便于审查录屏；`npm run bench:local-edit` 测纯算法的 200/450/900 点性能。两者输出到 `test-results/local-edit/`，不自动打开浏览器或报告。算法、纪录身份与后续草稿协议提案见 [RFC](docs/local-edit-rfc.md)，测量方法与实际结果见 [原型验证](docs/local-edit-verification.md)。
+
+P1-06A阶段测量：`PAPERLAP_PHASE=after npm run bench:local-phases`，覆盖200/450/900点、1/5/20赛道、normal/4×、冷读/热备份和保存；`test:local-response`覆盖可见等待、取消/旧回调、连续输入、冲突/读回失败，生成三尺寸状态图和实录。用`PAPERLAP_URL`指定独立预览地址；均为隔离无头运行。

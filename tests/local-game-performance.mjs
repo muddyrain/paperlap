@@ -77,9 +77,18 @@ try {
               },
               true,
             );
-            element.addEventListener(event, () =>
-              localPerf[key].push(performance.now() - start),
-            );
+            element.addEventListener(event, () => {
+              const finish = () => {
+                if (
+                  document
+                    .querySelector("#local-editor")
+                    .getAttribute("aria-busy") === "true"
+                )
+                  requestAnimationFrame(finish);
+                else localPerf[key].push(performance.now() - start);
+              };
+              finish();
+            });
           };
           watch(
             document.querySelector(".local-surface"),
@@ -131,8 +140,20 @@ try {
             before.textures,
           );
           await p.mouse.up();
+          await p.waitForFunction(
+            () =>
+              document
+                .querySelector("#local-editor")
+                .getAttribute("aria-busy") !== "true",
+          );
           assert.equal(await p.locator("#local-adopt").isEnabled(), true);
           await p.locator("#local-adopt").click();
+          await p.waitForFunction(
+            () =>
+              document
+                .querySelector("#local-editor")
+                .getAttribute("aria-busy") !== "true",
+          );
         }
         const during = await p.evaluate(() => ({
           local: paperlapDebug.local,
@@ -153,6 +174,8 @@ try {
             .length <= 3,
         );
         await p.locator("#local-save").click();
+        await p.waitForFunction(() => !paperlapDebug.local.active);
+        const completed = await p.evaluate(() => paperlapDebug.local.metrics);
         assert.equal(await p.evaluate(() => paperlapDebug.mode), "ready");
         await cdp.send("HeapProfiler.collectGarbage");
         const heapBefore = (await cdp.send("Runtime.getHeapUsage")).usedSize;
@@ -172,7 +195,7 @@ try {
           `bounded editor heap ${heapAfter - heapBefore}`,
         );
         const preview = stats(during.local.metrics.previewMs),
-          release = stats(perf.release),
+          release = stats(during.local.metrics.releaseMs),
           move = stats(perf.move);
         // Guard the high-frequency work relative to the strict release validation,
         // rather than claiming a universal frame rate on all desktop hardware.
@@ -188,8 +211,13 @@ try {
           preview,
           move,
           release,
-          adopt: stats(perf.adopt),
-          save: stats(perf.save),
+          adopt: stats(during.local.metrics.adoptMs),
+          save: stats(completed.saveMs),
+          includingPaintWait: {
+            release: stats(perf.release),
+            adopt: stats(perf.adopt),
+            save: stats(perf.save),
+          },
           raf: stats(during.perf.frames),
           pointerEvents: during.local.metrics.pointerMoves,
           previewFrames: during.local.metrics.frames,
