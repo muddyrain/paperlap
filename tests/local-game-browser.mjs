@@ -23,7 +23,12 @@ const check = (name) => {
   report.checks.push(name);
   console.log(`PASS ${name}`);
 };
-const state = (p) => p.evaluate(() => window.paperlapDebug);
+const state = async (p) => {
+  const value = await p.evaluate(() => window.paperlapDebug);
+  if (!value.local.busy) return value;
+  await p.waitForFunction(() => !paperlapDebug.local.busy);
+  return p.evaluate(() => window.paperlapDebug);
+};
 const raw = (p, key = "paperlap.save.v3") =>
   p.evaluate((k) => localStorage.getItem(k), key);
 async function load(p) {
@@ -210,7 +215,11 @@ async function completeLap(p) {
     const end = Date.now() + 180000;
     while (Date.now() < end) {
       const s = await state(p);
-      if (s.lap.completed >= 1) return;
+      if (
+        s.lap.completed >= 1 &&
+        (await p.locator("#best").innerText()) !== "--:--.--"
+      )
+        return;
       const points = s.track.points,
         car = s.car;
       let index = 0,

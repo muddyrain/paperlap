@@ -12,7 +12,11 @@ import {
   localDraftMessage,
   type LocalDraftResult,
 } from "./local-draft-storage";
-import type { LocalSource, LocalCheckpoint } from "./local-source";
+import {
+  LocalGeometryProof,
+  type LocalSource,
+  type LocalCheckpoint,
+} from "./local-source";
 import type { Point, Track } from "./geometry";
 import type { RaceScene } from "./scene";
 import { Trackbook, trackbookMessage } from "./trackbook";
@@ -45,6 +49,11 @@ export class LocalEditor {
     selection: LocalDrag;
   } | null = null;
   private frame = 0;
+  private proof: LocalGeometryProof | null = null;
+  private busy: "validating" | "adopting" | "saving" | null = null;
+  private generation = 0;
+  private workFrame = 0;
+  private workTimer: ReturnType<typeof setTimeout> | undefined;
   private keys = historyKeys();
   private counters = {
     pointerMoves: 0,
@@ -53,6 +62,8 @@ export class LocalEditor {
     adoptions: 0,
     previewMs: [] as number[],
     releaseMs: [] as number[],
+    adoptMs: [] as number[],
+    saveMs: [] as number[],
   };
   get active() {
     return !this.root.hidden;
@@ -71,6 +82,8 @@ export class LocalEditor {
   get telemetry() {
     return {
       active: this.active,
+      busy: this.busy,
+      proof: this.proof?.stats ?? null,
       source: this.source ? { ...this.source } : null,
       current: this.model?.current ?? null,
       pending: this.model?.pending ?? null,
@@ -190,10 +203,14 @@ export class LocalEditor {
     return this.root.querySelector<HTMLButtonElement>(`#${id}`)!;
   }
   enter(source: LocalSource, track: Track) {
+    this.stopOperation();
+    // A previous successful save must not speak for the next editing attempt.
+    this.board.querySelector("#toast")?.replaceChildren();
     this.accessBlocked = false;
     this.source = { ...source };
     this.base = track.points.map((p) => ({ ...p }));
-    this.model = new LocalEditModel(this.base);
+    this.proof = new LocalGeometryProof(source, this.base);
+    this.model = new LocalEditModel(this.base, { source, proof: this.proof });
     this.wasReady = this.scene.mode === "ready";
     this.counters = {
       pointerMoves: 0,
@@ -202,6 +219,8 @@ export class LocalEditor {
       adoptions: 0,
       previewMs: [],
       releaseMs: [],
+      adoptMs: [],
+      saveMs: [],
     };
     const sheet = this.motion.capture(this.scene);
     this.scene.keys.clear();
@@ -217,7 +236,7 @@ export class LocalEditor {
     title.textContent = track.name.trim() || "未命名赛道";
     title.title = title.textContent;
     this.backup = this.store
-      ? new LocalDraftStorage(this.store, this.hooks.check)
+      ? new LocalDraftStorage(this.store, this.hooks.check, this.proof)
       : null;
     const loaded = this.backup?.open(source, this.base) ?? {
       ok: false as const,
@@ -271,13 +290,117 @@ export class LocalEditor {
       );
   }
   private refresh() {
+    const busy = !!this.busy;
+    this.root.setAttribute("aria-busy", String(busy));
+    this.canvas.setAttribute("aria-disabled", String(busy));
+    this.get("local-cancel").innerHTML = buttonContent(
+      "back",
+      busy ? "取消等待" : "取消调整",
+      "Esc",
+    );
+    this.get("local-adopt").innerHTML = buttonContent(
+      "check",
+      this.busy === "validating"
+        ? "正在校验…"
+        : this.busy === "adopting"
+          ? "正在采用…"
+          : "采用本次调整",
+      "Enter",
+    );
+    this.get("local-save").innerHTML = buttonContent(
+      "check",
+      this.busy === "saving" ? "正在保存…" : "保存局部修改",
+      this.keys.modifier === "Meta" ? "⌘ Enter" : "Ctrl Enter",
+    );
+    this.get("local-adopt").setAttribute(
+      "aria-busy",
+      String(this.busy === "validating" || this.busy === "adopting"),
+    );
+    this.get("local-save").setAttribute(
+      "aria-busy",
+      String(this.busy === "saving"),
+    );
     const pending = this.model?.pending;
     this.get("local-adopt").disabled =
-      !!this.drag || !pending || !!pending.error;
+      busy || !!this.drag || !pending || !!pending.error;
     this.get("local-save").disabled =
-      this.accessBlocked || !!this.drag || !!pending || !this.model?.dirty;
-    this.get("local-undo").disabled = !this.model?.canUndo;
-    this.get("local-redo").disabled = !this.model?.canRedo;
+      busy ||
+      this.accessBlocked ||
+      !!this.drag ||
+      !!pending ||
+      !this.model?.dirty;
+    this.get("local-undo").disabled = busy || !this.model?.canUndo;
+    this.get("local-redo").disabled = busy || !this.model?.canRedo;
+  }
+  private stopOperation() {
+    this.generation++;
+    cancelAnimationFrame(this.workFrame);
+    this.workFrame = 0;
+    clearTimeout(this.workTimer);
+    this.workTimer = undefined;
+    this.busy = null;
+    this.root.setAttribute("aria-busy", "false");
+  }
+  private beginOperation(
+    kind: NonNullable<LocalEditor["busy"]>,
+    work: () => void,
+  ) {
+    if (
+      !this.active ||
+      this.busy ||
+      this.dialog.open ||
+      this.book.reloadRequired
+    )
+      return;
+    const generation = ++this.generation;
+    this.busy = kind;
+    this.status(
+      {
+        validating: "正在校验路线…",
+        adopting: "正在采用并备份…",
+        saving: "正在保存局部修改…",
+      }[kind],
+    );
+    this.focus();
+    this.refresh();
+    // The first frame paints busy feedback. Computation starts only after the
+    // next rendering opportunity; no artificial minimum spinner duration.
+    this.workFrame = requestAnimationFrame(() => {
+      if (generation !== this.generation || !this.active) return;
+      this.workFrame = requestAnimationFrame(() => {
+        if (generation !== this.generation || !this.active) return;
+        this.workFrame = 0;
+        this.workTimer = setTimeout(() => {
+          this.workTimer = undefined;
+          if (generation !== this.generation || !this.active) return;
+          if (document.hidden) {
+            this.interrupt();
+            return;
+          }
+          const start = performance.now();
+          try {
+            work();
+          } catch {
+            this.status("操作未完成，已采用修改和已有备份保留，请重试。", true);
+          } finally {
+            const times =
+              kind === "adopting"
+                ? this.counters.adoptMs
+                : kind === "saving"
+                  ? this.counters.saveMs
+                  : null;
+            if (times) {
+              times.push(performance.now() - start);
+              if (times.length > 120) times.shift();
+            }
+            if (generation === this.generation) {
+              this.busy = null;
+              this.refresh();
+            }
+          }
+        }, 0);
+      });
+    });
   }
   private paint() {
     if (!this.model || !this.active) return;
@@ -304,6 +427,7 @@ export class LocalEditor {
     if (
       e.button !== 0 ||
       !this.active ||
+      !!this.busy ||
       this.book.reloadRequired ||
       this.dialog.open ||
       !this.model ||
@@ -364,22 +488,23 @@ export class LocalEditor {
     if (!this.drag || this.drag.pointer !== e.pointerId || !this.model) return;
     this.drag.latest = this.position(e);
     this.preview();
-    const candidate = this.visible!,
-      start = performance.now();
+    const candidate = this.visible!;
     this.release();
-    this.counters.validations++;
-    const error = this.model.preview(candidate);
-    this.counters.releaseMs.push(performance.now() - start);
-    if (this.counters.releaseMs.length > 120) this.counters.releaseMs.shift();
-    this.visible = null;
-    this.status(
-      error
-        ? `不能采用：${error.reason}`
-        : "路线合法 · Enter 采用到编辑历史，还不会正式保存。",
-      !!error,
-    );
-    this.refresh();
-    this.paint();
+    this.beginOperation("validating", () => {
+      const start = performance.now();
+      this.counters.validations++;
+      const error = this.model!.preview(candidate);
+      this.counters.releaseMs.push(performance.now() - start);
+      if (this.counters.releaseMs.length > 120) this.counters.releaseMs.shift();
+      this.visible = null;
+      this.status(
+        error
+          ? `不能采用：${error.reason}`
+          : "路线合法 · Enter 采用到编辑历史，还不会正式保存。",
+        !!error,
+      );
+      this.paint();
+    });
   };
   private release() {
     const pointer = this.drag?.pointer;
@@ -397,17 +522,28 @@ export class LocalEditor {
   };
   interrupt() {
     if (!this.active) return;
-    const pending = !!this.drag || !!this.model?.pending;
+    const queued = !!this.busy;
+    const pending = !!this.busy || !!this.drag || !!this.model?.pending;
+    this.stopOperation();
     this.release();
     this.model?.cancelPreview();
     this.visible = null;
     this.selection = null;
-    if (pending) this.status("本次未采用预览已取消；已采用路线和草稿保留。");
+    if (pending)
+      this.status(
+        queued
+          ? "处理已中断；已采用路线和草稿保留。"
+          : "本次未采用预览已取消；已采用路线和草稿保留。",
+      );
     this.checkpoint();
     this.refresh();
     this.paint();
   }
   private adopt() {
+    if (!this.model?.pending || this.model.pending.error || this.busy) return;
+    this.beginOperation("adopting", () => this.adoptNow());
+  }
+  private adoptNow() {
     if (
       !this.active ||
       this.book.reloadRequired ||
@@ -435,7 +571,13 @@ export class LocalEditor {
     this.motion.emphasize("local-adopt", this.get("local-adopt"), "page");
   }
   private history(action: "undo" | "redo") {
-    if (!this.active || this.dialog.open || this.book.reloadRequired) return;
+    if (
+      !this.active ||
+      this.busy ||
+      this.dialog.open ||
+      this.book.reloadRequired
+    )
+      return;
     this.release();
     this.visible = null;
     this.selection = null;
@@ -451,7 +593,7 @@ export class LocalEditor {
     this.focus();
   }
   private requestCancel() {
-    if (this.drag || this.model?.pending) {
+    if (this.busy || this.drag || this.model?.pending) {
       this.interrupt();
       this.focus();
     } else this.hooks.cancel();
@@ -460,6 +602,13 @@ export class LocalEditor {
     if (!this.active) return;
     if (this.book.reloadRequired) {
       e.preventDefault();
+      return;
+    }
+    if (this.busy) {
+      if (!ignoresShortcuts(e) && e.code === "Escape" && !e.repeat) {
+        e.preventDefault();
+        this.requestCancel();
+      } else if (e.code !== "Tab") e.preventDefault();
       return;
     }
     const target = shortcutTarget(e.target);
@@ -502,6 +651,16 @@ export class LocalEditor {
   }
   save() {
     if (
+      this.busy ||
+      !this.model?.dirty ||
+      this.model.pending ||
+      this.accessBlocked
+    )
+      return;
+    this.beginOperation("saving", () => this.saveNow());
+  }
+  private saveNow() {
+    if (
       !this.active ||
       this.dialog.open ||
       this.drag ||
@@ -514,7 +673,11 @@ export class LocalEditor {
       return;
     const sheet = this.motion.capture(this.scene, this.canvas),
       result = profile("local.commit", () =>
-        this.book.commitLocal(this.source!, this.model!.current),
+        this.book.commitLocal(
+          this.source!,
+          this.model!.current,
+          this.proof ?? undefined,
+        ),
       );
     if (!result.ok) {
       this.status(trackbookMessage(result.error), true);
@@ -541,6 +704,7 @@ export class LocalEditor {
   }
   cancel(discard = true) {
     if (!this.active) return true;
+    this.stopOperation();
     if (
       discard &&
       this.hasDraft &&
@@ -570,17 +734,20 @@ export class LocalEditor {
     this.hooks.later();
   }
   private leave() {
+    this.stopOperation();
     this.release();
     this.closeRecovery();
     this.root.hidden = true;
     this.board.classList.remove("editing", "local-editing");
     this.model = null;
+    this.proof = null;
     this.source = null;
     this.backup = null;
     this.selection = null;
     this.visible = null;
   }
   block() {
+    this.stopOperation();
     if (this.active) {
       this.release();
       this.root.inert = true;
@@ -588,6 +755,7 @@ export class LocalEditor {
   }
   accessChanged(reason: string | null) {
     if (!this.active || !reason) return;
+    this.interrupt();
     this.accessBlocked = true;
     this.status(reason, true);
     this.root.querySelector("#local-backup")!.textContent =
@@ -595,6 +763,7 @@ export class LocalEditor {
     this.refresh();
   }
   destroy() {
+    this.stopOperation();
     this.release();
     this.dialog.close();
     this.dialog.remove();

@@ -8,7 +8,7 @@ import {
 } from "./geometry-identity";
 import { STORAGE_KEY, readV3Identity } from "./storage-v3";
 import {
-  checkLocalPoints,
+  LocalGeometryProof,
   sameLocalSource,
   type LocalSource,
   type LocalCheckpoint,
@@ -97,8 +97,7 @@ export class LocalDraftStorage {
   private expected: string | null = null;
   private official: string | null = null;
   private source: LocalSource | null = null;
-  private base: Point[] = [];
-  private proofs = new Set<string>();
+  private proof: LocalGeometryProof | null = null;
   private failure: ErrorKind = "invalid";
   get confirmed() {
     return this.document !== null;
@@ -106,17 +105,13 @@ export class LocalDraftStorage {
   constructor(
     private store: Store,
     private allow: () => boolean,
+    private sharedProof?: LocalGeometryProof,
   ) {}
-  private valid(c: LocalCheckpoint) {
+  private valid(c: LocalCheckpoint, fresh = false) {
     for (const p of [c.current, c.previous, c.next]) {
       if (!p) continue;
-      const raw = JSON.stringify(p);
-      if (this.proofs.has(raw)) continue;
-      if (profile("draft.validate", () => checkLocalPoints(this.base, p)))
+      if (profile("draft.validate", () => this.proof!.check(p, fresh)))
         return false;
-      this.proofs.add(raw);
-      if (this.proofs.size > 6)
-        this.proofs.delete(this.proofs.values().next().value!);
     }
     return true;
   }
@@ -124,8 +119,9 @@ export class LocalDraftStorage {
     this.failure = "invalid";
     this.document = null;
     this.source = { ...source };
-    this.base = base.map((p) => ({ ...p }));
-    this.proofs.clear();
+    this.proof = this.sharedProof?.matches(source, base)
+      ? this.sharedProof
+      : new LocalGeometryProof(source, base);
     try {
       if (source.algorithmVersion !== 1) return { ok: false, error: "invalid" };
       if (!this.allow()) {
@@ -152,7 +148,8 @@ export class LocalDraftStorage {
       const matching = doc.entries.find((e) =>
         sameLocalSource(e.source, source),
       );
-      if (matching && !this.valid(matching.checkpoint))
+      // Disk bytes are never trusted through an in-memory cache, even if equal.
+      if (matching && !this.valid(matching.checkpoint, true))
         return { ok: false, error: "invalid" };
       this.document = doc;
       return {

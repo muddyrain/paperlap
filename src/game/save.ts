@@ -111,7 +111,9 @@ function readTrack(
       (p, i) => p.x === geometry!.points[i].x && p.y === geometry!.points[i].y,
     )
   ) {
-    if (profile("geometry.strict", () => validate(points, value.width as number)))
+    if (
+      profile("geometry.strict", () => validate(points, value.width as number))
+    )
       return null;
     geometry = {
       width: value.width,

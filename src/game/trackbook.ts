@@ -18,6 +18,7 @@ import {
   sameLocalSource,
   samePoints,
   checkLocalPoints,
+  LocalGeometryProof,
   type LocalSource,
 } from "./local-source";
 import type { StorageError, WriteResult } from "./storage-v3";
@@ -87,7 +88,11 @@ export class Trackbook {
   cancelLocal() {
     this.local = null;
   }
-  commitLocal(source: LocalSource, points: readonly Point[]): CommandResult {
+  commitLocal(
+    source: LocalSource,
+    points: readonly Point[],
+    proof?: LocalGeometryProof,
+  ): CommandResult {
     if (this.reloadRequired) return { ok: false, error: "reload-required" };
     if (this.intent || !this.local || this.save.schemaVersion !== 3)
       return { ok: false, error: "editing" };
@@ -104,7 +109,9 @@ export class Trackbook {
     if (!checked.ok) return checked;
     if (
       profile("local.commitValidate", () =>
-        checkLocalPoints(entry.track.points, points),
+        proof?.matches(source, entry.track.points)
+          ? proof.check(points)?.reason
+          : checkLocalPoints(entry.track.points, points),
       )
     )
       return { ok: false, error: "invalid-track" };

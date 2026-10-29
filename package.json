@@ -32,7 +32,10 @@
     "test:local-edit": "node tests/local-edit-browser.mjs",
     "bench:local-edit": "tsx tests/local-edit-performance.ts",
     "record:local-edit": "PAPERLAP_RECORD=1 node tests/local-edit-browser.mjs",
-    "bench:v3:browser": "node tests/save-v3-performance-browser.mjs"
+    "bench:v3:browser": "node tests/save-v3-performance-browser.mjs",
+    "test:local-response": "node tests/local-response-browser.mjs",
+    "bench:local-phases": "node tests/local-phase-performance.mjs",
+    "bench:local-recovery": "node tests/local-recovery-performance.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

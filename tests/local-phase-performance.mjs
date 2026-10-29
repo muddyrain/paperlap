@@ -40,7 +40,12 @@ const report = {
   failedRequests: [],
 };
 const state = (p) => p.evaluate(() => paperlapDebug);
-const done = (p) => p.waitForFunction(() => !paperlapDebug.local.busy);
+const done = (p) =>
+  p.waitForFunction(
+    () =>
+      document.querySelector("#local-editor").getAttribute("aria-busy") !==
+      "true",
+  );
 try {
   for (const count of [200, 450, 900])
     for (const tracks of [1, 5, 20])
@@ -216,6 +221,34 @@ try {
       }
   assert.deepEqual(report.errors, []);
   assert.deepEqual(report.failedRequests, []);
+  if (phase === "after")
+    for (const c of report.cases.filter((c) => c.points === 900)) {
+      for (const round of c.rounds) {
+        for (const op of round.operations) {
+          assert.ok(
+            op.stages["local.checkpoint"].median <
+              op.stages["local.releaseValidate"].median * 0.5 + 4 * c.cpuRate,
+            "backup must reuse local evidence instead of repeating strict geometry",
+          );
+        }
+        assert.equal(
+          round.save["geometry.strict"].samples.length,
+          1,
+          "new V3 candidate still receives a complete geometry check",
+        );
+        assert.equal(
+          round.save["v3.validate"].samples.length,
+          2,
+          "candidate and writer keep V3 validation",
+        );
+        assert.equal(round.save["v3.digest"].samples.length, c.tracks * 2);
+        assert.equal(round.save["storage.readback"].samples.length, 1);
+        assert.ok(
+          round.save["local.commitValidate"].median <
+            round.save["geometry.strict"].median * 0.5 + 4 * c.cpuRate,
+        );
+      }
+    }
 } finally {
   await writeFile(`${output}/phases.json`, JSON.stringify(report, null, 2));
   await browser.close();

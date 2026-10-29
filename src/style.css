@@ -1504,6 +1504,8 @@ button:disabled {
   pointer-events: auto;
   font-size: 14px;
   padding: 10px 12px;
+  /* State colors must paint before synchronous work, without an unfinished fade. */
+  transition-property: transform, box-shadow;
 }
 #local-status {
   font-size: 14px;
@@ -1552,4 +1554,12 @@ button:disabled {
   #local-status {
     font-size: 12px;
   }
+}
+
+/* Quiet paper feedback stays visible while the one-shot local task is queued. */
+.local-actions button[aria-busy="true"] {
+  opacity: 1;
+  background: #efdfb8;
+  color: #4b514f;
+  box-shadow: 1px 2px 0 #8f806b45;
 }
