@@ -24,9 +24,19 @@ const check = (name) => {
   console.log(`PASS ${name}`);
 };
 const state = async (p) => {
-  const value = await p.evaluate(() => window.paperlapDebug);
-  if (!value.local.busy) return value;
-  await p.waitForFunction(() => !paperlapDebug.local.busy);
+  const { value, ariaBusy } = await p.evaluate(() => ({
+    value: window.paperlapDebug,
+    ariaBusy: document.querySelector("#local-editor").getAttribute("aria-busy"),
+  }));
+  if (!value.local.busy && (!value.local.active || ariaBusy === "false"))
+    return value;
+  await p.waitForFunction(
+    () =>
+      !paperlapDebug.local.busy &&
+      (!paperlapDebug.local.active ||
+        document.querySelector("#local-editor").getAttribute("aria-busy") ===
+          "false"),
+  );
   return p.evaluate(() => window.paperlapDebug);
 };
 const raw = (p, key = "paperlap.save.v3") =>
@@ -591,6 +601,9 @@ try {
     await block(p, "paperlap.local-draft.v1");
     await drag(p, top(await state(p)), { x: 0, y: -8 });
     await p.keyboard.press("Enter");
+    const adopted = await state(p);
+    assert.equal(adopted.local.dirty, true);
+    assert.equal(adopted.local.pending, null);
     assert.match(await p.locator("#local-backup").innerText(), /未备份/);
     assert.equal(await raw(p, "paperlap.local-draft.v1"), backup);
     await restore(p);
@@ -657,6 +670,7 @@ try {
         }
       }, stage);
       await p.keyboard.press(`${await modifier(p)}+Enter`);
+      await state(p);
       assert.equal(await raw(p, "paperlap.local-draft.v1"), backup);
       assert.notEqual(
         await p.locator("#toast").getAttribute("data-feedback"),

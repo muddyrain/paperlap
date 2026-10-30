@@ -24,6 +24,7 @@ export class SaveHistory {
   private entry = document.createElement("button");
   private returnFocus: HTMLElement | null = null;
   private error: StorageError | null = null;
+  private localNotice: string | null = null;
   constructor(
     private board: HTMLElement,
     private save: () => Save,
@@ -34,7 +35,7 @@ export class SaveHistory {
     this.dialog.id = "save-history";
     this.dialog.className = "game-menu paper save-history";
     this.dialog.setAttribute("aria-labelledby", "save-history-title");
-    this.dialog.innerHTML = `<h2 id="save-history-title">纪录历史与存档</h2><p id="save-state-description" role="status"></p><p>旧纪录（旧几何身份，未验证）已完整保留，不与当前个人最佳比较。不同规则与孤立归档在下方逐项列出。</p><p>V1/V2 是升级前备份，旧版不会看到 V3 新作品。恢复前请导出所有键并关闭其他标签；本游戏不会自动删除或覆盖旧键、损坏原文。</p><div class="history-actions"><button id="history-close" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回", "Esc")}</button><button id="export-save" class="paper">${buttonContent("book", "导出全部存档备份")}</button><button id="retry-save" class="paper">${buttonContent("reset", "重新加载 / 重试升级")}</button></div><p id="backup-error" role="status"></p><ol id="record-history-list"></ol>`;
+    this.dialog.innerHTML = `<h2 id="save-history-title">纪录历史与存档</h2><p id="save-state-description" role="status"></p><section id="local-cleanup-notice" class="local-cleanup-notice" hidden><p id="local-cleanup-description" role="status"></p><button id="acknowledge-local-notice" class="paper">${buttonContent("check", "已知晓，保留旧草稿")}</button></section><p>旧纪录（旧几何身份，未验证）已完整保留，不与当前个人最佳比较。不同规则与孤立归档在下方逐项列出。</p><p>V1/V2 是升级前备份，旧版不会看到 V3 新作品。恢复前请导出所有键并关闭其他标签；本游戏不会自动删除或覆盖旧键、损坏原文。</p><div class="history-actions"><button id="history-close" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回", "Esc")}</button><button id="export-save" class="paper">${buttonContent("book", "导出全部存档备份")}</button><button id="retry-save" class="paper">${buttonContent("reset", "重新加载 / 重试升级")}</button></div><p id="backup-error" role="status"></p><ol id="record-history-list"></ol>`;
     this.board.append(this.dialog);
     this.badge.id = "storage-state";
     this.badge.className = "storage-state";
@@ -47,6 +48,14 @@ export class SaveHistory {
     this.entry.onclick = () => this.open();
     document.querySelector(".timing")!.append(this.entry);
     this.get("history-close").onclick = () => this.close();
+    this.get("acknowledge-local-notice").onclick = () => {
+      // Acknowledgement only dismisses this session's UI notice, never storage.
+      this.localNotice = null;
+      this.update();
+      if (this.returnFocus === this.badge && this.badge.hidden)
+        this.returnFocus = this.entry;
+      this.get("history-close").focus({ preventScroll: true });
+    };
     this.get("retry-save").onclick = () => location.reload();
     this.get("export-save").onclick = () => {
       try {
@@ -92,19 +101,29 @@ export class SaveHistory {
     this.error = error;
     this.update();
   }
+  localDraftNotice(message: string) {
+    this.localNotice = message;
+    this.update();
+  }
   update() {
     const save = this.save(),
       text = legacyLabel(save, save.activeTrackUid);
     this.entry.textContent = text || "纪录历史 / 备份";
     this.entry.title = "查看全部旧纪录（旧几何身份，未验证）及存档备份";
-    this.badge.hidden = !this.error;
-    this.badge.textContent = "存档未保存或只读 · 查看说明";
-    this.badge.title = storageMessage(this.error);
+    this.badge.hidden = !this.error && !this.localNotice;
+    this.badge.textContent = this.error
+      ? "存档未保存或只读 · 查看说明"
+      : "赛道已保存 · 旧草稿保留";
+    this.badge.title = this.error
+      ? storageMessage(this.error)
+      : (this.localNotice ?? "");
     if (this.dialog.open) this.render();
   }
   private render() {
     const save = this.save();
     this.get("save-state-description").textContent = storageMessage(this.error);
+    this.get("local-cleanup-notice").hidden = !this.localNotice;
+    this.get("local-cleanup-description").textContent = this.localNotice ?? "";
     const list = this.get("record-history-list");
     list.replaceChildren();
     const row = (title: string, key: string, value: number) => {

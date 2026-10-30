@@ -1,0 +1,177 @@
+[
+  {
+    "command": "git diff --check",
+    "seconds": 0.28,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 0,
+    "last_scene": null,
+    "log": "logs/diff-check.log"
+  },
+  {
+    "command": "npm run typecheck",
+    "seconds": 1.05,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 0,
+    "last_scene": null,
+    "log": "logs/typecheck.log"
+  },
+  {
+    "command": "npm run test",
+    "seconds": 7.22,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 0,
+    "last_scene": null,
+    "log": "logs/test.log"
+  },
+  {
+    "command": "npm run build",
+    "seconds": 1.68,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 0,
+    "last_scene": null,
+    "log": "logs/build.log"
+  },
+  {
+    "command": "node tests/ux-polish-browser.mjs",
+    "seconds": 143.62,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 86,
+    "last_scene": "PASS edge-conflict: five buttons, text and nine-point hit areas fit",
+    "log": "logs/ux-polish-browser.log",
+    "checks": 86,
+    "failures": [],
+    "pageerrors": [],
+    "screenshots": 77
+  },
+  {
+    "command": "npm run test:local-game",
+    "seconds": 114.63,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 22,
+    "last_scene": "PASS L respects native text/modifier/IME/repeat guards; Space adopts and native Enter keeps local edits",
+    "log": "logs/test-local-game.log"
+  },
+  {
+    "command": "npm run test:local-response",
+    "seconds": 123.0,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 19,
+    "last_scene": "PASS a failed second edit cannot retain the earlier successful save notice",
+    "log": "logs/test-local-response.log"
+  },
+  {
+    "command": "npm run test:hud",
+    "seconds": 35.98,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 12,
+    "last_scene": "PASS 900x700 quota: centered, unclipped, unoccluded HUD; history return stable",
+    "log": "logs/test-hud.log"
+  },
+  {
+    "command": "npm run test:focus",
+    "seconds": 17.48,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 9,
+    "last_scene": "PASS initial reduced-motion and forced colors preserve a visible non-enclosing focus cue",
+    "log": "logs/test-focus.log"
+  },
+  {
+    "command": "npm run test:menu",
+    "seconds": 125.47,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 13,
+    "last_scene": "PASS reduced-motion menu is immediately usable, no delayed close or automatic start",
+    "log": "logs/test-menu.log"
+  },
+  {
+    "command": "npm run test:trackbook",
+    "seconds": 337.29,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 27,
+    "last_scene": "PASS 900×700: real A/B cards, selection, visible icon + Chinese + keycaps in game/drawer/editor and ready switch feedback",
+    "log": "logs/test-trackbook.log"
+  },
+  {
+    "command": "npm run test:motion",
+    "seconds": 163.88,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 14,
+    "last_scene": "PASS real driven valid lap persists a new record, rewards HUD/star/stamp and keeps input usable",
+    "log": "logs/test-motion.log"
+  },
+  {
+    "command": "node tests/draft-browser.mjs",
+    "seconds": 408.27,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 28,
+    "last_scene": "PASS reduced-motion preserves recovery, history and keyboard focus without timing-dependent data callbacks",
+    "log": "logs/draft-browser.log"
+  },
+  {
+    "command": "node tests/draft-storage-browser.mjs",
+    "seconds": 55.46,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 4,
+    "last_scene": "PASS storage-getter/create: explicit confirmation leaves a nonempty editor through the original route without touching unknown backups",
+    "log": "logs/draft-storage-browser.log"
+  },
+  {
+    "command": "node tests/draft-interruption-browser.mjs",
+    "seconds": 77.96,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 5,
+    "last_scene": "PASS pointercancel: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes",
+    "log": "logs/draft-interruption-browser.log"
+  },
+  {
+    "command": "npm run test:storage",
+    "seconds": 50.85,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 15,
+    "last_scene": "PASS legacy whole-stroke bytes remain read-only; new drafts recover only the matching V3 revision",
+    "log": "logs/test-storage.log"
+  },
+  {
+    "command": "npm run test:browser",
+    "seconds": 83.29,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 15,
+    "last_scene": "PASS no console errors or failed resources",
+    "log": "logs/test-browser.log"
+  },
+  {
+    "command": "npm run test:handling",
+    "seconds": 33.63,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 4,
+    "last_scene": "PASS new best uses rules-2 while the original rules-1 record remains saved",
+    "log": "logs/test-handling.log"
+  },
+  {
+    "command": "npm run test:sound",
+    "seconds": 12.04,
+    "exit": 0,
+    "timed_out": false,
+    "passed_scenes": 4,
+    "last_scene": "PASS visibilitychange after sound click still freezes timer/car, clears held input and silences motor until explicit resume",
+    "log": "logs/test-sound.log"
+  }
+]

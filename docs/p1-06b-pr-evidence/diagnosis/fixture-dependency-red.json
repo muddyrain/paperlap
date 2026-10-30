@@ -1,0 +1,7 @@
+{
+  "command": "node tests/ux-polish-browser.mjs",
+  "environment": "clean clone + pre-review patch; no audit docs",
+  "exit": 1,
+  "seconds": 0.39,
+  "missing": "docs/p1-06-ux-evidence/genuine-legacy-storage.json"
+}

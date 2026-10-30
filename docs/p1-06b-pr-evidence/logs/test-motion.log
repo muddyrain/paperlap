@@ -1,0 +1,19 @@
+
+> paperlap@1.0.0 test:motion
+> node tests/motion-browser.mjs
+
+PASS menu choreography preserves immediate pause/resume, controls scope, repeated Esc and fixed Canvas geometry
+PASS both edit intents reveal paper and cancel to the correct menu/book origin without writing
+PASS new save stays ready, replace runs immediately, confirmation keeps candidate and explicit discard never writes
+PASS A/B changes celebrate committed tracks only and return to menu without automatic start
+PASS failed switch/save preserve durable data and show no success stamp or switch sheet
+PASS 1366x768: keyframes, long name, visible keycaps, fixed world geometry and safe discard focus
+PASS 1280x800: keyframes, long name, visible keycaps, fixed world geometry and safe discard focus
+PASS 900x700: keyframes, long name, visible keycaps, fixed world geometry and safe discard focus
+PASS touching drawing cancels old paper; live reduced-motion/blur settles visuals without changing modal intent
+PASS native keyboard/touch press feedback and 20 rapid route cycles leave no stale animation, focus or overlay
+PASS initial reduced-motion keeps all menu/editor actions and candidate preservation without transient layers
+PASS mouse/keyboard focus stays distinct from press/selection across menu, controls, book, draft, reopen and reduced-motion
+PASS normal/reduced at 1x/4x CPU: measured rAF/input latency and bounded resources, no animation waits
+PASS real driven valid lap persists a new record, rewards HUD/star/stamp and keeps input usable
+Headless motion browsers and contexts closed

@@ -1,0 +1,9 @@
+
+> paperlap@1.0.0 test:handling
+> node tests/handling-browser.mjs
+
+PASS legacy save keeps track/preferences without applying the old physics record
+PASS real direction input builds and releases promptly at driving speed
+PASS two valid laps use higher speed on broad bends and lift before tighter turns
+PASS new best uses rules-2 while the original rules-1 record remains saved
+Headless handling browser and context closed

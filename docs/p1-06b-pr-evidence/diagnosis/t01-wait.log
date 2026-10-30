@@ -1,0 +1,15 @@
+[
+  {
+    "immediate": {
+      "busy": "adopting",
+      "ariaBusy": "true",
+      "backup": "局部草稿已备份；刷新可恢复最近一步撤销/重做。"
+    },
+    "final": {
+      "busy": null,
+      "ariaBusy": "false",
+      "backup": "局部草稿未备份：空间不足或读取受限，请勿刷新。",
+    },
+    "oldDraftUnchanged": true
+  }
+]

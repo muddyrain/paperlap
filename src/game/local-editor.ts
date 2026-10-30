@@ -111,7 +111,7 @@ export class LocalEditor {
     const k = this.keys;
     this.root.id = "local-editor";
     this.root.hidden = true;
-    this.root.innerHTML = `<header class="local-heading"><div class="local-title"><h2>局部调整</h2><span>目标赛道：<strong id="local-track-name" tabindex="0"></strong></span></div><p>拖动道路调整一个弯道 · 虚线是原路线，黄色是影响范围，灰色起点区受保护</p><p id="local-backup" role="status"></p></header><footer class="local-footer"><p id="local-status" role="status"></p><div class="local-actions"><button id="local-cancel" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "取消调整", "Esc")}</button><button id="local-undo" class="paper" aria-keyshortcuts="${k.modifier}+Z">${buttonContent("undo", "撤销", k.undo)}</button><button id="local-redo" class="paper" aria-keyshortcuts="${k.modifier}+Shift+Z">${buttonContent("redo", "重做", k.redo)}</button><button id="local-adopt" class="paper" aria-keyshortcuts="Enter">${buttonContent("check", "采用本次调整", "Enter")}</button><button id="local-save" class="primary" aria-keyshortcuts="${k.modifier}+Enter">${buttonContent("check", "保存局部修改", k.modifier === "Meta" ? "⌘ Enter" : "Ctrl Enter")}</button></div></footer>`;
+    this.root.innerHTML = `<header class="local-heading"><div class="local-title"><h2>局部调整</h2><span>目标赛道：<strong id="local-track-name" tabindex="0"></strong></span></div><button id="local-help-toggle" class="paper" aria-expanded="false" aria-controls="local-help">${buttonContent("help", "操作帮助")}</button><p id="local-help" class="paper" hidden>拖动弯道，松手校验。虚线是原路线，黄色是影响范围，灰色起点区受保护。采用只进入编辑历史，正式保存后再返回驾驶。</p><p id="local-backup" role="status"></p></header><footer class="local-footer"><div class="local-actions"><button id="local-cancel" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "取消调整", "Esc")}</button><button id="local-undo" class="paper" aria-keyshortcuts="${k.modifier}+Z">${buttonContent("undo", "撤销", k.undo)}</button><button id="local-redo" class="paper" aria-keyshortcuts="${k.modifier}+Shift+Z">${buttonContent("redo", "重做", k.redo)}</button><button id="local-adopt" class="paper" aria-keyshortcuts="Enter">${buttonContent("check", "采用本次调整", "Enter")}</button><button id="local-save" class="primary" aria-keyshortcuts="${k.modifier}+Enter">${buttonContent("check", "保存局部修改", k.modifier === "Meta" ? "⌘ Enter" : "Ctrl Enter")}</button></div><p id="local-status" role="status"></p></footer>`;
     this.canvas.className = "local-surface";
     this.canvas.width = WORLD.width * 2;
     this.canvas.height = WORLD.height * 2;
@@ -130,6 +130,14 @@ export class LocalEditor {
     this.dialog.setAttribute("aria-labelledby", "local-recovery-title");
     this.dialog.innerHTML = `<h2 id="local-recovery-title">找到上次的局部调整</h2><p>继续只恢复合法编辑路线，不会覆盖正式赛道或起跑。刷新恢复最近一步撤销/重做，会话内可撤销 24 次。</p><p id="local-recovery-error" role="status"></p><div class="menu-actions"><button id="local-continue" class="primary">${buttonContent("edit", "继续局部调整")}</button><button id="local-discard" class="paper">${buttonContent("trash", "放弃草稿")}</button><button id="local-later" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "暂不处理", "Esc")}</button></div>`;
     board.append(this.dialog);
+    this.get("local-help-toggle").onclick = () => {
+      const help = this.root.querySelector<HTMLElement>("#local-help")!;
+      help.hidden = !help.hidden;
+      this.get("local-help-toggle").setAttribute(
+        "aria-expanded",
+        String(!help.hidden),
+      );
+    };
     this.get("local-cancel").onclick = () => this.requestCancel();
     this.get("local-adopt").onclick = () => this.adopt();
     this.get("local-save").onclick = () => this.save();
@@ -231,6 +239,8 @@ export class LocalEditor {
     this.scene.scenery.setVisible(false);
     this.root.hidden = false;
     this.root.inert = false;
+    this.root.querySelector<HTMLElement>("#local-help")!.hidden = true;
+    this.get("local-help-toggle").setAttribute("aria-expanded", "false");
     this.board.classList.add("editing", "local-editing");
     const title = this.root.querySelector<HTMLElement>("#local-track-name")!;
     title.textContent = track.name.trim() || "未命名赛道";
@@ -331,6 +341,20 @@ export class LocalEditor {
       !this.model?.dirty;
     this.get("local-undo").disabled = busy || !this.model?.canUndo;
     this.get("local-redo").disabled = busy || !this.model?.canRedo;
+    this.get("local-help-toggle").disabled = busy;
+    // Keep the shortcut mapping; only advertise actions that can run now.
+    for (const [id, shortcut] of [
+      ["local-cancel", "Escape"],
+      ["local-undo", `${this.keys.modifier}+Z`],
+      ["local-redo", `${this.keys.modifier}+Shift+Z`],
+      ["local-adopt", "Enter"],
+      ["local-save", `${this.keys.modifier}+Enter`],
+    ]) {
+      const button = this.get(id);
+      button.querySelector<HTMLElement>("kbd")!.hidden = button.disabled;
+      if (button.disabled) button.removeAttribute("aria-keyshortcuts");
+      else button.setAttribute("aria-keyshortcuts", shortcut);
+    }
   }
   private stopOperation() {
     this.generation++;
@@ -693,7 +717,7 @@ export class LocalEditor {
     const cleanup = this.backup?.confirmed ? this.backup.clear(true) : null;
     const message =
       cleanup && !cleanup.ok
-        ? "赛道已保存；局部草稿未能清理，已保留。"
+        ? "赛道已保存；旧局部草稿仍保留，清理未完成。"
         : this.unconfirmed
           ? "赛道已保存；未知旧局部草稿原文保留。"
           : null;
