@@ -1,21 +1,20 @@
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { launchHeadless, engineName } from "./fixtures/release-engine.mjs";
 
 delete process.env.PWDEBUG;
-const { chromium } = await import("@playwright/test");
-const browser = await chromium.launch({
-  headless: true,
-  args: ["--mute-audio"],
-});
+const browser = await launchHeadless();
 const base = process.env.PAPERLAP_URL || "http://127.0.0.1:5173";
-const output = fileURLToPath(
+const output = process.env.PAPERLAP_SOUND_OUTPUT || fileURLToPath(
   new URL("../test-results/sound/", import.meta.url),
 );
 await mkdir(output, { recursive: true });
 const checks = [],
   errors = [],
-  failedRequests = [];
+  failedRequests = [],
+  nativePointerFocus = [];
+const navigationKey = engineName === "webkit" ? "Alt+Tab" : "Tab";
 const state = (page) => page.evaluate(() => window.paperlapDebug);
 const focus = (page) => page.evaluate(() => document.activeElement?.id);
 const muted = (page) =>
@@ -124,6 +123,12 @@ try {
   await isolated(async (page) => {
     const ready = await state(page);
     await page.locator("#sound").click();
+    const pointerFocus = await focus(page);
+    nativePointerFocus.push({ mode: "ready", id: pointerFocus });
+    // WebKit follows macOS pointer focus policy: use native Tab before testing button keys.
+    if (engineName === "webkit") {
+      for (let i = 0; i < 24 && (await focus(page)) !== "sound"; i++) await page.keyboard.press(navigationKey);
+    }
     assert.equal(await focus(page), "sound");
     assert.equal((await state(page)).mode, "ready");
     assert.deepEqual((await state(page)).car, ready.car);
@@ -142,8 +147,10 @@ try {
     await page.keyboard.down("ArrowUp");
     await simulateFor(page, 0.2);
     // Tab intentionally leaves the game; ordinary focus-loss protection must remain.
+    await page.keyboard.press("Tab");
+    assert.equal((await state(page)).mode, "paused");
     for (let i = 0; i < 12 && (await focus(page)) !== "sound"; i++)
-      await page.keyboard.press("Tab");
+      await page.keyboard.press(navigationKey);
     assert.equal(await focus(page), "sound");
     const paused = await state(page);
     assert.equal(paused.mode, "paused");
@@ -217,8 +224,10 @@ try {
   assert.deepEqual(failedRequests, []);
 } finally {
   await writeFile(
-    `${output}report.json`,
-    JSON.stringify({ headless: true, checks, errors, failedRequests }, null, 2),
+    `${output}/report.json`,
+    JSON.stringify({ engine: engineName, browser: browser.version(), headless: true, checks, errors, failedRequests, nativePointerFocus, navigationKey,
+      keyboardPolicy: engineName === "webkit" ? "plain Tab skips native buttons in this macOS WebKit runtime; Alt+Tab reaches them (see release probe); real Safari settings NOT TESTED" : "plain Tab reaches native buttons",
+      audibleOutput: "NOT TESTED: headless motor graph/state, not human hearing" }, null, 2),
   );
   await browser.close();
   console.log("Headless sound browser and all contexts closed");

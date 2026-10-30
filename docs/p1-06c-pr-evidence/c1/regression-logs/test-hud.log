@@ -1,0 +1,16 @@
+
+> paperlap@1.0.0 test:hud
+> node tests/hud-browser.mjs
+
+PASS 1366x768 fresh: centered, unclipped, unoccluded HUD; history return stable
+PASS 1366x768 legacy: centered, unclipped, unoccluded HUD; history return stable
+PASS 1366x768 current: centered, unclipped, unoccluded HUD; history return stable
+PASS 1366x768 quota: centered, unclipped, unoccluded HUD; history return stable
+PASS 1280x800 fresh: centered, unclipped, unoccluded HUD; history return stable
+PASS 1280x800 legacy: centered, unclipped, unoccluded HUD; history return stable
+PASS 1280x800 current: centered, unclipped, unoccluded HUD; history return stable
+PASS 1280x800 quota: centered, unclipped, unoccluded HUD; history return stable
+PASS 900x700 fresh: centered, unclipped, unoccluded HUD; history return stable
+PASS 900x700 legacy: centered, unclipped, unoccluded HUD; history return stable
+PASS 900x700 current: centered, unclipped, unoccluded HUD; history return stable
+PASS 900x700 quota: centered, unclipped, unoccluded HUD; history return stable

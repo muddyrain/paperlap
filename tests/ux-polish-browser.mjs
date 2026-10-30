@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { launchHeadless, engineName } from "./fixtures/release-engine.mjs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 delete process.env.PWDEBUG;
-const { chromium, expect } = await import("@playwright/test");
+const { expect } = await import("@playwright/test");
 const base = process.env.PAPERLAP_URL || "http://127.0.0.1:5173";
 const phase = process.env.PAPERLAP_UX_PHASE || "after";
 const output = process.env.PAPERLAP_UX_OUTPUT || `test-results/ux-polish/${phase}`;
@@ -10,8 +11,8 @@ const legacySave = JSON.parse(await readFile(new URL("./fixtures/ux-legacy-save-
 const legacy = { cookies: [], origins: [{ origin: new URL(base).origin,
   localStorage: [{ name: "paperlap.save.v2", value: JSON.stringify(legacySave) }] }] };
 await mkdir(output, { recursive: true });
-const browser = await chromium.launch({ headless: true, args: ["--mute-audio"] });
-const report = { phase, headless: true, browser: browser.version(), checks: [], failures: [], errors: [], screens: [], busy: [], accessibility: [], help: [], fixture: "tests/fixtures/ux-legacy-save-v2.json" };
+const browser = await launchHeadless();
+const report = { phase, engine: engineName, headless: true, browser: browser.version(), checks: [], failures: [], errors: [], screens: [], busy: [], accessibility: [], help: [], media: [], notTested: [], nativeFocus: [], fixture: "tests/fixtures/ux-legacy-save-v2.json" };
 const verify = (name, ok, detail) => {
   report.checks.push({ name, ok, detail });
   if (!ok)
@@ -372,7 +373,8 @@ try {
       caps(`${tag} draft failure`, data);
       await restore(p);
       const accepted = (await state(p)).local.current;
-      await drag(p, -360);
+      // Keep the illegal gesture inside the viewport; Firefox cancels off-window capture.
+      await drag(p, 360);
       assert.ok((await state(p)).local.pending.error);
       await p.keyboard.press("Enter");
       await settled(p);
@@ -434,7 +436,10 @@ try {
         verify(`${tag}: F-03 acknowledgement changes UI only`, true);
       }
       await p.keyboard.press("Escape");
-      assert.equal(await p.evaluate(() => document.activeElement.id), "record-history-open");
+      const historyReturnFocus = await p.evaluate(() => document.activeElement.id);
+      verify(`${tag}: pointer history returns focus to its entry`, historyReturnFocus === "record-history-open", { actual: historyReturnFocus });
+      // Keep the focus failure red, then recover through native keys to exercise independent cases.
+      if (historyReturnFocus !== "record-history-open") await gameFocus(p);
       await restore(p);
       await p.keyboard.press("Escape");
       await shot(p, "esc-menu");
@@ -454,6 +459,7 @@ try {
       const warn = data.controls.find(b => b.id === "storage-state");
       verify(`${tag}: F-04 warning nine-point hit test`, warn.hits.every(h => h.own));
       let native = true;
+      const pointerChecks = [];
       for (const x of [.15, .5, .85])
         for (const y of [.2, .5, .8]) {
           await settled(other);
@@ -463,10 +469,14 @@ try {
           native &&= opened;
           if (opened) {
             await other.keyboard.press("Escape");
-            native &&= await other.evaluate(() => document.activeElement.id === "storage-state");
+            const returned = await other.evaluate(() => document.activeElement.id);
+            pointerChecks.push({ x, y, opened, returned });
+            native = native && returned === "storage-state";
           }
         }
-      verify(`${tag}: F-04 all nine native clicks and focus return`, native);
+      report.nativeFocus.push({ width, pointerChecks });
+      verify(`${tag}: F-04 all nine native clicks open the panel`, pointerChecks.length === 9 && pointerChecks.every(x => x.opened));
+      verify(`${tag}: F-04 all nine native clicks and focus return`, native, pointerChecks);
       for (const key of ["Enter", "Space"]) {
         await other.locator("#storage-state").focus();
         await other.keyboard.press(key);
@@ -510,7 +520,10 @@ try {
       await edge.keyboard.press("Tab");
       let data = await shot(edge, "forced-name-focus");
       const name = data.controls.find(b => b.id === "local-track-name");
-      verify(`${tag}: F-01 forced-colors retains visible pencil`, name.focus && name.style.pencil.content !== "none" && name.style.pencil.background !== "rgba(0, 0, 0, 0)");
+      const forcedColorsActive = await edge.evaluate(() => matchMedia("(forced-colors: active)").matches);
+      report.media.push({ width, forcedColorsActive, reducedMotion: (await state(edge)).motion.reduced });
+      if (forcedColorsActive) verify(`${tag}: F-01 forced-colors retains visible pencil`, name.focus && name.style.pencil.content !== "none" && name.style.pencil.background !== "rgba(0, 0, 0, 0)");
+      else { report.notTested.push(`${tag}: forced-colors unavailable in this engine/runtime`); console.log(`NOT TESTED ${tag}: forced-colors media did not activate`); }
       assert.equal((await state(edge)).motion.reduced, true);
       await edge.emulateMedia({ forcedColors: "none" });
       await conflict(edge, ec, "edge-conflict");

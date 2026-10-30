@@ -1,0 +1,107 @@
+{
+  "base": "3904352f6e7fd799bde398d6fe8e558bd274657f",
+  "branch": "feat/p1-06c-release-qa",
+  "recommendation": "CONDITIONAL GO",
+  "issues": {
+    "QA-UI-01": "FIXED LOCALLY / verified, pending review",
+    "QA-UI-02": "FIXED LOCALLY / verified, pending review"
+  },
+  "engines": [
+    {
+      "engine": "chromium",
+      "browser": "141.0.7390.37",
+      "p2": {
+        "status": "PASS",
+        "checks": 138,
+        "failures": [],
+        "notTested": []
+      },
+      "ux": {
+        "checks": 92,
+        "failures": []
+      },
+      "viewports": [
+        [
+          1366,
+          768
+        ],
+        [
+          1280,
+          800
+        ],
+        [
+          900,
+          700
+        ]
+      ]
+    },
+    {
+      "engine": "firefox",
+      "browser": "142.0.1",
+      "p2": {
+        "status": "PASS",
+        "checks": 138,
+        "failures": [],
+        "notTested": []
+      },
+      "ux": {
+        "checks": 92,
+        "failures": []
+      },
+      "viewports": [
+        [
+          1366,
+          768
+        ],
+        [
+          1280,
+          800
+        ],
+        [
+          900,
+          700
+        ]
+      ]
+    },
+    {
+      "engine": "webkit",
+      "browser": "26.0",
+      "p2": {
+        "status": "PASS",
+        "checks": 138,
+        "failures": [],
+        "notTested": [
+          "1366: forced-color-adjust CSS property unsupported; media and painted pencil tested, native OS high contrast not tested",
+          "1280: forced-color-adjust CSS property unsupported; media and painted pencil tested, native OS high contrast not tested",
+          "900: forced-color-adjust CSS property unsupported; media and painted pencil tested, native OS high contrast not tested"
+        ]
+      },
+      "ux": {
+        "checks": 92,
+        "failures": []
+      },
+      "viewports": [
+        [
+          1366,
+          768
+        ],
+        [
+          1280,
+          800
+        ],
+        [
+          900,
+          700
+        ]
+      ]
+    }
+  ],
+  "manualNotTested": [
+    "real Safari",
+    "other OS/devices/DPR/zoom",
+    "native background/BFCache/resume",
+    "real audio output",
+    "real IME/assistive technology/OS high contrast"
+  ],
+  "oldEvidencePolicy": "original results retained, not rewritten"
+}

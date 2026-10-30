@@ -1,0 +1,11 @@
+FAIL firefox: smoke 1366: Expected values to be strictly equal:
+
+'running' !== 'ready'
+
+FAIL firefox: smoke 1280: Expected values to be strictly equal:
+
+'running' !== 'ready'
+
+FAIL firefox: smoke 900: Expected values to be strictly equal:
+
+'running' !== 'ready'

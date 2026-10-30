@@ -1,0 +1,152 @@
+[
+  {
+    "stage": "before",
+    "suite": "p2",
+    "engine": "chromium",
+    "command": "PAPERLAP_BROWSER=chromium PAPERLAP_URL=http://127.0.0.1:4230 node tests/p2-focus-browser.mjs",
+    "exit": 1,
+    "status": "FAIL",
+    "seconds": 104.77,
+    "log": "before/chromium/p2/run.log"
+  },
+  {
+    "stage": "before",
+    "suite": "p2",
+    "engine": "firefox",
+    "command": "PAPERLAP_BROWSER=firefox PAPERLAP_URL=http://127.0.0.1:4230 node tests/p2-focus-browser.mjs",
+    "exit": 1,
+    "status": "FAIL",
+    "seconds": 37.73,
+    "log": "before/firefox/p2/run.log"
+  },
+  {
+    "stage": "before",
+    "suite": "p2",
+    "engine": "webkit",
+    "command": "PAPERLAP_BROWSER=webkit PAPERLAP_URL=http://127.0.0.1:4230 node tests/p2-focus-browser.mjs",
+    "exit": 1,
+    "status": "FAIL",
+    "seconds": 28.5,
+    "log": "before/webkit/p2/run.log"
+  },
+  {
+    "stage": "after-dev",
+    "suite": "p2",
+    "engine": "chromium",
+    "command": "PAPERLAP_BROWSER=chromium PAPERLAP_URL=http://127.0.0.1:4230 node tests/p2-focus-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 120.24,
+    "log": "after-dev/chromium/p2/run.log"
+  },
+  {
+    "stage": "after-dev",
+    "suite": "p2",
+    "engine": "firefox",
+    "command": "PAPERLAP_BROWSER=firefox PAPERLAP_URL=http://127.0.0.1:4230 node tests/p2-focus-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 45.96,
+    "log": "after-dev/firefox/p2/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "smoke",
+    "engine": "chromium",
+    "command": "PAPERLAP_BROWSER=chromium PAPERLAP_URL=http://127.0.0.1:4231 node tests/release-smoke.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 44.98,
+    "log": "after/chromium/smoke/run.log"
+  },
+  {
+    "stage": "after-dev",
+    "suite": "p2",
+    "engine": "webkit",
+    "command": "PAPERLAP_BROWSER=webkit PAPERLAP_URL=http://127.0.0.1:4230 node tests/p2-focus-browser.mjs",
+    "exit": 1,
+    "status": "FAIL",
+    "seconds": 38.12,
+    "log": "after-dev/webkit/p2/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "smoke",
+    "engine": "firefox",
+    "command": "PAPERLAP_BROWSER=firefox PAPERLAP_URL=http://127.0.0.1:4231 node tests/release-smoke.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 21.0,
+    "log": "after/firefox/smoke/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "smoke",
+    "engine": "webkit",
+    "command": "PAPERLAP_BROWSER=webkit PAPERLAP_URL=http://127.0.0.1:4231 node tests/release-smoke.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 12.72,
+    "log": "after/webkit/smoke/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "ux",
+    "engine": "chromium",
+    "command": "PAPERLAP_BROWSER=chromium PAPERLAP_URL=http://127.0.0.1:4231 node tests/ux-polish-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 210.14,
+    "log": "after/chromium/ux/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "ux",
+    "engine": "firefox",
+    "command": "PAPERLAP_BROWSER=firefox PAPERLAP_URL=http://127.0.0.1:4231 node tests/ux-polish-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 75.98,
+    "log": "after/firefox/ux/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "ux",
+    "engine": "webkit",
+    "command": "PAPERLAP_BROWSER=webkit PAPERLAP_URL=http://127.0.0.1:4231 node tests/ux-polish-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 54.3,
+    "log": "after/webkit/ux/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "p2",
+    "engine": "chromium",
+    "command": "PAPERLAP_BROWSER=chromium PAPERLAP_URL=http://127.0.0.1:4231 node tests/p2-focus-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 159.79,
+    "log": "after/chromium/p2/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "p2",
+    "engine": "firefox",
+    "command": "PAPERLAP_BROWSER=firefox PAPERLAP_URL=http://127.0.0.1:4231 node tests/p2-focus-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 43.71,
+    "log": "after/firefox/p2/run.log"
+  },
+  {
+    "stage": "after",
+    "suite": "p2",
+    "engine": "webkit",
+    "command": "PAPERLAP_BROWSER=webkit PAPERLAP_URL=http://127.0.0.1:4231 node tests/p2-focus-browser.mjs",
+    "exit": 0,
+    "status": "PASS",
+    "seconds": 33.99,
+    "log": "after/webkit/p2/run.log"
+  }
+]

@@ -1,0 +1,3 @@
+FAIL chromium: functional=PASS, focus-style=FAIL, painted Phaser/FIT and native interactions 1366x768
+FAIL chromium: functional=PASS, focus-style=FAIL, painted Phaser/FIT and native interactions 1280x800
+FAIL chromium: functional=PASS, focus-style=FAIL, painted Phaser/FIT and native interactions 900x700

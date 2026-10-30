@@ -1,0 +1,15 @@
+{
+  "id": "track-name",
+  "tag": "SPAN",
+  "mode": "paused",
+  "input": "keyboard",
+  "outlineStyle": "solid",
+  "outlineWidth": "2px",
+  "outlineColor": "rgb(60, 102, 124)",
+  "mark": {
+    "content": "none",
+    "width": "auto",
+    "height": "auto",
+    "background": "rgba(0, 0, 0, 0)"
+  }
+}

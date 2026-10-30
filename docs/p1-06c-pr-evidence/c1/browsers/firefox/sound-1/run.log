@@ -1,0 +1,5 @@
+PASS held throttle survives pointer sound on/off; timer/car/motor/preferences continue, steering and key release still work
+PASS ready mouse toggle permits starting; Tab still pauses driving and native Enter/Space toggle once without starting or stealing button focus
+PASS blur after sound click still freezes timer/car, clears held input and silences motor until explicit resume
+PASS visibilitychange after sound click still freezes timer/car, clears held input and silences motor until explicit resume
+Headless sound browser and all contexts closed

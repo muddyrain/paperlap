@@ -140,6 +140,7 @@ button:disabled:hover {
   font-weight: 600;
 }
 #track-name {
+  position: relative;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -940,7 +941,6 @@ button .button-label {
   color: #5d6b70;
   line-height: 1.5;
 }
-#track-name:focus-visible,
 #editor-track-name:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
@@ -1332,10 +1332,12 @@ button:disabled {
   transform: rotate(-1deg);
   pointer-events: none;
 }
+.board[data-input="keyboard"] #track-name:focus,
 .board[data-input="keyboard"] #local-track-name:focus {
   outline: 0;
   background-color: var(--focus-wash);
 }
+.board[data-input="keyboard"] #track-name:focus::after,
 .board[data-input="keyboard"] #local-track-name:focus::after {
   content: "";
   position: absolute;
@@ -1351,7 +1353,8 @@ button:disabled {
   --focus-pencil: #fff4d8;
   background-color: #b74422;
 }
-.board[data-input="pointer"] button:focus-visible {
+.board[data-input="pointer"] button:focus-visible,
+.board[data-input="pointer"] #track-name:focus-visible {
   outline-color: transparent;
 }
 .trackbook input:focus-visible {
@@ -1361,6 +1364,7 @@ button:disabled {
 
 @media (forced-colors: active) {
   .board[data-input="keyboard"] button:focus::after,
+  .board[data-input="keyboard"] #track-name:focus::after,
   .board[data-input="keyboard"] #local-track-name:focus::after {
     background: Highlight;
     forced-color-adjust: none;

@@ -1,0 +1,3 @@
+FAIL webkit: smoke 1366: focus must not have a visible enclosing outline
+FAIL webkit: smoke 1280: focus must not have a visible enclosing outline
+FAIL webkit: smoke 900: focus must not have a visible enclosing outline

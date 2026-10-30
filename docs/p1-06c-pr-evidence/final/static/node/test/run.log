@@ -1,0 +1,751 @@
+
+> paperlap@1.0.0 test
+> tsx --test tests/*.test.ts
+
+TAP version 13
+# Subtest: 20×900 hot draft opens reuse exact validated bytes; cold external bytes remain fully checked
+ok 1 - 20×900 hot draft opens reuse exact validated bytes; cold external bytes remain fully checked
+  ---
+  duration_ms: 5002.744625
+  type: 'test'
+  ...
+# {"tracks":20,"points":900,"characters":838217,"cold":{"medianMs":896.3877090000001,"p95Ms":910.7025000000003,"milliseconds":[895.250583,896.3877090000001,910.7025000000003]},"hot":{"medianMs":3.302458999999544,"p95Ms":3.521208000000115,"milliseconds":[3.1452079999999114,3.1537090000001626,3.302458999999544,3.392957999999453,3.521208000000115]}}
+# Subtest: whole-stroke history restores valid preview after R and can redo empty
+ok 2 - whole-stroke history restores valid preview after R and can redo empty
+  ---
+  duration_ms: 36.285459
+  type: 'test'
+  ...
+# Subtest: history is bounded, copies points and discards redo after a new stroke
+ok 3 - history is bounded, copies points and discards redo after a new stroke
+  ---
+  duration_ms: 1.186
+  type: 'test'
+  ...
+# Subtest: restoration revalidates invalid, overflow and interrupted raw; never trusts candidates
+ok 4 - restoration revalidates invalid, overflow and interrupted raw; never trusts candidates
+  ---
+  duration_ms: 9.312958
+  type: 'test'
+  ...
+# Subtest: source distinguishes intent, UID and original geometry across replaced saves
+ok 5 - source distinguishes intent, UID and original geometry across replaced saves
+  ---
+  duration_ms: 1.027792
+  type: 'test'
+  ...
+# Subtest: separate versioned drafts roundtrip without touching Save V2 or allocating a track
+ok 6 - separate versioned drafts roundtrip without touching Save V2 or allocating a track
+  ---
+  duration_ms: 8.699042
+  type: 'test'
+  ...
+# Subtest: corrupt, unsupported, excessive and nonfinite payloads are rejected without overwrite
+ok 7 - corrupt, unsupported, excessive and nonfinite payloads are rejected without overwrite
+  ---
+  duration_ms: 3.728167
+  type: 'test'
+  ...
+# Subtest: another tab cannot be silently overwritten or deleted
+ok 8 - another tab cannot be silently overwritten or deleted
+  ---
+  duration_ms: 3.222333
+  type: 'test'
+  ...
+# Subtest: quota and deletion failure preserve the previous draft
+ok 9 - quota and deletion failure preserve the previous draft
+  ---
+  duration_ms: 4.8415
+  type: 'test'
+  ...
+# Subtest: clearing one source preserves another intent and raw checkpoints
+ok 10 - clearing one source preserves another intent and raw checkpoints
+  ---
+  duration_ms: 3.108334
+  type: 'test'
+  ...
+# Subtest: stored malformed coordinates, phases, ownership, duplicates and retained states are rejected
+ok 11 - stored malformed coordinates, phases, ownership, duplicates and retained states are rejected
+  ---
+  duration_ms: 9.881667
+  type: 'test'
+  ...
+# Subtest: bounded slots reject the thirteenth source without evicting existing work
+ok 12 - bounded slots reject the thirteenth source without evicting existing work
+  ---
+  duration_ms: 64.257834
+  type: 'test'
+  ...
+# Subtest: opening against a different durable source refuses recovery and writes
+ok 13 - opening against a different durable source refuses recovery and writes
+  ---
+  duration_ms: 31.099208
+  type: 'test'
+  ...
+# Subtest: blocked reads retain the unavailable cause on later checkpoints and cleanup
+ok 14 - blocked reads retain the unavailable cause on later checkpoints and cleanup
+  ---
+  duration_ms: 0.285541
+  type: 'test'
+  ...
+# Subtest: a partial replacement checkpoint retains the last completed stroke across repeated interruptions and reload
+ok 15 - a partial replacement checkpoint retains the last completed stroke across repeated interruptions and reload
+  ---
+  duration_ms: 28.45425
+  type: 'test'
+  ...
+# Subtest: screenshot-style loop closes a nearby endpoint without a pinched join
+ok 16 - screenshot-style loop closes a nearby endpoint without a pinched join
+  ---
+  duration_ms: 22.703375
+  type: 'test'
+  ...
+# Subtest: ordinary hand wobble is smoothed regardless of where the stroke starts
+ok 17 - ordinary hand wobble is smoothed regardless of where the stroke starts
+  ---
+  duration_ms: 86.419
+  type: 'test'
+  ...
+# Subtest: SHA256 standard vectors and block boundaries match Node crypto
+ok 18 - SHA256 standard vectors and block boundaries match Node crypto
+  ---
+  duration_ms: 1.228208
+  type: 'test'
+  ...
+# Subtest: canonical v1 is exact big endian and normalizes minus zero only
+ok 19 - canonical v1 is exact big endian and normalizes minus zero only
+  ---
+  duration_ms: 0.373875
+  type: 'test'
+  ...
+# Subtest: digest matches Node on real geometry, keeps order, width and sub-0.1 coordinates
+ok 20 - digest matches Node on real geometry, keeps order, width and sub-0.1 coordinates
+  ---
+  duration_ms: 12.508125
+  type: 'test'
+  ...
+# Subtest: source digests preserve exact UTF-16 strings including lone surrogates
+ok 21 - source digests preserve exact UTF-16 strings including lone surrogates
+  ---
+  duration_ms: 0.526375
+  type: 'test'
+  ...
+# Subtest: medium/high-speed corner fits a smaller turning radius
+ok 22 - medium/high-speed corner fits a smaller turning radius
+  ---
+  duration_ms: 0.81775
+  type: 'test'
+  ...
+# speed=220, effective radius=83.11, quarter turn=0.592s
+# speed=260, effective radius=89.57, quarter turn=0.558s
+# Subtest: direction reaches useful lock quickly and releases without a long tail
+ok 23 - direction reaches useful lock quickly and releases without a long tail
+  ---
+  duration_ms: 0.166
+  type: 'test'
+  ...
+# release tail=3.77 degrees
+# Subtest: left/right corrections settle without a heading snap or residual slide
+ok 24 - left/right corrections settle without a heading snap or residual slide
+  ---
+  duration_ms: 0.214291
+  type: 'test'
+  ...
+# Subtest: all stored-centerline examples start legal
+ok 25 - all stored-centerline examples start legal
+  ---
+  duration_ms: 146.243458
+  type: 'test'
+  ...
+# Subtest: finite-support displacement keeps remote points, width semantics and original input exact
+ok 26 - finite-support displacement keeps remote points, width semantics and original input exact
+  ---
+  duration_ms: 191.97175
+  type: 'test'
+  ...
+# Subtest: selection is by arc, protected seam cannot move and near-seam support is clipped
+ok 27 - selection is by arc, protected seam cannot move and near-seam support is clipped
+  ---
+  duration_ms: 2.625958
+  type: 'test'
+  ...
+# Subtest: falloff has no boundary displacement jump and events do not accumulate
+ok 28 - falloff has no boundary displacement jump and events do not accumulate
+  ---
+  duration_ms: 10.507542
+  type: 'test'
+  ...
+# Subtest: nonfinite/extreme input is rejected or safely bounded without changing source
+ok 29 - nonfinite/extreme input is rejected or safely bounded without changing source
+  ---
+  duration_ms: 0.670625
+  type: 'test'
+  ...
+# Subtest: preview rejects edge, overlap, crossing and tight-corner candidates without replacing good route
+ok 30 - preview rejects edge, overlap, crossing and tight-corner candidates without replacing good route
+  ---
+  duration_ms: 53.727334
+  type: 'test'
+  ...
+# Subtest: adopt, undo, redo and cancel preserve exact points and isolate rejected previews
+ok 31 - adopt, undo, redo and cancel preserve exact points and isolate rejected previews
+  ---
+  duration_ms: 49.199417
+  type: 'test'
+  ...
+# Subtest: history stays bounded and a new accepted edit invalidates redo
+ok 32 - history stays bounded and a new accepted edit invalidates redo
+  ---
+  duration_ms: 505.850125
+  type: 'test'
+  ...
+# Subtest: legacy 0.1 fingerprint and recordKey can be identical for different legal geometry
+ok 33 - legacy 0.1 fingerprint and recordKey can be identical for different legal geometry
+  ---
+  duration_ms: 10.279209
+  type: 'test'
+  ...
+# Subtest: uneven saved sampling also preserves both start-adjacent segments exactly
+ok 34 - uneven saved sampling also preserves both start-adjacent segments exactly
+  ---
+  duration_ms: 20.206958
+  type: 'test'
+  ...
+# Subtest: local history restores exact accepted points and one-step undo/redo, rejecting seam edits
+ok 35 - local history restores exact accepted points and one-step undo/redo, rejecting seam edits
+  ---
+  duration_ms: 125.376708
+  type: 'test'
+  ...
+# Subtest: local draft stores exact accepted snapshots, retains whole-stroke bytes and source metadata
+ok 36 - local draft stores exact accepted snapshots, retains whole-stroke bytes and source metadata
+  ---
+  duration_ms: 202.192708
+  type: 'test'
+  ...
+# Subtest: wrong source, stale official bytes, unsupported algorithms and foreign drafts never apply
+ok 37 - wrong source, stale official bytes, unsupported algorithms and foreign drafts never apply
+  ---
+  duration_ms: 84.64925
+  type: 'test'
+  ...
+# Subtest: unknown draft and initial read failure cannot erase unknown backups
+ok 38 - unknown draft and initial read failure cannot erase unknown backups
+  ---
+  duration_ms: 32.738542
+  type: 'test'
+  ...
+# Subtest: quota and known cleanup failure preserve the previous recoverable local route
+ok 39 - quota and known cleanup failure preserve the previous recoverable local route
+  ---
+  duration_ms: 58.900708
+  type: 'test'
+  ...
+# Subtest: local draft bad geometry, duplicate source, bounds and external draft changes are refused
+ok 40 - local draft bad geometry, duplicate source, bounds and external draft changes are refused
+  ---
+  duration_ms: 53.061041
+  type: 'test'
+  ...
+# Subtest: explicit local transaction preserves UID/name and historical PB, changes revision only on changed geometry
+ok 41 - explicit local transaction preserves UID/name and historical PB, changes revision only on changed geometry
+  ---
+  duration_ms: 67.894459
+  type: 'test'
+  ...
+# Subtest: local no-op and invalid source never perform a false formal save
+ok 42 - local no-op and invalid source never perform a false formal save
+  ---
+  duration_ms: 32.679541
+  type: 'test'
+  ...
+# Subtest: prepare/write/apply failure obey strict transaction order and preserve local edit state
+ok 43 - prepare/write/apply failure obey strict transaction order and preserve local edit state
+  ---
+  duration_ms: 180.992916
+  type: 'test'
+  ...
+# Subtest: writer lease failure denies entering local edit and backup export includes its raw key
+ok 44 - writer lease failure denies entering local edit and backup export includes its raw key
+  ---
+  duration_ms: 12.393208
+  type: 'test'
+  ...
+# Subtest: local draft capacity never evicts old entries or truncates oversized raw data
+ok 45 - local draft capacity never evicts old entries or truncates oversized raw data
+  ---
+  duration_ms: 52.246166
+  type: 'test'
+  ...
+# Subtest: local checkpoint writes and cleanup require exact readback, not merely a nonthrowing storage call
+ok 46 - local checkpoint writes and cleanup require exact readback, not merely a nonthrowing storage call
+  ---
+  duration_ms: 44.263625
+  type: 'test'
+  ...
+# Subtest: exact local proofs are source-bound, privately copied, bounded; fingerprint is no evidence
+ok 47 - exact local proofs are source-bound, privately copied, bounded; fingerprint is no evidence
+  ---
+  duration_ms: 762.096209
+  type: 'test'
+  ...
+# Subtest: release proof is reused for draft backup but every disk recovery is strict
+ok 48 - release proof is reused for draft backup but every disk recovery is strict
+  ---
+  duration_ms: 74.137959
+  type: 'test'
+  ...
+# Subtest: formal transaction reuses only a matching proof and still validates V3 identity/write/readback
+ok 49 - formal transaction reuses only a matching proof and still validates V3 identity/write/readback
+  ---
+  duration_ms: 73.644458
+  type: 'test'
+  ...
+# Subtest: menu return only resumes its unchanged, focused running session
+ok 50 - menu return only resumes its unchanged, focused running session
+  ---
+  duration_ms: 0.445208
+  type: 'test'
+  ...
+# Subtest: lifecycle, trackbook and edit revoke resume; controls return one level
+ok 51 - lifecycle, trackbook and edit revoke resume; controls return one level
+  ---
+  duration_ms: 0.087667
+  type: 'test'
+  ...
+# Subtest: editing remembers each entry; confirmation and cancel never imply a save or resume
+ok 52 - editing remembers each entry; confirmation and cancel never imply a save or resume
+  ---
+  duration_ms: 0.095875
+  type: 'test'
+  ...
+# Subtest: a blocked or duplicate transition cannot replace an active modal
+ok 53 - a blocked or duplicate transition cannot replace an active modal
+  ---
+  duration_ms: 0.180875
+  type: 'test'
+  ...
+# Subtest: superseded completion cannot release the current visual
+ok 54 - superseded completion cannot release the current visual
+  ---
+  duration_ms: 0.489875
+  type: 'test'
+  ...
+# Subtest: lifecycle/reduced-motion clear is bounded and idempotent
+ok 55 - lifecycle/reduced-motion clear is bounded and idempotent
+  ---
+  duration_ms: 0.197208
+  type: 'test'
+  ...
+# Subtest: timer rolls over at whole minutes without a 60-second display
+ok 56 - timer rolls over at whole minutes without a 60-second display
+  ---
+  duration_ms: 0.4435
+  type: 'test'
+  ...
+# Subtest: default and freehand closed track are valid; stable geometry identity
+ok 57 - default and freehand closed track are valid; stable geometry identity
+  ---
+  duration_ms: 57.55425
+  type: 'test'
+  ...
+# Subtest: open, crossing, degenerate, nonfinite and overlapping roads are rejected
+ok 58 - open, crossing, degenerate, nonfinite and overlapping roads are rejected
+  ---
+  duration_ms: 3.749041
+  type: 'test'
+  ...
+# Subtest: sharp bends are checked after smoothing
+ok 59 - sharp bends are checked after smoothing
+  ---
+  duration_ms: 0.87525
+  type: 'test'
+  ...
+# Subtest: initialization and leaving start cannot record a lap
+ok 60 - initialization and leaving start cannot record a lap
+  ---
+  duration_ms: 0.154625
+  type: 'test'
+  ...
+# Subtest: ordered checkpoints + forward swept start crossing complete a valid lap
+ok 61 - ordered checkpoints + forward swept start crossing complete a valid lap
+  ---
+  duration_ms: 0.158709
+  type: 'test'
+  ...
+# Subtest: reverse crossing and skipped checkpoints do not count; offroad lap stays invalid until complete
+ok 62 - reverse crossing and skipped checkpoints do not count; offroad lap stays invalid until complete
+  ---
+  duration_ms: 0.509083
+  type: 'test'
+  ...
+# Subtest: fixed simulation matches at 30/60/144 FPS; large frame gaps are bounded
+ok 63 - fixed simulation matches at 30/60/144 FPS; large frame gaps are bounded
+  ---
+  duration_ms: 2.262333
+  type: 'test'
+  ...
+# Subtest: no stationary spinning, braking stops, offroad slows, pause does not advance or catch up
+ok 64 - no stationary spinning, braking stops, offroad slows, pause does not advance or catch up
+  ---
+  duration_ms: 3.173458
+  type: 'test'
+  ...
+# Subtest: 20×900 V3 cold load stays strict; metadata/best hot writes avoid full geometry
+ok 65 - 20×900 V3 cold load stays strict; metadata/best hot writes avoid full geometry
+  ---
+  duration_ms: 4600.444917
+  type: 'test'
+  ...
+# {"tracks":20,"points":900,"oldCharacters":838217,"v3Characters":843547,"cold":{"medianMs":768.16525,"p95Ms":788.2167920000002,"milliseconds":[726.1348750000002,768.16525,788.2167920000002]},"rename":{"medianMs":39.042625000000044,"p95Ms":39.331750000000284,"milliseconds":[38.183208999999806,39.042625000000044,39.331750000000284]},"best":{"medianMs":39.84825000000001,"p95Ms":43.21295900000041,"milliseconds":[38.31474999999955,39.84825000000001,43.21295900000041]},"mute":{"medianMs":22.813083000000006,"p95Ms":22.978041000000303,"milliseconds":[22.791291999999885,22.813083000000006,22.978041000000303]}}
+# Subtest: V2 upgrade preserves complete source bytes and archives every old record without authoritative PB
+ok 66 - V2 upgrade preserves complete source bytes and archives every old record without authoritative PB
+  ---
+  duration_ms: 36.037833
+  type: 'test'
+  ...
+# Subtest: stable identities survive quota migration retry and V1 directly upgrades without creating V2
+ok 67 - stable identities survive quota migration retry and V1 directly upgrades without creating V2
+  ---
+  duration_ms: 54.115834
+  type: 'test'
+  ...
+# Subtest: sub-0.1 changes with same old hash get a new identity and no inherited PB
+ok 68 - sub-0.1 changes with same old hash get a new identity and no inherited PB
+  ---
+  duration_ms: 52.999416
+  type: 'test'
+  ...
+# Subtest: invalid digest, duplicate UID/identity, geometry, records and capacities reject without cropping
+ok 69 - invalid digest, duplicate UID/identity, geometry, records and capacities reject without cropping
+  ---
+  duration_ms: 98.40025
+  type: 'test'
+  ...
+# Subtest: corrupt/unknown V3 is preserved; no legacy fallback writer can overwrite it
+ok 70 - corrupt/unknown V3 is preserved; no legacy fallback writer can overwrite it
+  ---
+  duration_ms: 103.15825
+  type: 'test'
+  ...
+# Subtest: writer lease, stale V3, old client changes and readback failure are protected
+ok 71 - writer lease, stale V3, old client changes and readback failure are protected
+  ---
+  duration_ms: 101.8755
+  type: 'test'
+  ...
+# Subtest: public mutation cannot rebind an existing identity, erase archives or forge cached geometry
+ok 72 - public mutation cannot rebind an existing identity, erase archives or forge cached geometry
+  ---
+  duration_ms: 70.405542
+  type: 'test'
+  ...
+# Subtest: new whole-stroke drafts bind the V3 revision, leaving v1 bytes untouched
+ok 73 - new whole-stroke drafts bind the V3 revision, leaving v1 bytes untouched
+  ---
+  duration_ms: 15.09975
+  type: 'test'
+  ...
+# Subtest: maximum readable legacy records all survive and explicit scene failures preserve transaction order
+ok 74 - maximum readable legacy records all survive and explicit scene failures preserve transaction order
+  ---
+  duration_ms: 61.454667
+  type: 'test'
+  ...
+# Subtest: V1 truncation or filtered records cannot silently become a successful V3 upgrade
+ok 75 - V1 truncation or filtered records cannot silently become a successful V3 upgrade
+  ---
+  duration_ms: 33.841292
+  type: 'test'
+  ...
+# Subtest: game shortcuts are scoped to the surface and match every displayed state
+ok 76 - game shortcuts are scoped to the surface and match every displayed state
+  ---
+  duration_ms: 1.653167
+  type: 'test'
+  ...
+# Subtest: text, IME, modifiers and repeated actions cannot cross shortcut contexts
+ok 77 - text, IME, modifiers and repeated actions cannot cross shortcut contexts
+  ---
+  duration_ms: 0.889541
+  type: 'test'
+  ...
+# Subtest: menu shortcuts preserve native buttons and protect child pages
+ok 78 - menu shortcuts preserve native buttons and protect child pages
+  ---
+  duration_ms: 0.121958
+  type: 'test'
+  ...
+# Subtest: editor history modifiers never capture text, IME, repeats or game shortcuts
+ok 79 - editor history modifiers never capture text, IME, repeats or game shortcuts
+  ---
+  duration_ms: 0.09475
+  type: 'test'
+  ...
+# Subtest: a previously validated mutable route cannot bypass geometry validation
+ok 80 - a previously validated mutable route cannot bypass geometry validation
+  ---
+  duration_ms: 85.742083
+  type: 'test'
+  ...
+# Subtest: frozen arrays do not make their mutable points safe, and sparse arrays are rejected
+ok 81 - frozen arrays do not make their mutable points safe, and sparse arrays are rejected
+  ---
+  duration_ms: 30.98575
+  type: 'test'
+  ...
+# Subtest: exact coordinates are retained even when a change keeps the same quantized fingerprint
+ok 82 - exact coordinates are retained even when a change keeps the same quantized fingerprint
+  ---
+  duration_ms: 29.80775
+  type: 'test'
+  ...
+# Subtest: metadata and record edits are checked even for an unchanged validated route
+ok 83 - metadata and record edits are checked even for an unchanged validated route
+  ---
+  duration_ms: 72.874667
+  type: 'test'
+  ...
+# Subtest: add and replace reject altered routes after an earlier successful validation
+ok 84 - add and replace reject altered routes after an earlier successful validation
+  ---
+  duration_ms: 43.223708
+  type: 'test'
+  ...
+# Subtest: every write reads storage again and rejects externally corrupted raw data
+ok 85 - every write reads storage again and rejects externally corrupted raw data
+  ---
+  duration_ms: 51.557958
+  type: 'test'
+  ...
+# Subtest: a changed valid storage string is fully checked and cache state is isolated per store
+ok 86 - a changed valid storage string is fully checked and cache state is isolated per store
+  ---
+  duration_ms: 40.207917
+  type: 'test'
+  ...
+# Subtest: failed writes never cause an invalid stored snapshot to become trusted
+ok 87 - failed writes never cause an invalid stored snapshot to become trusted
+  ---
+  duration_ms: 36.3535
+  type: 'test'
+  ...
+# Subtest: draft identity reuse never trusts changed or different-store raw bytes
+ok 88 - draft identity reuse never trusts changed or different-store raw bytes
+  ---
+  duration_ms: 129.152833
+  type: 'test'
+  ...
+# Subtest: 20 x 350 point metadata/write operations avoid full geometry cost
+ok 89 - 20 x 350 point metadata/write operations avoid full geometry cost
+  ---
+  duration_ms: 1072.658833
+  type: 'test'
+  ...
+# setBest=3.364ms, untrusted parse=119.467ms
+# renameTrack=2.201ms, untrusted parse=119.467ms
+# selectTrack=2.465ms, untrusted parse=119.467ms
+# writeSave=3.715ms, untrusted parse=119.467ms
+# bestAndWrite=5.318ms, untrusted parse=119.467ms
+# mutedAndWrite=4.173ms, untrusted parse=119.467ms
+# Subtest: 20 x 900 point metadata/write operations avoid full geometry cost
+ok 90 - 20 x 900 point metadata/write operations avoid full geometry cost
+  ---
+  duration_ms: 4385.073917
+  type: 'test'
+  ...
+# setBest=5.316ms, untrusted parse=688.505ms
+# renameTrack=4.533ms, untrusted parse=688.505ms
+# selectTrack=4.335ms, untrusted parse=688.505ms
+# writeSave=8.045ms, untrusted parse=688.505ms
+# bestAndWrite=13.409ms, untrusted parse=688.505ms
+# mutedAndWrite=8.584ms, untrusted parse=688.505ms
+# Subtest: fresh V2 has one default entry and round-trips without changing identity
+ok 91 - fresh V2 has one default entry and round-trips without changing identity
+  ---
+  duration_ms: 47.241125
+  type: 'test'
+  ...
+# Subtest: V1 migration preserves geometry/name/preferences, both rules and archives orphan records
+ok 92 - V1 migration preserves geometry/name/preferences, both rules and archives orphan records
+  ---
+  duration_ms: 37.787875
+  type: 'test'
+  ...
+# Subtest: V1 migration writes only V2, then repeated loads prefer persisted V2
+ok 93 - V1 migration writes only V2, then repeated loads prefer persisted V2
+  ---
+  duration_ms: 35.769166
+  type: 'test'
+  ...
+# Subtest: same geometry with different UIDs has independent bests and survives switching/reload
+ok 94 - same geometry with different UIDs has independent bests and survives switching/reload
+  ---
+  duration_ms: 50.439458
+  type: 'test'
+  ...
+# Subtest: rename retains UID/records; geometry and rules changes isolate historical bests
+ok 95 - rename retains UID/records; geometry and rules changes isolate historical bests
+  ---
+  duration_ms: 40.808375
+  type: 'test'
+  ...
+# Subtest: best updates never replace a faster result
+ok 96 - best updates never replace a faster result
+  ---
+  duration_ms: 13.341708
+  type: 'test'
+  ...
+# Subtest: delete removes only the selected entry and its records, switches active, refuses last track
+ok 97 - delete removes only the selected entry and its records, switches active, refuses last track
+  ---
+  duration_ms: 24.356292
+  type: 'test'
+  ...
+# Subtest: invalid names, missing/duplicate UID and track capacities fail without mutating input
+ok 98 - invalid names, missing/duplicate UID and track capacities fail without mutating input
+  ---
+  duration_ms: 428.744458
+  type: 'test'
+  ...
+# Subtest: V2 rejects malformed JSON, geometry, IDs, metadata and invalid record associations
+ok 99 - V2 rejects malformed JSON, geometry, IDs, metadata and invalid record associations
+  ---
+  duration_ms: 58.5695
+  type: 'test'
+  ...
+# Subtest: record limits return failure; never evict valid records to make room
+ok 100 - record limits return failure; never evict valid records to make room
+  ---
+  duration_ms: 18.310542
+  type: 'test'
+  ...
+# Subtest: V1 preserves more than the old 32-record read window; over-limit migration does not truncate
+ok 101 - V1 preserves more than the old 32-record read window; over-limit migration does not truncate
+  ---
+  duration_ms: 19.564167
+  type: 'test'
+  ...
+# Subtest: legacy invalid values are ignored; a forged geometry ID never acquires current best
+ok 102 - legacy invalid values are ignored; a forged geometry ID never acquires current best
+  ---
+  duration_ms: 7.676917
+  type: 'test'
+  ...
+# Subtest: quota failure leaves V1 bytes intact; retry is stable and only successful V2 becomes authoritative
+ok 103 - quota failure leaves V1 bytes intact; retry is stable and only successful V2 becomes authoritative
+  ---
+  duration_ms: 49.79575
+  type: 'test'
+  ...
+# Subtest: corrupt V2 falls back to V1 without overwriting either key
+ok 104 - corrupt V2 falls back to V1 without overwriting either key
+  ---
+  duration_ms: 15.347625
+  type: 'test'
+  ...
+# Subtest: invalid V1 and blocked storage remain playable but are never automatically rewritten
+ok 105 - invalid V1 and blocked storage remain playable but are never automatically rewritten
+  ---
+  duration_ms: 38.086583
+  type: 'test'
+  ...
+# Subtest: valid V2 is authoritative without reading or migrating V1
+ok 106 - valid V2 is authoritative without reading or migrating V1
+  ---
+  duration_ms: 14.228
+  type: 'test'
+  ...
+# Subtest: write failures preserve an existing V2 snapshot and the caller's in-memory data
+ok 107 - write failures preserve an existing V2 snapshot and the caller's in-memory data
+  ---
+  duration_ms: 21.411125
+  type: 'test'
+  ...
+# Subtest: archive and serialized data ceilings fail explicitly without trimming
+ok 108 - archive and serialized data ceilings fail explicitly without trimming
+  ---
+  duration_ms: 31.244292
+  type: 'test'
+  ...
+# Subtest: invalid V2 without V1 remains a read-only playable fallback
+ok 109 - invalid V2 without V1 remains a read-only playable fallback
+  ---
+  duration_ms: 7.87125
+  type: 'test'
+  ...
+# Subtest: legacy empty names remain round-trippable; new entries cannot acquire empty names
+ok 110 - legacy empty names remain round-trippable; new entries cannot acquire empty names
+  ---
+  duration_ms: 14.762125
+  type: 'test'
+  ...
+# Subtest: thumbnail fits real coordinates and road width with padding; metadata never changes the drawing
+ok 111 - thumbnail fits real coordinates and road width with padding; metadata never changes the drawing
+  ---
+  duration_ms: 0.481584
+  type: 'test'
+  ...
+# Subtest: create commits a new UID only after persistence; cancel never changes the book
+ok 112 - create commits a new UID only after persistence; cancel never changes the book
+  ---
+  duration_ms: 47.557291
+  type: 'test'
+  ...
+# Subtest: failed creation retains the draft and old active state for retry
+ok 113 - failed creation retains the draft and old active state for retry
+  ---
+  duration_ms: 57.474542
+  type: 'test'
+  ...
+# Subtest: selection persists before applying; reselecting the active entry is a stable no-op
+ok 114 - selection persists before applying; reselecting the active entry is a stable no-op
+  ---
+  duration_ms: 74.959292
+  type: 'test'
+  ...
+# Subtest: replace keeps UID, name and history, including unsaved playable editing
+ok 115 - replace keeps UID, name and history, including unsaved playable editing
+  ---
+  duration_ms: 39.046167
+  type: 'test'
+  ...
+# Subtest: rename and confirmed deletion preserve other records and archive; failures are atomic
+ok 116 - rename and confirmed deletion preserve other records and archive; failures are atomic
+  ---
+  duration_ms: 159.884375
+  type: 'test'
+  ...
+# Subtest: preparation errors preserve the old save; post-write rendering errors require reload
+ok 117 - preparation errors preserve the old save; post-write rendering errors require reload
+  ---
+  duration_ms: 49.076375
+  type: 'test'
+  ...
+# Subtest: metadata and no-ops never stop or rebuild the current scene; active deletion does
+ok 118 - metadata and no-ops never stop or rebuild the current scene; active deletion does
+  ---
+  duration_ms: 26.195625
+  type: 'test'
+  ...
+# Subtest: 20-entry limit rejects creation without starting a draft or writing
+ok 119 - 20-entry limit rejects creation without starting a draft or writing
+  ---
+  duration_ms: 6.789167
+  type: 'test'
+  ...
+# Subtest: failed unsaved replacement rendering reloads the durable old track
+ok 120 - failed unsaved replacement rendering reloads the durable old track
+  ---
+  duration_ms: 13.477875
+  type: 'test'
+  ...
+1..120
+# tests 120
+# suites 0
+# pass 120
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6159.739833

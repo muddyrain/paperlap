@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { launchHeadless, engineName } from "./fixtures/release-engine.mjs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { wobblyLoop } from "./fixtures/editor-paths.mjs";
@@ -24,13 +25,9 @@ console.log(JSON.stringify({v1,v2,v3:migrated.save}));
     { encoding: "utf8" },
   ),
 );
-const { chromium } = await import("@playwright/test");
-const browser = await chromium.launch({
-  headless: true,
-  args: ["--mute-audio"],
-});
+const browser = await launchHeadless();
 const base = process.env.PAPERLAP_URL || "http://127.0.0.1:5173",
-  output = "test-results/storage";
+  output = process.env.PAPERLAP_STORAGE_OUTPUT || "test-results/storage";
 await mkdir(output, { recursive: true });
 const checks = [],
   errors = [],
@@ -437,7 +434,7 @@ try {
 } finally {
   await writeFile(
     `${output}/report.json`,
-    JSON.stringify({ headless: true, checks, errors, failedRequests }, null, 2),
+    JSON.stringify({ engine: engineName, browser: browser.version(), headless: true, checks, errors, failedRequests }, null, 2),
   );
   await browser.close();
 }

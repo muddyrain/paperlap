@@ -1,0 +1,22 @@
+{
+  "initialStagedWhitespaceCheck": {
+    "status": "FAIL",
+    "reason": "new blank line at EOF in nine curated log copies",
+    "paths": [
+      "docs/p1-06c-pr-evidence/c2/regression-logs/typecheck.log",
+      "docs/p1-06c-pr-evidence/final/static/node/typecheck/run.log",
+      "docs/p1-06c-pr-evidence/c1/regression-logs/typecheck.log",
+      "docs/p1-06c-pr-evidence/c1/browsers/chromium/smoke-3/run.log",
+      "docs/p1-06c-pr-evidence/c1/browsers/chromium/smoke-1/run.log",
+      "docs/p1-06c-pr-evidence/c1/browsers/webkit/smoke-3/run.log",
+      "docs/p1-06c-pr-evidence/c1/browsers/webkit/smoke-1/run.log",
+      "docs/p1-06c-pr-evidence/c1/browsers/firefox/smoke-3/run.log",
+      "docs/p1-06c-pr-evidence/c1/browsers/firefox/smoke-1/run.log"
+    ],
+    "sourceOrTestFailure": false,
+    "localCommitWasNotPushed": true
+  },
+  "correction": "normalize curated copies only; original logs retained; parsed JSON results unchanged",
+  "preCommitCommandResults": "15/15 PASS in final/results.json",
+  "codeMatchesReviewedImplementation": true
+}

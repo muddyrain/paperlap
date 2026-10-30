@@ -1,0 +1,3 @@
+PASS chromium: functional=PASS, focus-style=PASS, painted Phaser/FIT and native interactions 1366x768
+PASS chromium: functional=PASS, focus-style=PASS, painted Phaser/FIT and native interactions 1280x800
+PASS chromium: functional=PASS, focus-style=PASS, painted Phaser/FIT and native interactions 900x700

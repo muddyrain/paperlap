@@ -1,0 +1,11 @@
+FAIL chromium: smoke 1366: Expected values to be strictly equal:
+
+'running' !== 'ready'
+
+FAIL chromium: smoke 1280: Expected values to be strictly equal:
+
+'running' !== 'ready'
+
+FAIL chromium: smoke 900: Expected values to be strictly equal:
+
+'running' !== 'ready'

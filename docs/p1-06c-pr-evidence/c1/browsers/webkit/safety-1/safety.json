@@ -1,0 +1,77 @@
+{
+  "engine": "webkit",
+  "browser": "26.0",
+  "headless": true,
+  "fixture": "controlled source/draft inputs in isolated contexts; no fake scores used for game-chain evidence",
+  "cases": [
+    {
+      "name": "writer-release-reload",
+      "status": "PASS",
+      "ms": 2113,
+      "available": true,
+      "locks": {
+        "held": [
+          {
+            "clientId": "f55aa326-1d71-41ad-aa3a-1f50805022ca",
+            "mode": "exclusive",
+            "name": "paperlap-save-v3-writer"
+          }
+        ],
+        "pending": []
+      }
+    },
+    {
+      "name": "locks-unavailable-readonly",
+      "status": "PASS",
+      "ms": 1028,
+      "writes": "none",
+      "temporaryDriving": true,
+      "nativeLockFeatureIntentionallyRemoved": true
+    },
+    {
+      "name": "export-all-six-raw-keys",
+      "status": "PASS",
+      "ms": 1127,
+      "fields": [
+        "format",
+        "v3",
+        "v2",
+        "v1",
+        "draftV1",
+        "draftV2",
+        "localDraftV1"
+      ],
+      "exactCodeUnitsPreserved": true,
+      "importFeature": "NOT TESTED: no one-click import exists"
+    },
+    {
+      "name": "quota-upgrade-retry",
+      "status": "PASS",
+      "ms": 954,
+      "stableMigrationIdentity": "m-8d2faa21d44afcff025c703ad1102b7ff386bbd370a1f0f27464480a1e4dc1c8",
+      "fault": "controlled setItem QuotaExceededError, not real disk exhaustion"
+    },
+    {
+      "name": "readback-throw",
+      "status": "PASS",
+      "ms": 1461,
+      "firstWrites": 1,
+      "laterWritesBlocked": true,
+      "allOtherRawKeysPreserved": true,
+      "durableV3ReadableAfterReload": true,
+      "fault": "controlled Storage API"
+    },
+    {
+      "name": "write-readback-conflict",
+      "status": "PASS",
+      "ms": 1497,
+      "firstWrites": 1,
+      "laterWritesBlocked": true,
+      "allOtherRawKeysPreserved": true,
+      "durableV3ReadableAfterReload": true,
+      "fault": "controlled Storage API"
+    }
+  ],
+  "errors": [],
+  "status": "PASS"
+}

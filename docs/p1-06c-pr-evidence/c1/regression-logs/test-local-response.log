@@ -1,0 +1,23 @@
+
+> paperlap@1.0.0 test:local-response
+> node tests/local-response-browser.mjs
+
+PASS 1366x768: painted busy, single adoption, proof reuse, quota failure retains state, native retry saves once
+PASS 1280x800: painted busy, single adoption, proof reuse, quota failure retains state, native retry saves once
+PASS 900x700 reduced: painted busy, single adoption, proof reuse, quota failure retains state, native retry saves once
+PASS validating + Escape: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS validating + blur: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS validating + hidden: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS validating + resize: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS adopting + Escape: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS adopting + blur: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS adopting + hidden: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS adopting + resize: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS saving + Escape: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS saving + blur: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS saving + hidden: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS saving + resize: cancel queued work, keep accepted backup, ignore old callback, accept next drag
+PASS real second read-only tab/source change cancels queued save; neither branch nor draft overwritten
+PASS no-op write/readback failure cannot celebrate or clear draft after queued save
+PASS uninterrupted recording: real native Space/held Enter, undo/redo, busy save and reliable success
+PASS a failed second edit cannot retain the earlier successful save notice

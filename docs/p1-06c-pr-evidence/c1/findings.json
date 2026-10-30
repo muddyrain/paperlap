@@ -1,0 +1,52 @@
+[
+  {
+    "id": "QA-UI-01",
+    "severity": "P2",
+    "status": "OPEN",
+    "kind": "existing HUD focus-style consistency gap, separate from local-editor F-01",
+    "element": "#track-name[tabindex]",
+    "engines": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ],
+    "viewports": [
+      "1366x768",
+      "1280x800",
+      "900x700"
+    ],
+    "actual": "native Tab after driving pauses game and focuses HUD name; 2px solid outline, no pencil marker",
+    "impact": "keyboard style inconsistent, gameplay and focus navigation remain available",
+    "reproduce": "fresh game, start, ArrowUp until moving, release, Tab",
+    "evidence": [
+      "diagnosis/focus-outline-probe.json",
+      "browsers/chromium/smoke-5/smoke.json",
+      "browsers/firefox/smoke-5/smoke.json",
+      "browsers/webkit/smoke-5/smoke.json",
+      "browsers/chromium/smoke-5/hud-focus-900.png"
+    ],
+    "suggestion": "extend existing keyboard-only pencil treatment to the HUD name; retain full-name access and forced colors; separate review",
+    "production_changed": false
+  },
+  {
+    "id": "QA-UI-02",
+    "severity": "P2",
+    "status": "OPEN",
+    "kind": "WebKit pointer dialog return focus differs from keyboard",
+    "element": "#record-history-open, #storage-state",
+    "engines": [
+      "webkit"
+    ],
+    "actual": "Pointer-open then Esc does not restore trigger focus; native Enter opening and Esc do return to trigger",
+    "impact": "Pointer dismissal can leave focus inside the closed dialog; the next Esc is then consumed and fails to open the game menu until focus moves. Keyboard-only trigger Enter/Esc works.",
+    "reproduce": "Fresh writer and readonly page: focus game, native pointer click history/status, Escape; compare focused-trigger Enter/Escape",
+    "evidence": [
+      "diagnosis/history-focus-webkit.json",
+      "browsers/webkit/ux-3/report.json",
+      "browsers/webkit/ux-2/run.log"
+    ],
+    "root": "SaveHistory.open captures document.activeElement; WebKit pointer click does not focus the button, so it captures a different/hidden element",
+    "suggestion": "Pass the actual trigger explicitly to history open, with keyboard focus and acknowledgement fallback regression; separate UI review",
+    "production_changed": false
+  }
+]

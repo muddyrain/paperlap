@@ -22,7 +22,7 @@ export class SaveHistory {
   private dialog = document.createElement("dialog");
   private badge = document.createElement("button");
   private entry = document.createElement("button");
-  private returnFocus: HTMLElement | null = null;
+  private returnFocus: HTMLButtonElement | null = null;
   private error: StorageError | null = null;
   private localNotice: string | null = null;
   constructor(
@@ -40,12 +40,12 @@ export class SaveHistory {
     this.badge.id = "storage-state";
     this.badge.className = "storage-state";
     this.badge.setAttribute("aria-haspopup", "dialog");
-    this.badge.onclick = () => this.open();
+    this.badge.onclick = () => this.open(this.badge);
     document.querySelector(".mode-copy")!.append(this.badge);
     this.entry.id = "record-history-open";
     this.entry.className = "record-history-open";
     this.entry.setAttribute("aria-haspopup", "dialog");
-    this.entry.onclick = () => this.open();
+    this.entry.onclick = () => this.open(this.entry);
     document.querySelector(".timing")!.append(this.entry);
     this.get("history-close").onclick = () => this.close();
     this.get("acknowledge-local-notice").onclick = () => {
@@ -168,11 +168,9 @@ export class SaveHistory {
       list.textContent =
         "暂无历史纪录。完成有效圈后，个人最佳会按当前几何身份独立记录。";
   }
-  open() {
-    this.returnFocus =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
+  private open(trigger: HTMLButtonElement) {
+    // WebKit pointer clicks can leave activeElement on BODY instead of the invoker.
+    this.returnFocus = trigger;
     this.pause();
     this.render();
     this.dialog.showModal();
@@ -182,7 +180,11 @@ export class SaveHistory {
   private close() {
     this.motion.overlayClose(this.dialog);
     this.dialog.close();
-    this.returnFocus?.focus({ preventScroll: true });
+    const target = this.returnFocus;
+    (target?.isConnected && !target.disabled && target.getClientRects().length
+      ? target
+      : this.entry
+    ).focus({ preventScroll: true });
   }
   destroy() {
     this.dialog.close();

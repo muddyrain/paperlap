@@ -1,0 +1,14 @@
+
+> paperlap@1.0.0 test:editor
+> node tests/editor-browser.mjs
+
+PASS editor shows keycaps; Enter cannot start an empty draft
+PASS real pointer draws screenshot-style loop and shows closure guidance before release
+PASS R redraws a preview; held-key repeats preserve the next draft
+PASS text fields and modified shortcuts do not trigger editor actions
+PASS Enter on a focused button retains its native action; cancelling restores old track
+PASS invalid drafts cannot start/save; blur, resize and R during drag recover without stuck capture
+PASS Enter starts an accepted track with keyboard control; Esc restores prior driving state
+PASS hand-drawn wobble and shortcut buttons work at all three desktop sizes
+PASS no console errors or failed resource requests
+Headless editor browser and context closed

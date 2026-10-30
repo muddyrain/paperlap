@@ -1,0 +1,18 @@
+
+> paperlap@1.0.0 test:menu
+> node tests/menu-browser.mjs
+
+PASS ready/paused never auto-start; running Esc and pause button share menu; qualified Esc resumes without held-repeat throttle; Space stays quick
+PASS menu→book→real A/B selection returns to menu and stays ready; direct T returns to game; best and selection survive refresh
+PASS empty cancel returns to menu; valid drafts survive Esc/default Enter confirmation; explicit discard returns through menu/book without writes
+PASS controls is one-level return; modal Tab, native sound Space/Enter, IME/modifiers/text/repeat protection and real menu R work
+PASS blur revokes menu resume eligibility; focus/close cannot start until explicit Space
+PASS visibilitychange revokes menu resume eligibility; focus/close cannot start until explicit Space
+PASS resize revokes menu resume eligibility; focus/close cannot start until explicit Space
+PASS menu sound and track selection write failures stay visible, preserve durable data and cannot restore stale driving
+PASS post-write scene failure clears modal/return stack; every shortcut stays blocked until durable reload
+PASS 1366×768: long name, all menu buttons/keycaps, controls and discard confirmation fit without changing canvas
+PASS 1280×800: long name, all menu buttons/keycaps, controls and discard confirmation fit without changing canvas
+PASS 900×700: long name, all menu buttons/keycaps, controls and discard confirmation fit without changing canvas
+PASS reduced-motion menu is immediately usable, no delayed close or automatic start
+Headless menu browser and all contexts closed

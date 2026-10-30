@@ -1,0 +1,22 @@
+{
+  "engine": "webkit",
+  "browser": "26.0",
+  "headless": true,
+  "checks": [
+    "held throttle survives pointer sound on/off; timer/car/motor/preferences continue, steering and key release still work",
+    "ready mouse toggle permits starting; Tab still pauses driving and native Enter/Space toggle once without starting or stealing button focus",
+    "blur after sound click still freezes timer/car, clears held input and silences motor until explicit resume",
+    "visibilitychange after sound click still freezes timer/car, clears held input and silences motor until explicit resume"
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "nativePointerFocus": [
+    {
+      "mode": "ready",
+      "id": ""
+    }
+  ],
+  "navigationKey": "Alt+Tab",
+  "keyboardPolicy": "plain Tab skips native buttons in this macOS WebKit runtime; Alt+Tab reaches them (see release probe); real Safari settings NOT TESTED",
+  "audibleOutput": "NOT TESTED: headless motor graph/state, not human hearing"
+}

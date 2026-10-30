@@ -1,0 +1,37 @@
+PASS 1366x768: five buttons, text and nine-point hit areas fit
+PASS 1366x768 empty: F-06 disabled actions have no executable keycap
+PASS 1366x768: F-01 name uses pencil instead of enclosing outline
+PASS 1366x768: F-01 Shift+Tab returns to the full name
+PASS 1366x768: F-05 independent title/name with accessible full name
+PASS 1366x768: F-07 disabled primary hover keeps readable background
+PASS 1366x768: F-07 disabled pointer press stays inert
+PASS 1366x768: native Enter opens operation help
+PASS 1366x768 valid: F-06 disabled actions have no executable keycap
+PASS 1366x768: enabled primary keeps its normal hover
+PASS 1366x768 draft failure: F-06 disabled actions have no executable keycap
+PASS 1366x768 invalid: F-06 disabled actions have no executable keycap
+PASS 1366x768: F-06 validating/adopting keep cancel Esc
+PASS 1366x768 cleanup: status accessible name matches visible text, detail remains accessible
+PASS 1366x768: F-03 saved/draft-retained warning outlives toast
+PASS 1366x768: F-03 history explains saved, retained, incomplete cleanup
+PASS 1366x768: F-03 acknowledgement changes UI only
+FAIL 1366x768: pointer history returns focus to its entry
+Headless UX contexts and browser closed
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+false !== true
+
+    at file://<workspace>/tests/ux-polish-browser.mjs:447:14 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3

@@ -1,0 +1,29 @@
+PASS valid preview → R → keyboard undo/redo and native buttons restore whole strokes without official writes
+PASS R checkpoint survives reload and retains its only recoverable preview
+PASS reliable replace save and scene commit clear only the matching draft
+PASS real reload offers create-only recovery; explicit adoption revalidates preview and never writes Save V2
+PASS Esc defaults to keep drawing; explicit discard clears the matching draft and restores the source
+PASS closing and reopening a browser page retains recoverable raw without auto-start
+PASS invalid completed stroke and defer/Esc preserve raw; restoration cannot bypass validation
+PASS blur checkpoints interrupted raw and releases pointer; restored partial cannot save and fresh stroke works
+PASS resize checkpoints interrupted raw and releases pointer; restored partial cannot save and fresh stroke works
+PASS pointercancel checkpoints interrupted raw and releases pointer; restored partial cannot save and fresh stroke works
+PASS A/B selection and deleting the original entry never attach A's draft to B
+PASS replacing the official library leaves unmatched draft bytes intact and offers no incorrect recovery
+PASS create official save failure retains backup (including strict V3 replacement); reload recovery and successful retry clean it
+PASS replace official save failure retains backup (including strict V3 replacement); reload recovery and successful retry clean it
+PASS quota/cleanup rejection preserve memory and previous bytes; failed discard stays editing and can retry
+PASS official success with backup cleanup failure reports retained stale draft without undoing the committed scene
+PASS a real second tab changing the draft prevents silent write/delete while local undo remains available
+PASS corrupt/unsupported draft is not overwritten; editor remains usable and official data stays isolated
+PASS corrupt/unsupported draft is not overwritten; editor remains usable and official data stays isolated
+PASS damaged V3 remains untouched; unverified source drawing stays in memory with an explicit no-backup warning
+PASS native input undo, IME, held undo and held R never consume unrelated snapshots
+PASS 1366×768: controls stay in margins; rapid sheet transitions preserve draft and return from recovery to original book
+PASS 1280×800: controls stay in margins; rapid sheet transitions preserve draft and return from recovery to original book
+PASS 900×700: controls stay in margins; rapid sheet transitions preserve draft and return from recovery to original book
+PASS create and replace checkpoints coexist; explicitly discarding create preserves replace and the official track
+PASS replacing the source geometry with a different genuinely drawn route rejects the old draft despite matching UID
+PASS real pointer drawing checkpoints at most once per second plus completion, and unchanged pagehide does not rewrite the backup
+PASS reduced-motion preserves recovery, history and keyboard focus without timing-dependent data callbacks
+Passed 28 draft browser checks
