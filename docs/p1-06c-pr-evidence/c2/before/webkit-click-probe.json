@@ -1,0 +1,50 @@
+[
+  {
+    "reduced": "no-preference",
+    "trigger": "record-history-open",
+    "after": {
+      "focus": "save-history",
+      "visible": false,
+      "triggerHidden": false,
+      "events": [
+        {
+          "target": "record-history-open",
+          "active": "",
+          "tag": "BODY",
+          "open": false
+        },
+        {
+          "target": "history-close",
+          "active": "save-history",
+          "tag": "DIALOG",
+          "open": true
+        }
+      ]
+    },
+    "nextEscMenu": false
+  },
+  {
+    "reduced": "reduce",
+    "trigger": "storage-state",
+    "after": {
+      "focus": "save-history",
+      "visible": false,
+      "triggerHidden": false,
+      "events": [
+        {
+          "target": "storage-state",
+          "active": "",
+          "tag": "BODY",
+          "open": false
+        },
+        {
+          "target": "history-close",
+          "active": "save-history",
+          "tag": "DIALOG",
+          "open": true
+        }
+      ]
+    },
+    "nextEscMenu": false
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "phase": "after",
+  "engine": "firefox",
+  "headless": true,
+  "browser": "142.0.1",
+  "checks": [
+    {
+      "name": "1366x768: five buttons, text and nine-point hit areas fit",
+      "ok": true
+    },
+    {
+      "name": "1366x768 empty: F-06 disabled actions have no executable keycap",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-01 name uses pencil instead of enclosing outline",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-01 Shift+Tab returns to the full name",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-05 independent title/name with accessible full name",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-07 disabled primary hover keeps readable background",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-07 disabled pointer press stays inert",
+      "ok": true
+    },
+    {
+      "name": "1366x768: native Enter opens operation help",
+      "ok": true
+    },
+    {
+      "name": "1366x768 valid: F-06 disabled actions have no executable keycap",
+      "ok": true
+    },
+    {
+      "name": "1366x768: enabled primary keeps its normal hover",
+      "ok": true
+    },
+    {
+      "name": "1366x768 draft failure: F-06 disabled actions have no executable keycap",
+      "ok": true
+    }
+  ],
+  "failures": [],
+  "errors": [],
+  "screens": [
+    "hud-normal-1366",
+    "hud-long-1366",
+    "local-empty-1366",
+    "name-focus-1366",
+    "disabled-hover-1366",
+    "local-help-1366",
+    "local-valid-1366",
+    "local-adopted-1366",
+    "draft-quota-1366"
+  ],
+  "busy": [],
+  "accessibility": [],
+  "help": [],
+  "media": [],
+  "notTested": [],
+  "fixture": "tests/fixtures/ux-legacy-save-v2.json"
+}

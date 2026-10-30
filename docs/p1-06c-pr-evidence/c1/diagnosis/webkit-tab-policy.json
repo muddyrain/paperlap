@@ -1,0 +1,172 @@
+[
+  {
+    "key": "Tab",
+    "sequence": [
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      }
+    ]
+  },
+  {
+    "key": "Alt+Tab",
+    "sequence": [
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "record-history-open",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "trackbook-open",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "pause",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "start",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "sound",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "local-edit",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "edit",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "restart",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "",
+        "tag": "BODY"
+      },
+      {
+        "id": "game",
+        "tag": "DIV"
+      },
+      {
+        "id": "track-name",
+        "tag": "SPAN"
+      },
+      {
+        "id": "record-history-open",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "trackbook-open",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "pause",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "start",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "sound",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "local-edit",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "edit",
+        "tag": "BUTTON"
+      },
+      {
+        "id": "restart",
+        "tag": "BUTTON"
+      }
+    ]
+  }
+]

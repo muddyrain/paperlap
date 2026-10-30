@@ -1,0 +1,3 @@
+FAIL firefox: smoke 1366: Cannot read properties of null (reading 'error')
+FAIL firefox: smoke 1280: Cannot read properties of null (reading 'error')
+FAIL firefox: smoke 900: Cannot read properties of null (reading 'error')

@@ -1,0 +1,321 @@
+{
+  "phase": "after",
+  "engine": "webkit",
+  "headless": true,
+  "browser": "26.0",
+  "checks": [
+    {
+      "name": "1366x768: five buttons, text and nine-point hit areas fit",
+      "ok": true
+    },
+    {
+      "name": "1366x768 empty: F-06 disabled actions have no executable keycap",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-01 name uses pencil instead of enclosing outline",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-01 Shift+Tab returns to the full name",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-05 independent title/name with accessible full name",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-07 disabled primary hover keeps readable background",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-07 disabled pointer press stays inert",
+      "ok": true
+    },
+    {
+      "name": "1366x768: native Enter opens operation help",
+      "ok": true
+    },
+    {
+      "name": "1366x768 valid: F-06 disabled actions have no executable keycap",
+      "ok": true
+    },
+    {
+      "name": "1366x768: enabled primary keeps its normal hover",
+      "ok": true
+    },
+    {
+      "name": "1366x768 draft failure: F-06 disabled actions have no executable keycap",
+      "ok": true
+    },
+    {
+      "name": "1366x768 invalid: F-06 disabled actions have no executable keycap",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-06 validating/adopting keep cancel Esc",
+      "ok": true
+    },
+    {
+      "name": "1366x768 cleanup: status accessible name matches visible text, detail remains accessible",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-03 saved/draft-retained warning outlives toast",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-03 history explains saved, retained, incomplete cleanup",
+      "ok": true
+    },
+    {
+      "name": "1366x768: F-03 acknowledgement changes UI only",
+      "ok": true
+    },
+    {
+      "name": "1366x768: pointer history returns focus to its entry",
+      "ok": false,
+      "detail": {
+        "actual": "history-close"
+      }
+    }
+  ],
+  "failures": [
+    "1366x768: pointer history returns focus to its entry"
+  ],
+  "errors": [],
+  "screens": [
+    "hud-normal-1366",
+    "hud-long-1366",
+    "local-empty-1366",
+    "name-focus-1366",
+    "disabled-hover-1366",
+    "local-help-1366",
+    "local-valid-1366",
+    "local-adopted-1366",
+    "draft-quota-1366",
+    "local-invalid-1366",
+    "save-quota-1366",
+    "discard-confirm-1366",
+    "draft-recovery-1366",
+    "local-restored-1366",
+    "saved-cleanup-1366",
+    "cleanup-persistent-1366",
+    "cleanup-history-1366",
+    "esc-menu-1366",
+    "trackbook-1366"
+  ],
+  "busy": [
+    {
+      "width": 1366,
+      "stage": "editing",
+      "samples": [
+        {
+          "kind": "validating",
+          "buttons": [
+            {
+              "id": "local-cancel",
+              "disabled": false,
+              "keycaps": [
+                "Esc"
+              ]
+            },
+            {
+              "id": "local-undo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-redo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-adopt",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-save",
+              "disabled": true,
+              "keycaps": []
+            }
+          ]
+        },
+        {
+          "kind": "adopting",
+          "buttons": [
+            {
+              "id": "local-cancel",
+              "disabled": false,
+              "keycaps": [
+                "Esc"
+              ]
+            },
+            {
+              "id": "local-undo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-redo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-adopt",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-save",
+              "disabled": true,
+              "keycaps": []
+            }
+          ]
+        },
+        {
+          "kind": "validating",
+          "buttons": [
+            {
+              "id": "local-cancel",
+              "disabled": false,
+              "keycaps": [
+                "Esc"
+              ]
+            },
+            {
+              "id": "local-undo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-redo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-adopt",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-save",
+              "disabled": true,
+              "keycaps": []
+            }
+          ]
+        },
+        {
+          "kind": "adopting",
+          "buttons": [
+            {
+              "id": "local-cancel",
+              "disabled": false,
+              "keycaps": [
+                "Esc"
+              ]
+            },
+            {
+              "id": "local-undo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-redo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-adopt",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-save",
+              "disabled": true,
+              "keycaps": []
+            }
+          ]
+        },
+        {
+          "kind": "validating",
+          "buttons": [
+            {
+              "id": "local-cancel",
+              "disabled": false,
+              "keycaps": [
+                "Esc"
+              ]
+            },
+            {
+              "id": "local-undo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-redo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-adopt",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-save",
+              "disabled": true,
+              "keycaps": []
+            }
+          ]
+        },
+        {
+          "kind": "saving",
+          "buttons": [
+            {
+              "id": "local-cancel",
+              "disabled": false,
+              "keycaps": [
+                "Esc"
+              ]
+            },
+            {
+              "id": "local-undo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-redo",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-adopt",
+              "disabled": true,
+              "keycaps": []
+            },
+            {
+              "id": "local-save",
+              "disabled": true,
+              "keycaps": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "accessibility": [
+    {
+      "context": "1366x768 cleanup",
+      "visible": "赛道已保存 · 旧草稿保留",
+      "description": "赛道已保存；旧局部草稿仍保留，清理未完成。",
+      "snapshot": "- button \"赛道已保存 · 旧草稿保留\""
+    }
+  ],
+  "help": [],
+  "media": [],
+  "notTested": [],
+  "nativeFocus": [],
+  "fixture": "tests/fixtures/ux-legacy-save-v2.json"
+}

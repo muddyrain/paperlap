@@ -1,0 +1,127 @@
+PASS 1366x768: five buttons, text and nine-point hit areas fit
+PASS 1366x768 empty: F-06 disabled actions have no executable keycap
+PASS 1366x768: F-01 name uses pencil instead of enclosing outline
+PASS 1366x768: F-01 Shift+Tab returns to the full name
+PASS 1366x768: F-05 independent title/name with accessible full name
+PASS 1366x768: F-07 disabled primary hover keeps readable background
+PASS 1366x768: F-07 disabled pointer press stays inert
+PASS 1366x768: native Enter opens operation help
+PASS 1366x768 valid: F-06 disabled actions have no executable keycap
+PASS 1366x768: enabled primary keeps its normal hover
+PASS 1366x768 draft failure: F-06 disabled actions have no executable keycap
+PASS 1366x768 invalid: F-06 disabled actions have no executable keycap
+PASS 1366x768: F-06 validating/adopting keep cancel Esc
+PASS 1366x768 cleanup: status accessible name matches visible text, detail remains accessible
+PASS 1366x768: F-03 saved/draft-retained warning outlives toast
+PASS 1366x768: F-03 history explains saved, retained, incomplete cleanup
+PASS 1366x768: F-03 acknowledgement changes UI only
+FAIL 1366x768: pointer history returns focus to its entry
+PASS 1366x768: F-06 busy keeps only cancel Esc
+PASS 1366x768 readonly: status accessible name matches visible text, detail remains accessible
+PASS 1366x768: F-04 warning nine-point hit test
+PASS 1366x768: F-04 all nine native clicks open the panel
+FAIL 1366x768: F-04 all nine native clicks and focus return
+PASS default-conflict 1366: F-02 warning Range stays outside road
+PASS default-conflict: F-06 disabled actions have no executable keycap
+PASS default-conflict: five buttons, text and nine-point hit areas fit
+PASS 1366x768: F-01 forced-colors retains visible pencil
+PASS edge-conflict 1366: F-02 warning Range stays outside road
+PASS edge-conflict: F-06 disabled actions have no executable keycap
+PASS edge-conflict: five buttons, text and nine-point hit areas fit
+PASS 1280x800: five buttons, text and nine-point hit areas fit
+PASS 1280x800 empty: F-06 disabled actions have no executable keycap
+PASS 1280x800: F-01 name uses pencil instead of enclosing outline
+PASS 1280x800: F-01 Shift+Tab returns to the full name
+PASS 1280x800: F-05 independent title/name with accessible full name
+PASS 1280x800: F-07 disabled primary hover keeps readable background
+PASS 1280x800: F-07 disabled pointer press stays inert
+PASS 1280x800: native Enter opens operation help
+PASS 1280x800 valid: F-06 disabled actions have no executable keycap
+PASS 1280x800: enabled primary keeps its normal hover
+PASS 1280x800 draft failure: F-06 disabled actions have no executable keycap
+PASS 1280x800 invalid: F-06 disabled actions have no executable keycap
+PASS 1280x800: F-06 validating/adopting keep cancel Esc
+PASS 1280x800 cleanup: status accessible name matches visible text, detail remains accessible
+PASS 1280x800: F-03 saved/draft-retained warning outlives toast
+PASS 1280x800: F-03 history explains saved, retained, incomplete cleanup
+PASS 1280x800: F-03 acknowledgement changes UI only
+FAIL 1280x800: pointer history returns focus to its entry
+PASS 1280x800: F-06 busy keeps only cancel Esc
+PASS 1280x800 readonly: status accessible name matches visible text, detail remains accessible
+PASS 1280x800: F-04 warning nine-point hit test
+PASS 1280x800: F-04 all nine native clicks open the panel
+FAIL 1280x800: F-04 all nine native clicks and focus return
+PASS default-conflict 1280: F-02 warning Range stays outside road
+PASS default-conflict: F-06 disabled actions have no executable keycap
+PASS default-conflict: five buttons, text and nine-point hit areas fit
+PASS 1280x800: F-01 forced-colors retains visible pencil
+PASS edge-conflict 1280: F-02 warning Range stays outside road
+PASS edge-conflict: F-06 disabled actions have no executable keycap
+PASS edge-conflict: five buttons, text and nine-point hit areas fit
+PASS 900x700: five buttons, text and nine-point hit areas fit
+PASS 900x700 empty: F-06 disabled actions have no executable keycap
+PASS 900x700: F-01 name uses pencil instead of enclosing outline
+PASS 900x700: F-01 Shift+Tab returns to the full name
+PASS 900x700: F-05 independent title/name with accessible full name
+PASS 900x700: F-07 disabled primary hover keeps readable background
+PASS 900x700: F-07 disabled pointer press stays inert
+PASS 900x700: native Enter opens operation help
+PASS 900x700 valid: F-06 disabled actions have no executable keycap
+PASS 900x700: enabled primary keeps its normal hover
+PASS 900x700 draft failure: F-06 disabled actions have no executable keycap
+PASS 900x700 invalid: F-06 disabled actions have no executable keycap
+PASS 900x700: F-06 validating/adopting keep cancel Esc
+PASS 900x700 cleanup: status accessible name matches visible text, detail remains accessible
+PASS 900x700: F-03 saved/draft-retained warning outlives toast
+PASS 900x700: F-03 history explains saved, retained, incomplete cleanup
+PASS 900x700: F-03 acknowledgement changes UI only
+FAIL 900x700: pointer history returns focus to its entry
+PASS 900x700: F-06 busy keeps only cancel Esc
+PASS 900x700 readonly: status accessible name matches visible text, detail remains accessible
+PASS 900x700: F-04 warning nine-point hit test
+PASS 900x700: F-04 all nine native clicks open the panel
+FAIL 900x700: F-04 all nine native clicks and focus return
+PASS default-conflict 900: F-02 warning Range stays outside road
+PASS default-conflict: F-06 disabled actions have no executable keycap
+PASS default-conflict: five buttons, text and nine-point hit areas fit
+PASS 900x700 edge: expanded help stays outside the road stroke
+PASS 900x700 edge: nearest road edge receives native drag with help open
+PASS 900x700: F-01 forced-colors retains visible pencil
+PASS edge-conflict 900: F-02 warning Range stays outside road
+PASS edge-conflict: F-06 disabled actions have no executable keycap
+PASS edge-conflict: five buttons, text and nine-point hit areas fit
+Headless UX contexts and browser closed
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: UI regression findings remain
++ actual - expected
+
++ [
++   '1366x768: pointer history returns focus to its entry',
++   '1366x768: F-04 all nine native clicks and focus return',
++   '1280x800: pointer history returns focus to its entry',
++   '1280x800: F-04 all nine native clicks and focus return',
++   '900x700: pointer history returns focus to its entry',
++   '900x700: F-04 all nine native clicks and focus return'
++ ]
+- []
+
+    at file://<workspace>/tests/ux-polish-browser.mjs:542:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [
+    '1366x768: pointer history returns focus to its entry',
+    '1366x768: F-04 all nine native clicks and focus return',
+    '1280x800: pointer history returns focus to its entry',
+    '1280x800: F-04 all nine native clicks and focus return',
+    '900x700: pointer history returns focus to its entry',
+    '900x700: F-04 all nine native clicks and focus return'
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3

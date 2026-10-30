@@ -1,0 +1,123 @@
+[
+  {
+    "command": "npm run typecheck",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 2.36,
+    "timeout": false,
+    "completedScenes": 0,
+    "lastScene": null,
+    "engine": null,
+    "log": "regression-logs/typecheck.log"
+  },
+  {
+    "command": "npm run test",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 11.94,
+    "timeout": false,
+    "completedScenes": 0,
+    "lastScene": null,
+    "engine": null,
+    "log": "regression-logs/test.log"
+  },
+  {
+    "command": "npm run build",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 3.29,
+    "timeout": false,
+    "completedScenes": 0,
+    "lastScene": null,
+    "engine": null,
+    "log": "regression-logs/build.log"
+  },
+  {
+    "command": "npm run test:focus",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 24.47,
+    "timeout": false,
+    "completedScenes": 9,
+    "lastScene": "PASS initial reduced-motion and forced colors preserve a visible non-enclosing focus cue",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-focus.log"
+  },
+  {
+    "command": "npm run test:hud",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 52.48,
+    "timeout": false,
+    "completedScenes": 12,
+    "lastScene": "PASS 900x700 quota: centered, unclipped, unoccluded HUD; history return stable",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-hud.log"
+  },
+  {
+    "command": "npm run test:menu",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 199.23,
+    "timeout": false,
+    "completedScenes": 13,
+    "lastScene": "PASS reduced-motion menu is immediately usable, no delayed close or automatic start",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-menu.log"
+  },
+  {
+    "command": "npm run test:trackbook",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 451.3,
+    "timeout": false,
+    "completedScenes": 27,
+    "lastScene": "PASS 900×700: real A/B cards, selection, visible icon + Chinese + keycaps in game/drawer/editor and ready switch feedback",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-trackbook.log"
+  },
+  {
+    "command": "npm run test:browser",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 84.77,
+    "timeout": false,
+    "completedScenes": 15,
+    "lastScene": "PASS no console errors or failed resources",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-browser.log"
+  },
+  {
+    "command": "npm run test:local-game",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 115.61,
+    "timeout": false,
+    "completedScenes": 22,
+    "lastScene": "PASS L respects native text/modifier/IME/repeat guards; Space adopts and native Enter keeps local edits",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-local-game.log"
+  },
+  {
+    "command": "npm run test:local-response",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 120.87,
+    "timeout": false,
+    "completedScenes": 19,
+    "lastScene": "PASS a failed second edit cannot retain the earlier successful save notice",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-local-response.log"
+  },
+  {
+    "command": "npm run test:motion",
+    "status": "PASS",
+    "exit": 0,
+    "seconds": 173.17,
+    "timeout": false,
+    "completedScenes": 14,
+    "lastScene": "PASS real driven valid lap persists a new record, rewards HUD/star/stamp and keeps input usable",
+    "engine": "Chromium 141.0.7390.37",
+    "log": "regression-logs/test-motion.log"
+  }
+]

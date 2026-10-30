@@ -1,0 +1,24 @@
+{
+  "engine": "webkit",
+  "browser": "26.0",
+  "headless": true,
+  "checks": [
+    "first launch writes only V3 and stable default identity survives reload",
+    "1366x768: V2 migration preserves all tracks/archive/bytes and distinguishes historical records from authoritative PB",
+    "1280x800: V2 migration preserves all tracks/archive/bytes and distinguishes historical records from authoritative PB",
+    "900x700: V2 migration preserves all tracks/archive/bytes and distinguishes historical records from authoritative PB",
+    "V1 directly migrates both current and orphan records to V3 without writing V2",
+    "real whole-stroke save creates a new identity; rename/sound/reload preserve it and old records",
+    "browser WebCrypto independently confirms the canonical digest",
+    "real second tab is read-only; after writer closes and reloads it safely obtains the writer lease",
+    "old-client V2 changes are detected by live events and persisted source digest after reload without overwriting either branch",
+    "corrupt/unknown/digest-mismatched V3 is preserved and cannot fall back into an overwrite",
+    "corrupt/unknown/digest-mismatched V3 is preserved and cannot fall back into an overwrite",
+    "corrupt/unknown/digest-mismatched V3 is preserved and cannot fall back into an overwrite",
+    "quota upgrade failure preserves readable history and old bytes; retry has the same migrated identity",
+    "blocked storage still permits real driving and pause with persistent save failure information",
+    "legacy whole-stroke bytes remain read-only; new drafts recover only the matching V3 revision"
+  ],
+  "errors": [],
+  "failedRequests": []
+}

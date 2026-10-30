@@ -1,0 +1,135 @@
+PASS chromium: 1366 normal: HUD paper wash and pencil, full name
+PASS chromium: 1366 normal: pointer has no keyboard pencil
+PASS chromium: 1366 long: HUD paper wash and pencil, full name
+PASS chromium: 1366 long: pointer has no keyboard pencil
+PASS chromium: 1366: forced-colors pencil and reduced-motion
+PASS chromium: 1366-hud-pointer-pointer: return to actual trigger
+PASS chromium: 1366-hud-pointer-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1366-hud-pointer-pointer: book / menu / game return
+PASS chromium: 1366-hud-pointer-Escape: return to actual trigger
+PASS chromium: 1366-hud-pointer-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1366-hud-pointer-Escape: book / menu / game return
+PASS chromium: 1366-hud-Enter-pointer: return to actual trigger
+PASS chromium: 1366-hud-Enter-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1366-hud-Enter-pointer: book / menu / game return
+PASS chromium: 1366-hud-Enter-Escape: return to actual trigger
+PASS chromium: 1366-hud-Enter-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1366-hud-Enter-Escape: book / menu / game return
+PASS chromium: 1366-hud-Space-pointer: return to actual trigger
+PASS chromium: 1366-hud-Space-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1366-hud-Space-pointer: book / menu / game return
+PASS chromium: 1366-hud-Space-Escape: return to actual trigger
+PASS chromium: 1366-hud-Space-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1366-hud-Space-Escape: book / menu / game return
+PASS chromium: 1366-driving: return to actual trigger
+PASS chromium: 1366-driving: exactly one Esc opens game menu without driving
+PASS chromium: 1366-driving: book / menu / game return
+PASS chromium: 1366-readonly-pointer-pointer: return to actual trigger
+PASS chromium: 1366-readonly-pointer-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1366-readonly-pointer-pointer: book / menu / game return
+PASS chromium: 1366-readonly-pointer-Escape: return to actual trigger
+PASS chromium: 1366-readonly-pointer-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1366-readonly-pointer-Escape: book / menu / game return
+PASS chromium: 1366-readonly-Enter-pointer: return to actual trigger
+PASS chromium: 1366-readonly-Enter-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1366-readonly-Enter-pointer: book / menu / game return
+PASS chromium: 1366-readonly-Enter-Escape: return to actual trigger
+PASS chromium: 1366-readonly-Enter-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1366-readonly-Enter-Escape: book / menu / game return
+PASS chromium: 1366-readonly-Space-pointer: return to actual trigger
+PASS chromium: 1366-readonly-Space-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1366-readonly-Space-pointer: book / menu / game return
+PASS chromium: 1366-readonly-Space-Escape: return to actual trigger
+PASS chromium: 1366-readonly-Space-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1366-readonly-Space-Escape: book / menu / game return
+DONE chromium: 1366x768
+PASS chromium: 1280 normal: HUD paper wash and pencil, full name
+PASS chromium: 1280 normal: pointer has no keyboard pencil
+PASS chromium: 1280 long: HUD paper wash and pencil, full name
+PASS chromium: 1280 long: pointer has no keyboard pencil
+PASS chromium: 1280: forced-colors pencil and reduced-motion
+PASS chromium: 1280-hud-pointer-pointer: return to actual trigger
+PASS chromium: 1280-hud-pointer-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1280-hud-pointer-pointer: book / menu / game return
+PASS chromium: 1280-hud-pointer-Escape: return to actual trigger
+PASS chromium: 1280-hud-pointer-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1280-hud-pointer-Escape: book / menu / game return
+PASS chromium: 1280-hud-Enter-pointer: return to actual trigger
+PASS chromium: 1280-hud-Enter-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1280-hud-Enter-pointer: book / menu / game return
+PASS chromium: 1280-hud-Enter-Escape: return to actual trigger
+PASS chromium: 1280-hud-Enter-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1280-hud-Enter-Escape: book / menu / game return
+PASS chromium: 1280-hud-Space-pointer: return to actual trigger
+PASS chromium: 1280-hud-Space-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1280-hud-Space-pointer: book / menu / game return
+PASS chromium: 1280-hud-Space-Escape: return to actual trigger
+PASS chromium: 1280-hud-Space-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1280-hud-Space-Escape: book / menu / game return
+PASS chromium: 1280-driving: return to actual trigger
+PASS chromium: 1280-driving: exactly one Esc opens game menu without driving
+PASS chromium: 1280-driving: book / menu / game return
+PASS chromium: 1280-readonly-pointer-pointer: return to actual trigger
+PASS chromium: 1280-readonly-pointer-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1280-readonly-pointer-pointer: book / menu / game return
+PASS chromium: 1280-readonly-pointer-Escape: return to actual trigger
+PASS chromium: 1280-readonly-pointer-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1280-readonly-pointer-Escape: book / menu / game return
+PASS chromium: 1280-readonly-Enter-pointer: return to actual trigger
+PASS chromium: 1280-readonly-Enter-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1280-readonly-Enter-pointer: book / menu / game return
+PASS chromium: 1280-readonly-Enter-Escape: return to actual trigger
+PASS chromium: 1280-readonly-Enter-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1280-readonly-Enter-Escape: book / menu / game return
+PASS chromium: 1280-readonly-Space-pointer: return to actual trigger
+PASS chromium: 1280-readonly-Space-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 1280-readonly-Space-pointer: book / menu / game return
+PASS chromium: 1280-readonly-Space-Escape: return to actual trigger
+PASS chromium: 1280-readonly-Space-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 1280-readonly-Space-Escape: book / menu / game return
+DONE chromium: 1280x800
+PASS chromium: 900 normal: HUD paper wash and pencil, full name
+PASS chromium: 900 normal: pointer has no keyboard pencil
+PASS chromium: 900 long: HUD paper wash and pencil, full name
+PASS chromium: 900 long: pointer has no keyboard pencil
+PASS chromium: 900: forced-colors pencil and reduced-motion
+PASS chromium: 900-hud-pointer-pointer: return to actual trigger
+PASS chromium: 900-hud-pointer-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 900-hud-pointer-pointer: book / menu / game return
+PASS chromium: 900-hud-pointer-Escape: return to actual trigger
+PASS chromium: 900-hud-pointer-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 900-hud-pointer-Escape: book / menu / game return
+PASS chromium: 900-hud-Enter-pointer: return to actual trigger
+PASS chromium: 900-hud-Enter-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 900-hud-Enter-pointer: book / menu / game return
+PASS chromium: 900-hud-Enter-Escape: return to actual trigger
+PASS chromium: 900-hud-Enter-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 900-hud-Enter-Escape: book / menu / game return
+PASS chromium: 900-hud-Space-pointer: return to actual trigger
+PASS chromium: 900-hud-Space-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 900-hud-Space-pointer: book / menu / game return
+PASS chromium: 900-hud-Space-Escape: return to actual trigger
+PASS chromium: 900-hud-Space-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 900-hud-Space-Escape: book / menu / game return
+PASS chromium: 900-driving: return to actual trigger
+PASS chromium: 900-driving: exactly one Esc opens game menu without driving
+PASS chromium: 900-driving: book / menu / game return
+PASS chromium: 900-readonly-pointer-pointer: return to actual trigger
+PASS chromium: 900-readonly-pointer-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 900-readonly-pointer-pointer: book / menu / game return
+PASS chromium: 900-readonly-pointer-Escape: return to actual trigger
+PASS chromium: 900-readonly-pointer-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 900-readonly-pointer-Escape: book / menu / game return
+PASS chromium: 900-readonly-Enter-pointer: return to actual trigger
+PASS chromium: 900-readonly-Enter-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 900-readonly-Enter-pointer: book / menu / game return
+PASS chromium: 900-readonly-Enter-Escape: return to actual trigger
+PASS chromium: 900-readonly-Enter-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 900-readonly-Enter-Escape: book / menu / game return
+PASS chromium: 900-readonly-Space-pointer: return to actual trigger
+PASS chromium: 900-readonly-Space-pointer: exactly one Esc opens game menu without driving
+PASS chromium: 900-readonly-Space-pointer: book / menu / game return
+PASS chromium: 900-readonly-Space-Escape: return to actual trigger
+PASS chromium: 900-readonly-Space-Escape: exactly one Esc opens game menu without driving
+PASS chromium: 900-readonly-Space-Escape: book / menu / game return
+DONE chromium: 900x700

@@ -1,0 +1,15 @@
+{
+  "base": "3904352f6e7fd799bde398d6fe8e558bd274657f",
+  "server": "http://127.0.0.1:4231",
+  "type": "isolated clone production preview",
+  "sourcesMatchWorkspace": true,
+  "sources": {
+    "src/style.css": "8972cf624d939f5c053b4861d5bd1050e771359cf7a0792396c8dab6c7682c48",
+    "src/game/save-history.ts": "b0297470898eda342d82470f5fc6ce42bc90740af72527eb9540f156db8bca7e"
+  },
+  "assets": {
+    "index-BP2KAV4S.css": "32d5baa55af5a1e4c3d1c2200d05265562010fec2caffe45cb062ce85c26bd5a",
+    "index-BZGmgE8q.js": "9c22e0cc13ff343d513ee1710c5aacd2df7b0d74ab8fc3df56c0537379a9c8a7"
+  },
+  "preExistingTestsModifiedThisTurn": false
+}

@@ -1,0 +1,152 @@
+{
+  "engine": "firefox",
+  "browser": "142.0.1",
+  "headless": true,
+  "viewports": [
+    {
+      "width": 1366,
+      "height": 768,
+      "status": "FAIL",
+      "canvas": {
+        "box": {
+          "x": 40.016666412353516,
+          "y": 0,
+          "width": 1285.950008392334,
+          "height": 768
+        },
+        "backend": "WebGL 1.0",
+        "painted": [
+          {
+            "q": {
+              "x": 150.29226611992817,
+              "y": 451.47985435747347
+            },
+            "darkPixelsOf49": 49
+          },
+          {
+            "q": {
+              "x": 1280.7408892960118,
+              "y": 470.6752099826507
+            },
+            "darkPixelsOf49": 49
+          },
+          {
+            "q": {
+              "x": 444.0414467045982,
+              "y": 186.5452591225512
+            },
+            "darkPixelsOf49": 49
+          }
+        ],
+        "paperPixelsOf49": 49
+      },
+      "focus": {
+        "id": "track-name",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "mark": "none",
+        "markWidth": "auto",
+        "markHeight": "auto"
+      },
+      "error": "AssertionError [ERR_ASSERTION]: focus must not have a visible enclosing outline\n    at file://<workspace>/tests/release-smoke.mjs:40:31"
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "status": "FAIL",
+      "canvas": {
+        "box": {
+          "x": 0,
+          "y": 17.78333282470703,
+          "width": 1279.9832763671875,
+          "height": 764.4333419799805
+        },
+        "backend": "WebGL 1.0",
+        "painted": [
+          {
+            "q": {
+              "x": 150.29226611992817,
+              "y": 451.47985435747347
+            },
+            "darkPixelsOf49": 49
+          },
+          {
+            "q": {
+              "x": 1280.7408892960118,
+              "y": 470.6752099826507
+            },
+            "darkPixelsOf49": 49
+          },
+          {
+            "q": {
+              "x": 444.0414467045982,
+              "y": 186.5452591225512
+            },
+            "darkPixelsOf49": 49
+          }
+        ],
+        "paperPixelsOf49": 49
+      },
+      "focus": {
+        "id": "track-name",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "mark": "none",
+        "markWidth": "auto",
+        "markHeight": "auto"
+      },
+      "error": "AssertionError [ERR_ASSERTION]: focus must not have a visible enclosing outline\n    at file://<workspace>/tests/release-smoke.mjs:40:31"
+    },
+    {
+      "width": 900,
+      "height": 700,
+      "status": "FAIL",
+      "canvas": {
+        "box": {
+          "x": 0,
+          "y": 81.25,
+          "width": 899.9666748046875,
+          "height": 537.4833374023438
+        },
+        "backend": "WebGL 1.0",
+        "painted": [
+          {
+            "q": {
+              "x": 150.29226611992817,
+              "y": 451.47985435747347
+            },
+            "darkPixelsOf49": 49
+          },
+          {
+            "q": {
+              "x": 1280.7408892960118,
+              "y": 470.6752099826507
+            },
+            "darkPixelsOf49": 49
+          },
+          {
+            "q": {
+              "x": 444.0414467045982,
+              "y": 186.5452591225512
+            },
+            "darkPixelsOf49": 49
+          }
+        ],
+        "paperPixelsOf49": 49
+      },
+      "focus": {
+        "id": "track-name",
+        "outline": "solid",
+        "outlineWidth": "2px",
+        "mark": "none",
+        "markWidth": "auto",
+        "markHeight": "auto"
+      },
+      "error": "AssertionError [ERR_ASSERTION]: focus must not have a visible enclosing outline\n    at file://<workspace>/tests/release-smoke.mjs:40:31"
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "status": "FAIL"
+}

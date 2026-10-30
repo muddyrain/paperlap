@@ -1,0 +1,10 @@
+{
+  "engine": "webkit",
+  "browser": "26.0",
+  "headless": true,
+  "checks": [
+    "held throttle survives pointer sound on/off; timer/car/motor/preferences continue, steering and key release still work"
+  ],
+  "errors": [],
+  "failedRequests": []
+}

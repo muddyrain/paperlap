@@ -1,0 +1,120 @@
+{
+  "engine": "chromium",
+  "browser": "141.0.7390.37",
+  "headless": true,
+  "status": "PASS",
+  "steps": [
+    {
+      "name": "01-created-a",
+      "status": "PASS",
+      "uid": "861c846d-450b-40f4-a075-86998a495bfe",
+      "identity": "g-a43de34d088f496f8f0ef7b8c6b09a5a"
+    },
+    {
+      "name": "02-a-real-pb",
+      "status": "PASS",
+      "label": "A before local edit",
+      "completed": 1,
+      "lap": {
+        "elapsed": 0.01167071595829147,
+        "valid": true,
+        "nextGate": 1,
+        "completed": 1,
+        "last": 15.738329284041455
+      },
+      "key": "861c846d-450b-40f4-a075-86998a495bfe:g-a43de34d088f496f8f0ef7b8c6b09a5a:rules-2",
+      "pb": 15.738329284041455,
+      "wallMs": 22333,
+      "input": "native held Arrow keys; telemetry read-only"
+    },
+    {
+      "name": "03-created-b",
+      "status": "PASS",
+      "uid": "f1f11f67-f5e6-48bb-877b-89997d6a66fd"
+    },
+    {
+      "name": "04-two-bends-undo-redo",
+      "status": "PASS"
+    },
+    {
+      "name": "05-real-local-recovery",
+      "status": "PASS"
+    },
+    {
+      "name": "06-new-geometry-empty-pb",
+      "status": "PASS",
+      "oldIdentity": "g-a43de34d088f496f8f0ef7b8c6b09a5a",
+      "newIdentity": "g-8ee4bb3c9afb45cda30b520e1ed35fe8"
+    },
+    {
+      "name": "07-old-record-history",
+      "status": "PASS",
+      "history": "已保存修订的历史成绩（非当前个人最佳） · 00:15.73\n861c846d-450b-40f4-a075-86998a495bfe:g-a43de34d088f496f8f0ef7b8c6b09a5a:rules-2"
+    },
+    {
+      "name": "08-new-real-pb",
+      "status": "PASS",
+      "label": "A after two-bend revision",
+      "completed": 1,
+      "lap": {
+        "elapsed": 0.012050292931821865,
+        "valid": true,
+        "nextGate": 1,
+        "completed": 1,
+        "last": 15.05461637373463
+      },
+      "key": "861c846d-450b-40f4-a075-86998a495bfe:g-8ee4bb3c9afb45cda30b520e1ed35fe8:rules-2",
+      "pb": 15.05461637373463,
+      "wallMs": 17134,
+      "input": "native held Arrow keys; telemetry read-only"
+    },
+    {
+      "name": "09-export-complete",
+      "status": "PASS",
+      "backup": "game-chain-backup.json",
+      "exportedKeys": [
+        "format",
+        "v3",
+        "v2",
+        "v1",
+        "draftV1",
+        "draftV2",
+        "localDraftV1"
+      ]
+    }
+  ],
+  "errors": [],
+  "drive": [
+    {
+      "label": "A before local edit",
+      "completed": 1,
+      "lap": {
+        "elapsed": 0.01167071595829147,
+        "valid": true,
+        "nextGate": 1,
+        "completed": 1,
+        "last": 15.738329284041455
+      },
+      "key": "861c846d-450b-40f4-a075-86998a495bfe:g-a43de34d088f496f8f0ef7b8c6b09a5a:rules-2",
+      "pb": 15.738329284041455,
+      "wallMs": 22333,
+      "input": "native held Arrow keys; telemetry read-only"
+    },
+    {
+      "label": "A after two-bend revision",
+      "completed": 1,
+      "lap": {
+        "elapsed": 0.012050292931821865,
+        "valid": true,
+        "nextGate": 1,
+        "completed": 1,
+        "last": 15.05461637373463
+      },
+      "key": "861c846d-450b-40f4-a075-86998a495bfe:g-8ee4bb3c9afb45cda30b520e1ed35fe8:rules-2",
+      "pb": 15.05461637373463,
+      "wallMs": 17134,
+      "input": "native held Arrow keys; telemetry read-only"
+    }
+  ],
+  "video": "game-chain.webm"
+}

@@ -1,0 +1,22 @@
+PASS held throttle survives pointer sound on/off; timer/car/motor/preferences continue, steering and key release still work
+Headless sound browser and all contexts closed
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+'' !== 'sound'
+
+    at file://<workspace>/tests/sound-browser.mjs:131:12
+    at async isolated (file://<workspace>/tests/sound-browser.mjs:50:5)
+    at async file://<workspace>/tests/sound-browser.mjs:122:3 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '',
+  expected: 'sound',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3

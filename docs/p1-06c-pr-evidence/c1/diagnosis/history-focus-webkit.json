@@ -1,0 +1,46 @@
+[
+  {
+    "selector": "#record-history-open",
+    "native": "pointer",
+    "before": "game",
+    "during": "history-close",
+    "after": {
+      "id": "history-close",
+      "tag": "BUTTON",
+      "open": false
+    }
+  },
+  {
+    "selector": "#record-history-open",
+    "native": "keyboard",
+    "before": "record-history-open",
+    "during": "history-close",
+    "after": {
+      "id": "record-history-open",
+      "tag": "BUTTON",
+      "open": false
+    }
+  },
+  {
+    "selector": "#storage-state",
+    "native": "pointer",
+    "before": "game",
+    "during": "history-close",
+    "after": {
+      "id": "history-close",
+      "tag": "BUTTON",
+      "open": false
+    }
+  },
+  {
+    "selector": "#storage-state",
+    "native": "keyboard",
+    "before": "storage-state",
+    "during": "history-close",
+    "after": {
+      "id": "storage-state",
+      "tag": "BUTTON",
+      "open": false
+    }
+  }
+]

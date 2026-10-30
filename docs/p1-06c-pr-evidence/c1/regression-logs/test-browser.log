@@ -1,0 +1,20 @@
+
+> paperlap@1.0.0 test:browser
+> node tests/browser.mjs
+
+PASS real keyboard accelerates and steers
+PASS pause freezes timer and vehicle; resume and R reset work
+PASS window blur pauses and clears held input
+PASS hidden-tab lifecycle pauses until explicit resume
+PASS sound toggle and preference survive reload
+PASS real pointer creates track; custom track is keyboard-drivable
+PASS refresh restores accepted custom track
+PASS open/crossing drafts show errors; redraw and cancel preserve saved track
+PASS 1366x768, 1280x800, 900x700 layouts and scaled drawing align
+PASS HUD remains outside the default driving road at all three sizes
+PASS full valid lap with keyboard events records best; record survives refresh
+PASS offroad invalidates lap; R restores validity
+PASS repeated editing/restart keeps one engine canvas and bounded effects
+PASS corrupt storage falls back to playable default
+PASS no console errors or failed resources
+Headless browser and context closed

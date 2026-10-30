@@ -1,0 +1,29 @@
+{
+  "os": "15.7.9",
+  "kernel": "24.6.0",
+  "arch": "arm64",
+  "node": "v22.23.3",
+  "playwright": "1.56.1",
+  "browserVersions": {
+    "chromium": "141.0.7390.37",
+    "firefox": "142.0.1",
+    "webkit": "26.0"
+  },
+  "headless": true,
+  "personalBrowserUsed": false,
+  "viewports": [
+    [
+      1366,
+      768
+    ],
+    [
+      1280,
+      800
+    ],
+    [
+      900,
+      700
+    ]
+  ],
+  "deviceScaleFactor": 1
+}

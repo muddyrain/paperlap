@@ -1,0 +1,85 @@
+{
+  "engine": "firefox",
+  "browser": "142.0.1",
+  "headless": true,
+  "fixture": "controlled source/draft inputs in isolated contexts; no fake scores used for game-chain evidence",
+  "cases": [
+    {
+      "name": "writer-release-reload",
+      "status": "PASS",
+      "ms": 3001,
+      "available": true,
+      "locks": {
+        "held": [
+          {
+            "clientId": "58ffd6b7-6fd7-4f6e-a818-6067bb17701f",
+            "mode": "exclusive",
+            "name": "paperlap-save-v3-writer"
+          }
+        ],
+        "pending": []
+      }
+    },
+    {
+      "name": "locks-unavailable-readonly",
+      "status": "PASS",
+      "ms": 1122,
+      "writes": "none",
+      "temporaryDriving": true,
+      "nativeLockFeatureIntentionallyRemoved": true
+    },
+    {
+      "name": "export-all-six-raw-keys",
+      "status": "PASS",
+      "ms": 1255,
+      "fields": [
+        "format",
+        "v3",
+        "v2",
+        "v1",
+        "draftV1",
+        "draftV2",
+        "localDraftV1"
+      ],
+      "exactCodeUnitsPreserved": true,
+      "importFeature": "NOT TESTED: no one-click import exists"
+    },
+    {
+      "name": "exported-raw-restored-in-clean-context",
+      "status": "PASS",
+      "ms": 867,
+      "isolatedContext": true,
+      "allSixRawKeysPreserved": true,
+      "restoration": "QA-only storageState reconstruction; product has no one-click import"
+    },
+    {
+      "name": "quota-upgrade-retry",
+      "status": "PASS",
+      "ms": 1198,
+      "stableMigrationIdentity": "m-8d2faa21d44afcff025c703ad1102b7ff386bbd370a1f0f27464480a1e4dc1c8",
+      "fault": "controlled setItem QuotaExceededError, not real disk exhaustion"
+    },
+    {
+      "name": "readback-throw",
+      "status": "PASS",
+      "ms": 1388,
+      "firstWrites": 1,
+      "laterWritesBlocked": true,
+      "allOtherRawKeysPreserved": true,
+      "durableV3ReadableAfterReload": true,
+      "fault": "controlled Storage API"
+    },
+    {
+      "name": "write-readback-conflict",
+      "status": "PASS",
+      "ms": 1293,
+      "firstWrites": 1,
+      "laterWritesBlocked": true,
+      "allOtherRawKeysPreserved": true,
+      "durableV3ReadableAfterReload": true,
+      "fault": "controlled Storage API"
+    }
+  ],
+  "errors": [],
+  "status": "PASS"
+}

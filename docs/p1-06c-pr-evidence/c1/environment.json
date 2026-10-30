@@ -1,0 +1,65 @@
+{
+  "os": "macOS 15.7.9",
+  "kernel": "24.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M3 Pro",
+  "node": "22.23.3",
+  "playwright": "1.56.1",
+  "engines": [
+    {
+      "engine": "chromium",
+      "browserVersion": "141.0.7390.37",
+      "initiallyInstalled": true,
+      "headlessLaunch": "PASS",
+      "functionalStatus": "PASS all three viewports; see matrix for independent focus FAIL",
+      "suiteStatus": {
+        "smoke": "FAIL",
+        "ux": "PASS",
+        "storage": "PASS",
+        "safety": "PASS",
+        "game": "PASS",
+        "sound": "PASS",
+        "performance": "PASS"
+      }
+    },
+    {
+      "engine": "firefox",
+      "browserVersion": "142.0.1",
+      "initiallyInstalled": false,
+      "headlessLaunch": "PASS",
+      "functionalStatus": "PASS all three viewports; see matrix for independent focus FAIL",
+      "suiteStatus": {
+        "smoke": "FAIL",
+        "ux": "PASS",
+        "storage": "PASS",
+        "safety": "PASS",
+        "game": "PASS",
+        "sound": "PASS",
+        "performance": "PASS"
+      }
+    },
+    {
+      "engine": "webkit",
+      "browserVersion": "26.0",
+      "initiallyInstalled": false,
+      "headlessLaunch": "PASS",
+      "functionalStatus": "PASS all three viewports; see matrix for independent focus FAIL",
+      "suiteStatus": {
+        "smoke": "FAIL",
+        "ux": "FAIL",
+        "storage": "PASS",
+        "safety": "PASS",
+        "game": "PASS",
+        "sound": "PASS",
+        "performance": "PASS"
+      }
+    }
+  ],
+  "webkitIsRealSafari": false,
+  "appSources": "3904352f6e7fd799bde398d6fe8e558bd274657f",
+  "crossEngineTarget": "production build served on isolated localhost preview",
+  "browserPolicy": "explicit headless; fresh browser and contexts; no personal profile or browser connection",
+  "nativeBackground": "NOT TESTED: headless contexts did not become document.hidden",
+  "actualSafari": "NOT TESTED",
+  "sound": "Web Audio state tested; physical output/ear not tested"
+}

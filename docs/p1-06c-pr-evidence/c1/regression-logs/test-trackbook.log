@@ -1,0 +1,32 @@
+
+> paperlap@1.0.0 test:trackbook
+> node tests/trackbook-browser.mjs
+
+PASS real pointer creates B without replacing A; reload retains both UIDs
+PASS running B→A and repeated A/B switches reset scene, lap, effects, keys, motor and HUD; reload restores selection
+PASS empty/overlong names fail; text input and Enter/Escape stay isolated; rename persists UID and bests
+PASS replace and create cancellation restore car/lap; invalid drafts, R and previews never write
+PASS deletion requires confirmation; inactive removal preserves scene and other/legacy bests; last track is protected
+PASS confirmed active deletion selects the first remaining track and resets to ready across reload
+PASS QuotaExceededError: select/rename/delete/create failures preserve prior state; create can retry/cancel, V3 replace retains its editable candidate without claiming a save
+PASS SecurityError: select/rename/delete/create failures preserve prior state; create can retry/cancel, V3 replace retains its editable candidate without claiming a save
+PASS corrupt V3 remains protected through failed rename/create and cancellation
+PASS same-geometry UIDs retain independent bests; legacy blank name uses display fallback; 20-entry cap preserves all data
+PASS capture canvas failure: preserves old state before write or blocks broken rendering until reload from durable selection
+PASS prepare canvas failure: preserves old state before write or blocks broken rendering until reload from durable selection
+PASS apply canvas failure: preserves old state before write or blocks broken rendering until reload from durable selection
+PASS 1366×768: long/short track HUD, unobstructed pause/notification, explicit create/replace copy and shortcuts
+PASS 1280×800: long/short track HUD, unobstructed pause/notification, explicit create/replace copy and shortcuts
+PASS 900×700: long/short track HUD, unobstructed pause/notification, explicit create/replace copy and shortcuts
+PASS real keyboard lap celebrates a saved best in a compact notice clear of road and car
+PASS 1366×768, 1280×800, 900×700 controls fit; keyboard opens/closes the dialog and restores focus
+PASS T/E/Space/R scopes, modifiers/IME/repeat, held-key release, arrow-only focus, native button Space and real A/B Enter switch
+PASS Esc returns from rename/delete before closing; input isolation; N creates independently, R redraws, repeated Enter saves once and reload restores ready
+PASS SVG centerlines and widths match real A/B geometry; rename preserves and real replacement updates thumbnail; cards use UID + geometry + current rules best
+PASS failed switch preserves cards/thumbnail/selection and shows no success motion; Enter retries the same card after storage recovers
+PASS 300/180ms drawer presentation never delays modal close, rapid reopen retains focus, reduced motion removes animations including during exit
+PASS 20 long-name cards scroll internally, exit keeps scroll position, arrows wrap, full names stay accessible, N explains cap without changing canvas/save
+PASS 1366×768: real A/B cards, selection, visible icon + Chinese + keycaps in game/drawer/editor and ready switch feedback
+PASS 1280×800: real A/B cards, selection, visible icon + Chinese + keycaps in game/drawer/editor and ready switch feedback
+PASS 900×700: real A/B cards, selection, visible icon + Chinese + keycaps in game/drawer/editor and ready switch feedback
+Headless trackbook browser and all contexts closed
