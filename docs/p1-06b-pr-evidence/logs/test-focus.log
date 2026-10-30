@@ -1,0 +1,14 @@
+
+> paperlap@1.0.0 test:focus
+> node tests/focus-browser.mjs
+
+PASS pointer opens with real default focus; Tab reveals a non-enclosing keyboard location
+PASS focus and saved selection remain independent; native Space selects without starting
+PASS mouse book click then Esc returns to the correct button with only a pencil marker
+PASS controls page Tab/Shift+Tab and native Enter retain visible focus and one-level return
+PASS draft default, Esc and native Enter keep drawing; explicit discard restores the original menu focus
+PASS reopen and live reduced-motion preserve keyboard visibility, modal cleanup and no automatic start
+PASS 1280px: keyboard marker fits without changing game geometry or starting
+PASS 900px: keyboard marker fits without changing game geometry or starting
+PASS initial reduced-motion and forced colors preserve a visible non-enclosing focus cue
+Headless focus browsers and contexts closed

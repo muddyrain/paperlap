@@ -1,0 +1,2522 @@
+{
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "elements": [
+    {
+      "selector": ".board",
+      "box": {
+        "x": 0,
+        "y": 81.25,
+        "width": 900,
+        "height": 537.5,
+        "top": 81.25,
+        "right": 900,
+        "bottom": 618.75,
+        "left": 0
+      },
+      "ink": {
+        "x": 0,
+        "y": 81.25,
+        "width": 900,
+        "height": 537.5,
+        "top": 81.25,
+        "right": 900,
+        "bottom": 618.75,
+        "left": 0
+      },
+      "text": "\n \n 当前赛道：我的手绘赛道自由试跑存档未保存或只读 · 查看说明\n 本圈00:00.00个人最佳--:--.--☆纪录历史 / 备份\n 编辑当前赛道目标赛道：我的手绘赛道保存将替换当前赛道路线，取消不会影响原赛道。草稿已备份到此浏览器撤销⌘ Z重做⌘ ⇧ Z按住画一圈 · 起点附近松开 · 自动修圆\n 赛道本T菜单Esc\n \n ↑ 加速↓ 刹车←→ 转向R 重来 · Esc 菜单准备试跑方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。开始试跑Space已暂停车辆和计时都已暂停继续试跑Space声音局部调整L编辑当前E重新开始R\n 取消编辑Esc赛道画好了！按 Enter 保存新赛道，或按 R 重新绘制。重新绘制R保存修改并试跑Enter ↵\n 画面加载失败请重新加载以恢复已保存的赛道。重新加载\n DRAW A LITTLE. DRIVE A LITTLE.\n\n      PAPERLAP / 路线收藏我的赛道本关闭Esc\n      2 / 20 条赛道新建赛道N局部调整当前赛道L检测到其他标签或旧版存档变更，已停止保存。请先导出全部备份并关闭其他标签；刷新不会合并分支，仍冲突时需恢复一份一致备份。↑↓ 选路线 · Enter 使用 · 切换后等待开始方格本环线暂无纪录使用赛道Enter重命名删除我的手绘赛道暂无纪录当前赛道Enter重命名删除\n      赛道名称（最多 40 个字符）取消Esc保存名称Enter\n      将删除这条赛道及其全部纪录，其他赛道和旧归档保留。取消Esc确认删除\n      \n      关闭Esc\n      \n      \n        \n        重新开始R\n        我的赛道本T\n        编辑当前赛道E\n        局部调整L\n        \n        操作说明\n      \n      \n        驾驶↑ / W 加速 · ↓ / S 刹车← / A、→ / D 转向\n        游戏区域Space 开始 / 暂停 / 继续R 重新开始 · T 赛道本E 整圈重画 · L 局部调整 · Esc 游戏菜单\n        赛道本与绘图N 新建 · ↑↓ 选择焦点 · Enter 使用赛道绘图：Ctrl / ⌘ Z 撤销 · Ctrl / ⌘ Shift Z 重做Enter 保存 · R 重画 · Esc 取消 / 确认放弃\n      局部调整拖动弯道，松手校验；Enter 采用到历史Ctrl / ⌘ Enter 正式保存；撤销/重做同绘图Esc 先取消预览，再确认放弃；保存后等待开始按钮上的 Enter / Space 为原生操作。切换赛道等待开始；离开窗口会暂停，恢复焦点不会自动继续。返回菜单Esc\n      尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。继续绘制Esc放弃修改\n      找到上次的绘制继续上次绘制放弃草稿暂不处理Esc局部调整目标赛道：我的手绘赛道拖动道路调整一个弯道 · 虚线是原路线，黄色是影响范围，灰色起点区受保护停止写入，已有局部草稿保留；当前内存修改请勿刷新。检测到其他标签或旧版存档变更，已停止保存。请先导出全部备份并关闭其他标签；刷新不会合并分支，仍冲突时需恢复一份一致备份。取消调整Esc撤销⌘ Z重做⌘ ⇧ Z采用本次调整Enter保存局部修改⌘ Enter找到上次的局部调整继续只恢复合法编辑路线，不会覆盖正式赛道或起跑。刷新恢复最近一步撤销/重做，会话内可撤销 24 次。继续局部调整放弃草稿暂不处理Esc纪录历史与存档旧纪录（旧几何身份，未验证）已完整保留，不与当前个人最佳比较。不同规则与孤立归档在下方逐项列出。V1/V2 是升级前备份，旧版不会看到 V3 新作品。恢复前请导出所有键并关闭其他标签；本游戏不会自动删除或覆盖旧键、损坏原文。返回Esc导出全部存档备份重新加载 / 重试升级",
+      "title": "",
+      "label": "纸上飞驰赛车游戏",
+      "role": null,
+      "clientWidth": 900,
+      "scrollWidth": 900
+    },
+    {
+      "selector": ".local-heading",
+      "box": {
+        "x": 21.59375,
+        "y": 94.140625,
+        "width": 856.8125,
+        "height": 75,
+        "top": 94.140625,
+        "right": 878.40625,
+        "bottom": 169.140625,
+        "left": 21.59375
+      },
+      "ink": {
+        "x": 21.59375,
+        "y": 94.140625,
+        "width": 856.8125,
+        "height": 70,
+        "top": 94.140625,
+        "right": 878.40625,
+        "bottom": 164.140625,
+        "left": 21.59375
+      },
+      "text": "局部调整目标赛道：我的手绘赛道拖动道路调整一个弯道 · 虚线是原路线，黄色是影响范围，灰色起点区受保护停止写入，已有局部草稿保留；当前内存修改请勿刷新。",
+      "title": "",
+      "label": null,
+      "role": null,
+      "clientWidth": 857,
+      "scrollWidth": 857
+    },
+    {
+      "selector": ".local-title h2",
+      "box": {
+        "x": 21.59375,
+        "y": 94.140625,
+        "width": 80,
+        "height": 28,
+        "top": 94.140625,
+        "right": 101.59375,
+        "bottom": 122.140625,
+        "left": 21.59375
+      },
+      "ink": {
+        "x": 21.59375,
+        "y": 94.140625,
+        "width": 80,
+        "height": 28,
+        "top": 94.140625,
+        "right": 101.59375,
+        "bottom": 122.140625,
+        "left": 21.59375
+      },
+      "text": "局部调整",
+      "title": "",
+      "label": null,
+      "role": null,
+      "clientWidth": 80,
+      "scrollWidth": 80
+    },
+    {
+      "selector": ".local-title > span",
+      "box": {
+        "x": 121.59375,
+        "y": 102.140625,
+        "width": 132,
+        "height": 17,
+        "top": 102.140625,
+        "right": 253.59375,
+        "bottom": 119.140625,
+        "left": 121.59375
+      },
+      "ink": {
+        "x": 121.59375,
+        "y": 102.140625,
+        "width": 132,
+        "height": 17,
+        "top": 102.140625,
+        "right": 253.59375,
+        "bottom": 119.140625,
+        "left": 121.59375
+      },
+      "text": "目标赛道：我的手绘赛道",
+      "title": "",
+      "label": null,
+      "role": null,
+      "clientWidth": 132,
+      "scrollWidth": 132
+    },
+    {
+      "selector": "#local-track-name",
+      "box": {
+        "x": 181.59375,
+        "y": 102.140625,
+        "width": 72,
+        "height": 17,
+        "top": 102.140625,
+        "right": 253.59375,
+        "bottom": 119.140625,
+        "left": 181.59375
+      },
+      "ink": {
+        "x": 181.59375,
+        "y": 102.140625,
+        "width": 72,
+        "height": 17,
+        "top": 102.140625,
+        "right": 253.59375,
+        "bottom": 119.140625,
+        "left": 181.59375
+      },
+      "text": "我的手绘赛道",
+      "title": "我的手绘赛道",
+      "label": null,
+      "role": null,
+      "clientWidth": 72,
+      "scrollWidth": 72
+    },
+    {
+      "selector": "#local-backup",
+      "box": {
+        "x": 21.59375,
+        "y": 148.140625,
+        "width": 856.8125,
+        "height": 16,
+        "top": 148.140625,
+        "right": 878.40625,
+        "bottom": 164.140625,
+        "left": 21.59375
+      },
+      "ink": {
+        "x": 21.59375,
+        "y": 148.140625,
+        "width": 275,
+        "height": 16,
+        "top": 148.140625,
+        "right": 296.59375,
+        "bottom": 164.140625,
+        "left": 21.59375
+      },
+      "text": "停止写入，已有局部草稿保留；当前内存修改请勿刷新。",
+      "title": "",
+      "label": null,
+      "role": "status",
+      "clientWidth": 857,
+      "scrollWidth": 857
+    },
+    {
+      "selector": "#local-status",
+      "box": {
+        "x": 21.59375,
+        "y": 532.484375,
+        "width": 856.8125,
+        "height": 20,
+        "top": 532.484375,
+        "right": 878.40625,
+        "bottom": 552.484375,
+        "left": 21.59375
+      },
+      "ink": {
+        "x": 21.59375,
+        "y": 532.484375,
+        "width": 720,
+        "height": 17,
+        "top": 532.484375,
+        "right": 741.59375,
+        "bottom": 549.484375,
+        "left": 21.59375
+      },
+      "text": "检测到其他标签或旧版存档变更，已停止保存。请先导出全部备份并关闭其他标签；刷新不会合并分支，仍冲突时需恢复一份一致备份。",
+      "title": "",
+      "label": null,
+      "role": "status",
+      "clientWidth": 857,
+      "scrollWidth": 857
+    },
+    {
+      "selector": ".local-footer",
+      "box": {
+        "x": 21.59375,
+        "y": 532.484375,
+        "width": 856.8125,
+        "height": 68,
+        "top": 532.484375,
+        "right": 878.40625,
+        "bottom": 600.484375,
+        "left": 21.59375
+      },
+      "ink": {
+        "x": 21.59375,
+        "y": 532.484375,
+        "width": 856.8125,
+        "height": 68,
+        "top": 532.484375,
+        "right": 878.40625,
+        "bottom": 600.484375,
+        "left": 21.59375
+      },
+      "text": "检测到其他标签或旧版存档变更，已停止保存。请先导出全部备份并关闭其他标签；刷新不会合并分支，仍冲突时需恢复一份一致备份。取消调整Esc撤销⌘ Z重做⌘ ⇧ Z采用本次调整Enter保存局部修改⌘ Enter",
+      "title": "",
+      "label": null,
+      "role": null,
+      "clientWidth": 857,
+      "scrollWidth": 857
+    }
+  ],
+  "controls": [
+    {
+      "id": "local-track-name",
+      "box": {
+        "x": 181.59375,
+        "y": 102.140625,
+        "width": 72,
+        "height": 17,
+        "top": 102.140625,
+        "right": 253.59375,
+        "bottom": 119.140625,
+        "left": 181.59375
+      },
+      "ink": {
+        "x": 181.59375,
+        "y": 102.140625,
+        "width": 72,
+        "height": 17,
+        "top": 102.140625,
+        "right": 253.59375,
+        "bottom": 119.140625,
+        "left": 181.59375
+      },
+      "text": "我的手绘赛道",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": null,
+      "keycaps": [],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "local-track-name",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-track-name",
+          "own": true
+        }
+      ],
+      "focus": true,
+      "style": {
+        "outline": "auto",
+        "outlineWidth": "1px",
+        "outlineColor": "rgb(0, 95, 204)",
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "local-cancel",
+      "box": {
+        "x": 21.59375,
+        "y": 562.484375,
+        "width": 119.8125,
+        "height": 38,
+        "top": 562.484375,
+        "right": 141.40625,
+        "bottom": 600.484375,
+        "left": 21.59375
+      },
+      "ink": {
+        "x": 29.59375,
+        "y": 570.484375,
+        "width": 103.8125,
+        "height": 22,
+        "top": 570.484375,
+        "right": 133.40625,
+        "bottom": 592.484375,
+        "left": 29.59375
+      },
+      "text": "取消调整Esc",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "Escape",
+      "keycaps": [
+        "Esc"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-cancel",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-cancel",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-cancel",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-cancel",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-cancel",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "local-undo",
+      "box": {
+        "x": 191.515625,
+        "y": 562.484375,
+        "width": 97.828125,
+        "height": 38,
+        "top": 562.484375,
+        "right": 289.34375,
+        "bottom": 600.484375,
+        "left": 191.515625
+      },
+      "ink": {
+        "x": 199.515625,
+        "y": 570.484375,
+        "width": 81.828125,
+        "height": 22,
+        "top": 570.484375,
+        "right": 281.34375,
+        "bottom": 592.484375,
+        "left": 199.515625
+      },
+      "text": "撤销⌘ Z",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "Meta+Z",
+      "keycaps": [
+        "⌘ Z"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-undo",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-undo",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-undo",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-undo",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-undo",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "local-redo",
+      "box": {
+        "x": 339.453125,
+        "y": 562.484375,
+        "width": 115.4375,
+        "height": 38,
+        "top": 562.484375,
+        "right": 454.890625,
+        "bottom": 600.484375,
+        "left": 339.453125
+      },
+      "ink": {
+        "x": 347.453125,
+        "y": 570.484375,
+        "width": 99.4375,
+        "height": 22,
+        "top": 570.484375,
+        "right": 446.890625,
+        "bottom": 592.484375,
+        "left": 347.453125
+      },
+      "text": "重做⌘ ⇧ Z",
+      "disabled": true,
+      "busy": null,
+      "shortcuts": "Meta+Shift+Z",
+      "keycaps": [
+        "⌘ ⇧ Z"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-redo",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-redo",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-redo",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-redo",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-redo",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "1",
+        "translate": "0px",
+        "opacity": "0.4",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "local-adopt",
+      "box": {
+        "x": 505,
+        "y": 562.484375,
+        "width": 155.015625,
+        "height": 38,
+        "top": 562.484375,
+        "right": 660.015625,
+        "bottom": 600.484375,
+        "left": 505
+      },
+      "ink": {
+        "x": 513,
+        "y": 570.484375,
+        "width": 139.015625,
+        "height": 22,
+        "top": 570.484375,
+        "right": 652.015625,
+        "bottom": 592.484375,
+        "left": 513
+      },
+      "text": "采用本次调整Enter",
+      "disabled": true,
+      "busy": "false",
+      "shortcuts": "Enter",
+      "keycaps": [
+        "Enter"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-adopt",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-adopt",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-adopt",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-adopt",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-adopt",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "1",
+        "translate": "0px",
+        "opacity": "0.4",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "local-save",
+      "box": {
+        "x": 710.125,
+        "y": 562.484375,
+        "width": 168.234375,
+        "height": 38,
+        "top": 562.484375,
+        "right": 878.359375,
+        "bottom": 600.484375,
+        "left": 710.125
+      },
+      "ink": {
+        "x": 718.125,
+        "y": 570.484375,
+        "width": 152.234375,
+        "height": 22,
+        "top": 570.484375,
+        "right": 870.359375,
+        "bottom": 592.484375,
+        "left": 718.125
+      },
+      "text": "保存局部修改⌘ Enter",
+      "disabled": true,
+      "busy": "false",
+      "shortcuts": "Meta+Enter",
+      "keycaps": [
+        "⌘ Enter"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-save",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-save",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-save",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-save",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-save",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(255, 246, 228)",
+        "background": "rgb(201, 80, 43)",
+        "color": "rgb(255, 246, 228)",
+        "transform": "none",
+        "scale": "1",
+        "translate": "0px",
+        "opacity": "0.4",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    }
+  ],
+  "roadText": [
+    {
+      "selector": "#local-status",
+      "R": 33.75,
+      "intersections": [
+        {
+          "char": "出",
+          "box": {
+            "x": 309.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 321.59375,
+            "bottom": 549.484375,
+            "left": 309.59375
+          },
+          "nearestRoadCenter": 31.993310395386313,
+          "intersects": true
+        },
+        {
+          "char": "全",
+          "box": {
+            "x": 321.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 333.59375,
+            "bottom": 549.484375,
+            "left": 321.59375
+          },
+          "nearestRoadCenter": 28.87709988988366,
+          "intersects": true
+        },
+        {
+          "char": "部",
+          "box": {
+            "x": 333.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 345.59375,
+            "bottom": 549.484375,
+            "left": 333.59375
+          },
+          "nearestRoadCenter": 26.076685188602873,
+          "intersects": true
+        },
+        {
+          "char": "备",
+          "box": {
+            "x": 345.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 357.59375,
+            "bottom": 549.484375,
+            "left": 345.59375
+          },
+          "nearestRoadCenter": 23.587662287798103,
+          "intersects": true
+        },
+        {
+          "char": "份",
+          "box": {
+            "x": 357.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 369.59375,
+            "bottom": 549.484375,
+            "left": 357.59375
+          },
+          "nearestRoadCenter": 21.408400162994074,
+          "intersects": true
+        },
+        {
+          "char": "并",
+          "box": {
+            "x": 369.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 381.59375,
+            "bottom": 549.484375,
+            "left": 369.59375
+          },
+          "nearestRoadCenter": 19.547876179694082,
+          "intersects": true
+        },
+        {
+          "char": "关",
+          "box": {
+            "x": 381.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 393.59375,
+            "bottom": 549.484375,
+            "left": 381.59375
+          },
+          "nearestRoadCenter": 17.98896476522435,
+          "intersects": true
+        },
+        {
+          "char": "闭",
+          "box": {
+            "x": 393.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 405.59375,
+            "bottom": 549.484375,
+            "left": 393.59375
+          },
+          "nearestRoadCenter": 16.728159755385885,
+          "intersects": true
+        },
+        {
+          "char": "其",
+          "box": {
+            "x": 405.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 417.59375,
+            "bottom": 549.484375,
+            "left": 405.59375
+          },
+          "nearestRoadCenter": 15.774375958945225,
+          "intersects": true
+        },
+        {
+          "char": "他",
+          "box": {
+            "x": 417.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 429.59375,
+            "bottom": 549.484375,
+            "left": 417.59375
+          },
+          "nearestRoadCenter": 15.120038594531108,
+          "intersects": true
+        },
+        {
+          "char": "标",
+          "box": {
+            "x": 429.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 441.59375,
+            "bottom": 549.484375,
+            "left": 429.59375
+          },
+          "nearestRoadCenter": 14.75797398558835,
+          "intersects": true
+        },
+        {
+          "char": "签",
+          "box": {
+            "x": 441.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 453.59375,
+            "bottom": 549.484375,
+            "left": 441.59375
+          },
+          "nearestRoadCenter": 14.688111081613659,
+          "intersects": true
+        },
+        {
+          "char": "；",
+          "box": {
+            "x": 453.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 465.59375,
+            "bottom": 549.484375,
+            "left": 453.59375
+          },
+          "nearestRoadCenter": 14.698482465864982,
+          "intersects": true
+        },
+        {
+          "char": "刷",
+          "box": {
+            "x": 465.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 477.59375,
+            "bottom": 549.484375,
+            "left": 465.59375
+          },
+          "nearestRoadCenter": 14.938205932519079,
+          "intersects": true
+        },
+        {
+          "char": "新",
+          "box": {
+            "x": 477.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 489.59375,
+            "bottom": 549.484375,
+            "left": 477.59375
+          },
+          "nearestRoadCenter": 15.470755398191484,
+          "intersects": true
+        },
+        {
+          "char": "不",
+          "box": {
+            "x": 489.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 501.59375,
+            "bottom": 549.484375,
+            "left": 489.59375
+          },
+          "nearestRoadCenter": 16.307507465485685,
+          "intersects": true
+        },
+        {
+          "char": "会",
+          "box": {
+            "x": 501.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 513.59375,
+            "bottom": 549.484375,
+            "left": 501.59375
+          },
+          "nearestRoadCenter": 17.4477621225817,
+          "intersects": true
+        },
+        {
+          "char": "合",
+          "box": {
+            "x": 513.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 525.59375,
+            "bottom": 549.484375,
+            "left": 513.59375
+          },
+          "nearestRoadCenter": 18.885231719311793,
+          "intersects": true
+        },
+        {
+          "char": "并",
+          "box": {
+            "x": 525.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 537.59375,
+            "bottom": 549.484375,
+            "left": 525.59375
+          },
+          "nearestRoadCenter": 20.625751847989136,
+          "intersects": true
+        },
+        {
+          "char": "分",
+          "box": {
+            "x": 537.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 549.59375,
+            "bottom": 549.484375,
+            "left": 537.59375
+          },
+          "nearestRoadCenter": 22.68089885142905,
+          "intersects": true
+        },
+        {
+          "char": "支",
+          "box": {
+            "x": 549.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 561.59375,
+            "bottom": 549.484375,
+            "left": 549.59375
+          },
+          "nearestRoadCenter": 25.041961389836715,
+          "intersects": true
+        },
+        {
+          "char": "，",
+          "box": {
+            "x": 561.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 573.59375,
+            "bottom": 549.484375,
+            "left": 561.59375
+          },
+          "nearestRoadCenter": 27.713544082813012,
+          "intersects": true
+        },
+        {
+          "char": "仍",
+          "box": {
+            "x": 573.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 585.59375,
+            "bottom": 549.484375,
+            "left": 573.59375
+          },
+          "nearestRoadCenter": 30.700268322648515,
+          "intersects": true
+        }
+      ],
+      "characters": [
+        {
+          "char": "检",
+          "box": {
+            "x": 21.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 33.59375,
+            "bottom": 549.484375,
+            "left": 21.59375
+          },
+          "nearestRoadCenter": 195.79535445345022,
+          "intersects": false
+        },
+        {
+          "char": "测",
+          "box": {
+            "x": 33.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 45.59375,
+            "bottom": 549.484375,
+            "left": 33.59375
+          },
+          "nearestRoadCenter": 186.27590152308997,
+          "intersects": false
+        },
+        {
+          "char": "到",
+          "box": {
+            "x": 45.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 57.59375,
+            "bottom": 549.484375,
+            "left": 45.59375
+          },
+          "nearestRoadCenter": 176.94399538030325,
+          "intersects": false
+        },
+        {
+          "char": "其",
+          "box": {
+            "x": 57.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 69.59375,
+            "bottom": 549.484375,
+            "left": 57.59375
+          },
+          "nearestRoadCenter": 167.75409959046024,
+          "intersects": false
+        },
+        {
+          "char": "他",
+          "box": {
+            "x": 69.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 81.59375,
+            "bottom": 549.484375,
+            "left": 69.59375
+          },
+          "nearestRoadCenter": 158.76574468441714,
+          "intersects": false
+        },
+        {
+          "char": "标",
+          "box": {
+            "x": 81.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 93.59375,
+            "bottom": 549.484375,
+            "left": 81.59375
+          },
+          "nearestRoadCenter": 149.9895468542998,
+          "intersects": false
+        },
+        {
+          "char": "签",
+          "box": {
+            "x": 93.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 105.59375,
+            "bottom": 549.484375,
+            "left": 93.59375
+          },
+          "nearestRoadCenter": 141.41763978430149,
+          "intersects": false
+        },
+        {
+          "char": "或",
+          "box": {
+            "x": 105.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 117.59375,
+            "bottom": 549.484375,
+            "left": 105.59375
+          },
+          "nearestRoadCenter": 133.05824009768756,
+          "intersects": false
+        },
+        {
+          "char": "旧",
+          "box": {
+            "x": 117.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 129.59375,
+            "bottom": 549.484375,
+            "left": 117.59375
+          },
+          "nearestRoadCenter": 124.92245133444813,
+          "intersects": false
+        },
+        {
+          "char": "版",
+          "box": {
+            "x": 129.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 141.59375,
+            "bottom": 549.484375,
+            "left": 129.59375
+          },
+          "nearestRoadCenter": 117.01597819257728,
+          "intersects": false
+        },
+        {
+          "char": "存",
+          "box": {
+            "x": 141.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 153.59375,
+            "bottom": 549.484375,
+            "left": 141.59375
+          },
+          "nearestRoadCenter": 109.34518660312648,
+          "intersects": false
+        },
+        {
+          "char": "档",
+          "box": {
+            "x": 153.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 165.59375,
+            "bottom": 549.484375,
+            "left": 153.59375
+          },
+          "nearestRoadCenter": 101.93456542100756,
+          "intersects": false
+        },
+        {
+          "char": "变",
+          "box": {
+            "x": 165.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 177.59375,
+            "bottom": 549.484375,
+            "left": 165.59375
+          },
+          "nearestRoadCenter": 94.76583138865638,
+          "intersects": false
+        },
+        {
+          "char": "更",
+          "box": {
+            "x": 177.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 189.59375,
+            "bottom": 549.484375,
+            "left": 177.59375
+          },
+          "nearestRoadCenter": 87.84021783127024,
+          "intersects": false
+        },
+        {
+          "char": "，",
+          "box": {
+            "x": 189.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 201.59375,
+            "bottom": 549.484375,
+            "left": 189.59375
+          },
+          "nearestRoadCenter": 81.19661097384889,
+          "intersects": false
+        },
+        {
+          "char": "已",
+          "box": {
+            "x": 201.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 213.59375,
+            "bottom": 549.484375,
+            "left": 201.59375
+          },
+          "nearestRoadCenter": 74.81664714346404,
+          "intersects": false
+        },
+        {
+          "char": "停",
+          "box": {
+            "x": 213.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 225.59375,
+            "bottom": 549.484375,
+            "left": 213.59375
+          },
+          "nearestRoadCenter": 68.7379496658965,
+          "intersects": false
+        },
+        {
+          "char": "止",
+          "box": {
+            "x": 225.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 237.59375,
+            "bottom": 549.484375,
+            "left": 225.59375
+          },
+          "nearestRoadCenter": 62.988868711761235,
+          "intersects": false
+        },
+        {
+          "char": "保",
+          "box": {
+            "x": 237.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 249.59375,
+            "bottom": 549.484375,
+            "left": 237.59375
+          },
+          "nearestRoadCenter": 57.563245468408866,
+          "intersects": false
+        },
+        {
+          "char": "存",
+          "box": {
+            "x": 249.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 261.59375,
+            "bottom": 549.484375,
+            "left": 249.59375
+          },
+          "nearestRoadCenter": 52.46912082488338,
+          "intersects": false
+        },
+        {
+          "char": "。",
+          "box": {
+            "x": 261.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 273.59375,
+            "bottom": 549.484375,
+            "left": 261.59375
+          },
+          "nearestRoadCenter": 47.70981702129674,
+          "intersects": false
+        },
+        {
+          "char": "请",
+          "box": {
+            "x": 273.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 285.59375,
+            "bottom": 549.484375,
+            "left": 273.59375
+          },
+          "nearestRoadCenter": 43.285743384891795,
+          "intersects": false
+        },
+        {
+          "char": "先",
+          "box": {
+            "x": 285.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 297.59375,
+            "bottom": 549.484375,
+            "left": 285.59375
+          },
+          "nearestRoadCenter": 39.19308841904434,
+          "intersects": false
+        },
+        {
+          "char": "导",
+          "box": {
+            "x": 297.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 309.59375,
+            "bottom": 549.484375,
+            "left": 297.59375
+          },
+          "nearestRoadCenter": 35.43036217013797,
+          "intersects": false
+        },
+        {
+          "char": "出",
+          "box": {
+            "x": 309.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 321.59375,
+            "bottom": 549.484375,
+            "left": 309.59375
+          },
+          "nearestRoadCenter": 31.993310395386313,
+          "intersects": true
+        },
+        {
+          "char": "全",
+          "box": {
+            "x": 321.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 333.59375,
+            "bottom": 549.484375,
+            "left": 321.59375
+          },
+          "nearestRoadCenter": 28.87709988988366,
+          "intersects": true
+        },
+        {
+          "char": "部",
+          "box": {
+            "x": 333.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 345.59375,
+            "bottom": 549.484375,
+            "left": 333.59375
+          },
+          "nearestRoadCenter": 26.076685188602873,
+          "intersects": true
+        },
+        {
+          "char": "备",
+          "box": {
+            "x": 345.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 357.59375,
+            "bottom": 549.484375,
+            "left": 345.59375
+          },
+          "nearestRoadCenter": 23.587662287798103,
+          "intersects": true
+        },
+        {
+          "char": "份",
+          "box": {
+            "x": 357.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 369.59375,
+            "bottom": 549.484375,
+            "left": 357.59375
+          },
+          "nearestRoadCenter": 21.408400162994074,
+          "intersects": true
+        },
+        {
+          "char": "并",
+          "box": {
+            "x": 369.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 381.59375,
+            "bottom": 549.484375,
+            "left": 369.59375
+          },
+          "nearestRoadCenter": 19.547876179694082,
+          "intersects": true
+        },
+        {
+          "char": "关",
+          "box": {
+            "x": 381.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 393.59375,
+            "bottom": 549.484375,
+            "left": 381.59375
+          },
+          "nearestRoadCenter": 17.98896476522435,
+          "intersects": true
+        },
+        {
+          "char": "闭",
+          "box": {
+            "x": 393.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 405.59375,
+            "bottom": 549.484375,
+            "left": 393.59375
+          },
+          "nearestRoadCenter": 16.728159755385885,
+          "intersects": true
+        },
+        {
+          "char": "其",
+          "box": {
+            "x": 405.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 417.59375,
+            "bottom": 549.484375,
+            "left": 405.59375
+          },
+          "nearestRoadCenter": 15.774375958945225,
+          "intersects": true
+        },
+        {
+          "char": "他",
+          "box": {
+            "x": 417.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 429.59375,
+            "bottom": 549.484375,
+            "left": 417.59375
+          },
+          "nearestRoadCenter": 15.120038594531108,
+          "intersects": true
+        },
+        {
+          "char": "标",
+          "box": {
+            "x": 429.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 441.59375,
+            "bottom": 549.484375,
+            "left": 429.59375
+          },
+          "nearestRoadCenter": 14.75797398558835,
+          "intersects": true
+        },
+        {
+          "char": "签",
+          "box": {
+            "x": 441.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 453.59375,
+            "bottom": 549.484375,
+            "left": 441.59375
+          },
+          "nearestRoadCenter": 14.688111081613659,
+          "intersects": true
+        },
+        {
+          "char": "；",
+          "box": {
+            "x": 453.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 465.59375,
+            "bottom": 549.484375,
+            "left": 453.59375
+          },
+          "nearestRoadCenter": 14.698482465864982,
+          "intersects": true
+        },
+        {
+          "char": "刷",
+          "box": {
+            "x": 465.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 477.59375,
+            "bottom": 549.484375,
+            "left": 465.59375
+          },
+          "nearestRoadCenter": 14.938205932519079,
+          "intersects": true
+        },
+        {
+          "char": "新",
+          "box": {
+            "x": 477.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 489.59375,
+            "bottom": 549.484375,
+            "left": 477.59375
+          },
+          "nearestRoadCenter": 15.470755398191484,
+          "intersects": true
+        },
+        {
+          "char": "不",
+          "box": {
+            "x": 489.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 501.59375,
+            "bottom": 549.484375,
+            "left": 489.59375
+          },
+          "nearestRoadCenter": 16.307507465485685,
+          "intersects": true
+        },
+        {
+          "char": "会",
+          "box": {
+            "x": 501.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 513.59375,
+            "bottom": 549.484375,
+            "left": 501.59375
+          },
+          "nearestRoadCenter": 17.4477621225817,
+          "intersects": true
+        },
+        {
+          "char": "合",
+          "box": {
+            "x": 513.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 525.59375,
+            "bottom": 549.484375,
+            "left": 513.59375
+          },
+          "nearestRoadCenter": 18.885231719311793,
+          "intersects": true
+        },
+        {
+          "char": "并",
+          "box": {
+            "x": 525.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 537.59375,
+            "bottom": 549.484375,
+            "left": 525.59375
+          },
+          "nearestRoadCenter": 20.625751847989136,
+          "intersects": true
+        },
+        {
+          "char": "分",
+          "box": {
+            "x": 537.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 549.59375,
+            "bottom": 549.484375,
+            "left": 537.59375
+          },
+          "nearestRoadCenter": 22.68089885142905,
+          "intersects": true
+        },
+        {
+          "char": "支",
+          "box": {
+            "x": 549.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 561.59375,
+            "bottom": 549.484375,
+            "left": 549.59375
+          },
+          "nearestRoadCenter": 25.041961389836715,
+          "intersects": true
+        },
+        {
+          "char": "，",
+          "box": {
+            "x": 561.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 573.59375,
+            "bottom": 549.484375,
+            "left": 561.59375
+          },
+          "nearestRoadCenter": 27.713544082813012,
+          "intersects": true
+        },
+        {
+          "char": "仍",
+          "box": {
+            "x": 573.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 585.59375,
+            "bottom": 549.484375,
+            "left": 573.59375
+          },
+          "nearestRoadCenter": 30.700268322648515,
+          "intersects": true
+        },
+        {
+          "char": "冲",
+          "box": {
+            "x": 585.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 597.59375,
+            "bottom": 549.484375,
+            "left": 585.59375
+          },
+          "nearestRoadCenter": 34.01032542147138,
+          "intersects": false
+        },
+        {
+          "char": "突",
+          "box": {
+            "x": 597.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 609.59375,
+            "bottom": 549.484375,
+            "left": 597.59375
+          },
+          "nearestRoadCenter": 37.64708918153456,
+          "intersects": false
+        },
+        {
+          "char": "时",
+          "box": {
+            "x": 609.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 621.59375,
+            "bottom": 549.484375,
+            "left": 609.59375
+          },
+          "nearestRoadCenter": 41.60903757090242,
+          "intersects": false
+        },
+        {
+          "char": "需",
+          "box": {
+            "x": 621.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 633.59375,
+            "bottom": 549.484375,
+            "left": 621.59375
+          },
+          "nearestRoadCenter": 45.89931476540929,
+          "intersects": false
+        },
+        {
+          "char": "恢",
+          "box": {
+            "x": 633.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 645.59375,
+            "bottom": 549.484375,
+            "left": 633.59375
+          },
+          "nearestRoadCenter": 50.51944023330371,
+          "intersects": false
+        },
+        {
+          "char": "复",
+          "box": {
+            "x": 645.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 657.59375,
+            "bottom": 549.484375,
+            "left": 645.59375
+          },
+          "nearestRoadCenter": 55.47259344324093,
+          "intersects": false
+        },
+        {
+          "char": "一",
+          "box": {
+            "x": 657.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 669.59375,
+            "bottom": 549.484375,
+            "left": 657.59375
+          },
+          "nearestRoadCenter": 60.76857977795138,
+          "intersects": false
+        },
+        {
+          "char": "份",
+          "box": {
+            "x": 669.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 681.59375,
+            "bottom": 549.484375,
+            "left": 669.59375
+          },
+          "nearestRoadCenter": 66.39503345769653,
+          "intersects": false
+        },
+        {
+          "char": "一",
+          "box": {
+            "x": 681.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 693.59375,
+            "bottom": 549.484375,
+            "left": 681.59375
+          },
+          "nearestRoadCenter": 72.34041234337097,
+          "intersects": false
+        },
+        {
+          "char": "致",
+          "box": {
+            "x": 693.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 705.59375,
+            "bottom": 549.484375,
+            "left": 693.59375
+          },
+          "nearestRoadCenter": 78.62558526967145,
+          "intersects": false
+        },
+        {
+          "char": "备",
+          "box": {
+            "x": 705.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 717.59375,
+            "bottom": 549.484375,
+            "left": 705.59375
+          },
+          "nearestRoadCenter": 85.22362683352071,
+          "intersects": false
+        },
+        {
+          "char": "份",
+          "box": {
+            "x": 717.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 729.59375,
+            "bottom": 549.484375,
+            "left": 717.59375
+          },
+          "nearestRoadCenter": 92.14464442110763,
+          "intersects": false
+        },
+        {
+          "char": "。",
+          "box": {
+            "x": 729.59375,
+            "y": 532.484375,
+            "width": 12,
+            "height": 17,
+            "top": 532.484375,
+            "right": 741.59375,
+            "bottom": 549.484375,
+            "left": 729.59375
+          },
+          "nearestRoadCenter": 99.3515228707179,
+          "intersects": false
+        }
+      ]
+    },
+    {
+      "selector": "#local-backup",
+      "R": 33.75,
+      "intersections": [],
+      "characters": [
+        {
+          "char": "停",
+          "box": {
+            "x": 21.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 32.59375,
+            "bottom": 164.140625,
+            "left": 21.59375
+          },
+          "nearestRoadCenter": 207.92170802503227,
+          "intersects": false
+        },
+        {
+          "char": "止",
+          "box": {
+            "x": 32.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 43.59375,
+            "bottom": 164.140625,
+            "left": 32.59375
+          },
+          "nearestRoadCenter": 199.45080317416117,
+          "intersects": false
+        },
+        {
+          "char": "写",
+          "box": {
+            "x": 43.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 54.59375,
+            "bottom": 164.140625,
+            "left": 43.59375
+          },
+          "nearestRoadCenter": 191.1575391071317,
+          "intersects": false
+        },
+        {
+          "char": "入",
+          "box": {
+            "x": 54.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 65.59375,
+            "bottom": 164.140625,
+            "left": 54.59375
+          },
+          "nearestRoadCenter": 182.97887783640618,
+          "intersects": false
+        },
+        {
+          "char": "，",
+          "box": {
+            "x": 65.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 76.59375,
+            "bottom": 164.140625,
+            "left": 65.59375
+          },
+          "nearestRoadCenter": 174.96810970426796,
+          "intersects": false
+        },
+        {
+          "char": "已",
+          "box": {
+            "x": 76.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 87.59375,
+            "bottom": 164.140625,
+            "left": 76.59375
+          },
+          "nearestRoadCenter": 167.1380043238428,
+          "intersects": false
+        },
+        {
+          "char": "有",
+          "box": {
+            "x": 87.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 98.59375,
+            "bottom": 164.140625,
+            "left": 87.59375
+          },
+          "nearestRoadCenter": 159.46730165342288,
+          "intersects": false
+        },
+        {
+          "char": "局",
+          "box": {
+            "x": 98.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 109.59375,
+            "bottom": 164.140625,
+            "left": 98.59375
+          },
+          "nearestRoadCenter": 151.96644967247363,
+          "intersects": false
+        },
+        {
+          "char": "部",
+          "box": {
+            "x": 109.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 120.59375,
+            "bottom": 164.140625,
+            "left": 109.59375
+          },
+          "nearestRoadCenter": 144.64673396698,
+          "intersects": false
+        },
+        {
+          "char": "草",
+          "box": {
+            "x": 120.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 131.59375,
+            "bottom": 164.140625,
+            "left": 120.59375
+          },
+          "nearestRoadCenter": 137.51482779899843,
+          "intersects": false
+        },
+        {
+          "char": "稿",
+          "box": {
+            "x": 131.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 142.59375,
+            "bottom": 164.140625,
+            "left": 131.59375
+          },
+          "nearestRoadCenter": 130.57421976768399,
+          "intersects": false
+        },
+        {
+          "char": "保",
+          "box": {
+            "x": 142.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 153.59375,
+            "bottom": 164.140625,
+            "left": 142.59375
+          },
+          "nearestRoadCenter": 123.82645030385699,
+          "intersects": false
+        },
+        {
+          "char": "留",
+          "box": {
+            "x": 153.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 164.59375,
+            "bottom": 164.140625,
+            "left": 153.59375
+          },
+          "nearestRoadCenter": 117.27223156461143,
+          "intersects": false
+        },
+        {
+          "char": "；",
+          "box": {
+            "x": 164.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 175.59375,
+            "bottom": 164.140625,
+            "left": 164.59375
+          },
+          "nearestRoadCenter": 110.91332004728123,
+          "intersects": false
+        },
+        {
+          "char": "当",
+          "box": {
+            "x": 175.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 186.59375,
+            "bottom": 164.140625,
+            "left": 175.59375
+          },
+          "nearestRoadCenter": 104.77685499442272,
+          "intersects": false
+        },
+        {
+          "char": "前",
+          "box": {
+            "x": 186.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 197.59375,
+            "bottom": 164.140625,
+            "left": 186.59375
+          },
+          "nearestRoadCenter": 98.8554783558272,
+          "intersects": false
+        },
+        {
+          "char": "内",
+          "box": {
+            "x": 197.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 208.59375,
+            "bottom": 164.140625,
+            "left": 197.59375
+          },
+          "nearestRoadCenter": 93.14830047438072,
+          "intersects": false
+        },
+        {
+          "char": "存",
+          "box": {
+            "x": 208.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 219.59375,
+            "bottom": 164.140625,
+            "left": 208.59375
+          },
+          "nearestRoadCenter": 87.708298035609,
+          "intersects": false
+        },
+        {
+          "char": "修",
+          "box": {
+            "x": 219.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 230.59375,
+            "bottom": 164.140625,
+            "left": 219.59375
+          },
+          "nearestRoadCenter": 82.50796172403359,
+          "intersects": false
+        },
+        {
+          "char": "改",
+          "box": {
+            "x": 230.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 241.59375,
+            "bottom": 164.140625,
+            "left": 230.59375
+          },
+          "nearestRoadCenter": 77.58864898605944,
+          "intersects": false
+        },
+        {
+          "char": "请",
+          "box": {
+            "x": 241.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 252.59375,
+            "bottom": 164.140625,
+            "left": 241.59375
+          },
+          "nearestRoadCenter": 72.91564729117515,
+          "intersects": false
+        },
+        {
+          "char": "勿",
+          "box": {
+            "x": 252.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 263.59375,
+            "bottom": 164.140625,
+            "left": 252.59375
+          },
+          "nearestRoadCenter": 68.5262081826821,
+          "intersects": false
+        },
+        {
+          "char": "刷",
+          "box": {
+            "x": 263.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 274.59375,
+            "bottom": 164.140625,
+            "left": 263.59375
+          },
+          "nearestRoadCenter": 64.39452331017769,
+          "intersects": false
+        },
+        {
+          "char": "新",
+          "box": {
+            "x": 274.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 285.59375,
+            "bottom": 164.140625,
+            "left": 274.59375
+          },
+          "nearestRoadCenter": 60.521110059495015,
+          "intersects": false
+        },
+        {
+          "char": "。",
+          "box": {
+            "x": 285.59375,
+            "y": 148.140625,
+            "width": 11,
+            "height": 16,
+            "top": 148.140625,
+            "right": 296.59375,
+            "bottom": 164.140625,
+            "left": 285.59375
+          },
+          "nearestRoadCenter": 56.915695730389544,
+          "intersects": false
+        }
+      ]
+    }
+  ],
+  "focus": "local-track-name",
+  "overflow": false,
+  "state": {
+    "mode": "editing",
+    "storage": {
+      "writable": false,
+      "error": "conflict",
+      "source": "default",
+      "persisted": true
+    },
+    "local": {
+      "active": true,
+      "busy": null,
+      "dirty": true,
+      "pending": false
+    },
+    "motion": {
+      "active": 0,
+      "reduced": true
+    }
+  }
+}

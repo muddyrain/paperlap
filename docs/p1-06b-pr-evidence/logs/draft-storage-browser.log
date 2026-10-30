@@ -1,0 +1,5 @@
+PASS draft-read/replace: explicit confirmation leaves a nonempty editor through the original route without touching unknown backups
+PASS draft-read/create: explicit confirmation leaves a nonempty editor through the original route without touching unknown backups
+PASS storage-getter/replace: explicit confirmation leaves a nonempty editor through the original route without touching unknown backups
+PASS storage-getter/create: explicit confirmation leaves a nonempty editor through the original route without touching unknown backups
+Passed 4 storage read rejection browser checks

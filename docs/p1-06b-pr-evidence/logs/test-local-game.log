@@ -1,0 +1,26 @@
+
+> paperlap@1.0.0 test:local-game
+> node tests/local-game-browser.mjs
+
+PASS wide 1366: two real bends, exact remote/seam points, undo/redo, reliable save/reload, A/B PB, illegal rejection
+PASS s 1280: two real bends, exact remote/seam points, undo/redo, reliable save/reload, A/B PB, illegal rejection
+PASS tight 900: two real bends, exact remote/seam points, undo/redo, reliable save/reload, A/B PB, illegal rejection
+PASS menu: L entry, safe parent return and focus without starting
+PASS book-game: L entry, safe parent return and focus without starting
+PASS book-menu: L entry, safe parent return and focus without starting
+PASS running L freezes vehicle/time/audio/input; cancel preserves exact paused state without starting
+PASS Esc cancels preview first, defaults to keep, explicitly discards only local edits
+PASS adopted A survives partial B, blur/resize/pointercancel/hidden/reload; recovery/later/discard and exact history work
+PASS uid: stale local draft stays untouched and never attaches
+PASS geometryIdentity: stale local draft stays untouched and never attaches
+PASS geometryDigest: stale local draft stays untouched and never attaches
+PASS algorithmVersion: stale local draft stays untouched and never attaches
+PASS formal quota failure preserves geometry/identity/PB/candidate/draft without success; retry commits
+PASS draft quota preserves earlier accepted backup; known cleanup failure cannot silently discard
+PASS initial local draft read denial permits explicit memory-only discard without deleting unknown backup
+PASS prepare scene failure preserves draft and safely keeps old state or reloads durable new revision
+PASS apply scene failure preserves draft and safely keeps old state or reloads durable new revision
+PASS real second tab cannot edit without Web Lock; reload after owner close acquires it
+PASS real external V3 conflict disables formal local save and preserves both branches
+PASS no-op avoids writes; local scope blocks game keys, keyboard pencil focus works, E remains whole redraw
+PASS L respects native text/modifier/IME/repeat guards; Space adopts and native Enter keeps local edits

@@ -187,6 +187,7 @@ const local = new LocalEditor(scene, book, board, motion, backing, {
   cancel: () => menu.cancelEdit(),
   later: () => menu.deferEditing(),
   saved: (message) => {
+    if (message) saveHistory.localDraftNotice(message);
     menu.editFinished();
     trackbook.render();
     updateBest();

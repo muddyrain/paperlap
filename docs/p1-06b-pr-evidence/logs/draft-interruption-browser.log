@@ -1,0 +1,6 @@
+PASS reload: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes
+PASS pagehide: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes
+PASS blur: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes
+PASS resize: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes
+PASS pointercancel: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes
+Passed 5 interruption browser checks

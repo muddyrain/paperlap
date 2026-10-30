@@ -1,0 +1,34 @@
+[
+  {
+    "command": "node tests/draft-browser.mjs",
+    "phase": "baseline",
+    "seconds": 378.41,
+    "exit": 0,
+    "passed": 28,
+    "last_scene": "PASS reduced-motion preserves recovery, history and keyboard focus without timing-dependent data callbacks"
+  },
+  {
+    "command": "node tests/draft-storage-browser.mjs",
+    "phase": "baseline",
+    "seconds": 53.25,
+    "exit": 0,
+    "passed": 4,
+    "last_scene": "PASS storage-getter/create: explicit confirmation leaves a nonempty editor through the original route without touching unknown backups"
+  },
+  {
+    "command": "node tests/draft-interruption-browser.mjs",
+    "phase": "baseline",
+    "seconds": 72.21,
+    "exit": 0,
+    "passed": 5,
+    "last_scene": "PASS pointercancel: unfinished B retains completed A through periodic checkpoint, interruption, reload and undo without official writes"
+  },
+  {
+    "command": "node tests/local-game-browser.mjs",
+    "phase": "baseline",
+    "seconds": 99.32,
+    "exit": 1,
+    "passed": 17,
+    "last_scene": "PASS prepare scene failure preserves draft and safely keeps old state or reloads durable new revision"
+  }
+]

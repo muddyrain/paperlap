@@ -1,0 +1,1136 @@
+{
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "elements": [
+    {
+      "selector": ".board",
+      "box": {
+        "x": 0,
+        "y": 81.25,
+        "width": 900,
+        "height": 537.5,
+        "top": 81.25,
+        "right": 900,
+        "bottom": 618.75,
+        "left": 0
+      },
+      "ink": {
+        "x": 0,
+        "y": 81.25,
+        "width": 900,
+        "height": 537.5,
+        "top": 81.25,
+        "right": 900,
+        "bottom": 618.75,
+        "left": 0
+      },
+      "text": "\n \n 当前赛道：晨光绕湖连续弯道局部调整与历史纪录保护的长名称赛道晨光绕湖连续弯道局部调整与历史自由试跑存档未保存或只读 · 查看说明\n 本圈00:00.00个人最佳--:--.--☆旧纪录（未验证）00:18.55\n 新建赛道目标赛道：撤销⌘ Z重做⌘ ⇧ Z按住画一圈 · 起点附近松开 · 自动修圆\n 赛道本T菜单Esc\n \n ↑ 加速↓ 刹车←→ 转向R 重来 · Esc 菜单准备试跑方向键或 WASD 驾驶，按住 ↑ 加速，弯前松油或刹车。开始试跑Space已暂停车辆和计时都已暂停继续试跑Space声音局部调整L编辑当前E重新开始R\n 取消编辑Esc重新绘制R保存修改并试跑Enter ↵\n 画面加载失败请重新加载以恢复已保存的赛道。重新加载\n DRAW A LITTLE. DRIVE A LITTLE.\n\n      PAPERLAP / 路线收藏我的赛道本关闭Esc\n      1 / 20 条赛道新建赛道N局部调整当前赛道L另一个标签正在管理此存档。本标签只读；请关闭写入标签后刷新重试。↑↓ 选路线 · Enter 使用 · 切换后等待开始晨光绕湖连续弯道局部调整与历史纪录保护的长名称赛道晨光绕湖连续弯道局部调整与历史暂无纪录旧纪录（未验证）00:18.55当前赛道Enter重命名删除\n      赛道名称（最多 40 个字符）取消Esc保存名称Enter\n      将删除这条赛道及其全部纪录，其他赛道和旧归档保留。取消Esc确认删除\n      \n      关闭Esc\n      \n      \n        \n        重新开始R\n        我的赛道本T\n        编辑当前赛道E\n        局部调整L\n        \n        操作说明\n      \n      \n        驾驶↑ / W 加速 · ↓ / S 刹车← / A、→ / D 转向\n        游戏区域Space 开始 / 暂停 / 继续R 重新开始 · T 赛道本E 整圈重画 · L 局部调整 · Esc 游戏菜单\n        赛道本与绘图N 新建 · ↑↓ 选择焦点 · Enter 使用赛道绘图：Ctrl / ⌘ Z 撤销 · Ctrl / ⌘ Shift Z 重做Enter 保存 · R 重画 · Esc 取消 / 确认放弃\n      局部调整拖动弯道，松手校验；Enter 采用到历史Ctrl / ⌘ Enter 正式保存；撤销/重做同绘图Esc 先取消预览，再确认放弃；保存后等待开始按钮上的 Enter / Space 为原生操作。切换赛道等待开始；离开窗口会暂停，恢复焦点不会自动继续。返回菜单Esc\n      尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。继续绘制Esc放弃修改\n      找到上次的绘制继续上次绘制放弃草稿暂不处理Esc局部调整目标赛道：拖动道路调整一个弯道 · 虚线是原路线，黄色是影响范围，灰色起点区受保护取消调整Esc撤销⌘ Z重做⌘ ⇧ Z采用本次调整Enter保存局部修改⌘ Enter找到上次的局部调整继续只恢复合法编辑路线，不会覆盖正式赛道或起跑。刷新恢复最近一步撤销/重做，会话内可撤销 24 次。继续局部调整放弃草稿暂不处理Esc纪录历史与存档旧纪录（旧几何身份，未验证）已完整保留，不与当前个人最佳比较。不同规则与孤立归档在下方逐项列出。V1/V2 是升级前备份，旧版不会看到 V3 新作品。恢复前请导出所有键并关闭其他标签；本游戏不会自动删除或覆盖旧键、损坏原文。返回Esc导出全部存档备份重新加载 / 重试升级",
+      "title": "",
+      "label": "纸上飞驰赛车游戏",
+      "role": null,
+      "clientWidth": 900,
+      "scrollWidth": 900
+    },
+    {
+      "selector": ".mode-note",
+      "box": {
+        "x": 20.94819450378418,
+        "y": 95.59429931640625,
+        "width": 266.9005126953125,
+        "height": 80.9207763671875,
+        "top": 95.59429931640625,
+        "right": 287.8487071990967,
+        "bottom": 176.51507568359375,
+        "left": 20.94819450378418
+      },
+      "ink": {
+        "x": 31.25454330444336,
+        "y": 91.90048217773438,
+        "width": 811.1096801757812,
+        "height": 74.81315612792969,
+        "top": 91.90048217773438,
+        "right": 842.3642234802246,
+        "bottom": 166.71363830566406,
+        "left": 31.25454330444336
+      },
+      "text": "当前赛道：晨光绕湖连续弯道局部调整与历史纪录保护的长名称赛道晨光绕湖连续弯道局部调整与历史自由试跑存档未保存或只读 · 查看说明",
+      "title": "",
+      "label": null,
+      "role": null,
+      "clientWidth": 266,
+      "scrollWidth": 266
+    },
+    {
+      "selector": ".timing",
+      "box": {
+        "x": 334.7717590332031,
+        "y": 97.10420989990234,
+        "width": 230.45645141601562,
+        "height": 67.79157257080078,
+        "top": 97.10420989990234,
+        "right": 565.2282104492188,
+        "bottom": 164.89578247070312,
+        "left": 334.7717590332031
+      },
+      "ink": {
+        "x": 351.8062438964844,
+        "y": 101.50204467773438,
+        "width": 208.93209838867188,
+        "height": 88.36520385742188,
+        "top": 101.50204467773438,
+        "right": 560.7383422851562,
+        "bottom": 189.86724853515625,
+        "left": 351.8062438964844
+      },
+      "text": "本圈00:00.00个人最佳--:--.--☆旧纪录（未验证）00:18.55",
+      "title": "",
+      "label": null,
+      "role": null,
+      "clientWidth": 230,
+      "scrollWidth": 230
+    },
+    {
+      "selector": "#track-name",
+      "box": {
+        "x": 122.05497741699219,
+        "y": 102.76775360107422,
+        "width": 155.00987243652344,
+        "height": 26.991477966308594,
+        "top": 102.76775360107422,
+        "right": 277.0648498535156,
+        "bottom": 129.7592315673828,
+        "left": 122.05497741699219
+      },
+      "ink": {
+        "x": 122.03752899169922,
+        "y": 91.90048217773438,
+        "width": 720.32666015625,
+        "height": 37.561920166015625,
+        "top": 91.90048217773438,
+        "right": 842.3641891479492,
+        "bottom": 129.46240234375,
+        "left": 122.03752899169922
+      },
+      "text": "晨光绕湖连续弯道局部调整与历史纪录保护的长名称赛道晨光绕湖连续弯道局部调整与历史",
+      "title": "晨光绕湖连续弯道局部调整与历史纪录保护的长名称赛道晨光绕湖连续弯道局部调整与历史",
+      "label": null,
+      "role": null,
+      "clientWidth": 155,
+      "scrollWidth": 720
+    },
+    {
+      "selector": "#record-history-open",
+      "box": {
+        "x": 438.9540710449219,
+        "y": 168.0185546875,
+        "width": 121.78427124023438,
+        "height": 21.84869384765625,
+        "top": 168.0185546875,
+        "right": 560.7383422851562,
+        "bottom": 189.86724853515625,
+        "left": 438.9540710449219
+      },
+      "ink": {
+        "x": 445.9818115234375,
+        "y": 172.06732177734375,
+        "width": 107.728759765625,
+        "height": 13.75115966796875,
+        "top": 172.06732177734375,
+        "right": 553.7105712890625,
+        "bottom": 185.8184814453125,
+        "left": 445.9818115234375
+      },
+      "text": "旧纪录（未验证）00:18.55",
+      "title": "查看全部旧纪录（旧几何身份，未验证）及存档备份",
+      "label": null,
+      "role": null,
+      "clientWidth": 122,
+      "scrollWidth": 122
+    },
+    {
+      "selector": "#storage-state",
+      "box": {
+        "x": 67.81898498535156,
+        "y": 147.6481170654297,
+        "width": 118.77864074707031,
+        "height": 19.065521240234375,
+        "top": 147.6481170654297,
+        "right": 186.59762573242188,
+        "bottom": 166.71363830566406,
+        "left": 67.81898498535156
+      },
+      "ink": {
+        "x": 67.85389709472656,
+        "y": 149.64781188964844,
+        "width": 118.70883178710938,
+        "height": 15.066131591796875,
+        "top": 149.64781188964844,
+        "right": 186.56272888183594,
+        "bottom": 164.7139434814453,
+        "left": 67.85389709472656
+      },
+      "text": "存档未保存或只读 · 查看说明",
+      "title": "另一个标签正在管理此存档。本标签只读；请关闭写入标签后刷新重试。",
+      "label": null,
+      "role": null,
+      "clientWidth": 119,
+      "scrollWidth": 119
+    }
+  ],
+  "controls": [
+    {
+      "id": "storage-state",
+      "box": {
+        "x": 67.81898498535156,
+        "y": 147.6481170654297,
+        "width": 118.77864074707031,
+        "height": 19.065521240234375,
+        "top": 147.6481170654297,
+        "right": 186.59762573242188,
+        "bottom": 166.71363830566406,
+        "left": 67.81898498535156
+      },
+      "ink": {
+        "x": 67.85389709472656,
+        "y": 149.64781188964844,
+        "width": 118.70883178710938,
+        "height": 15.066131591796875,
+        "top": 149.64781188964844,
+        "right": 186.56272888183594,
+        "bottom": 164.7139434814453,
+        "left": 67.85389709472656
+      },
+      "text": "存档未保存或只读 · 查看说明",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": null,
+      "keycaps": [],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "mode-note paper",
+          "own": false
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "storage-state",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "mode-note paper",
+          "own": false
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(155, 75, 48)",
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(155, 75, 48)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "record-history-open",
+      "box": {
+        "x": 438.9540710449219,
+        "y": 168.0185546875,
+        "width": 121.78427124023438,
+        "height": 21.84869384765625,
+        "top": 168.0185546875,
+        "right": 560.7383422851562,
+        "bottom": 189.86724853515625,
+        "left": 438.9540710449219
+      },
+      "ink": {
+        "x": 445.9818115234375,
+        "y": 172.06732177734375,
+        "width": 107.728759765625,
+        "height": 13.75115966796875,
+        "top": 172.06732177734375,
+        "right": 553.7105712890625,
+        "bottom": 185.8184814453125,
+        "left": 445.9818115234375
+      },
+      "text": "旧纪录（未验证）00:18.55",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": null,
+      "keycaps": [],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "record-history-open",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "record-history-open",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "trackbook-open",
+      "box": {
+        "x": 621.59375,
+        "y": 97.90625,
+        "width": 126,
+        "height": 41,
+        "top": 97.90625,
+        "right": 747.59375,
+        "bottom": 138.90625,
+        "left": 621.59375
+      },
+      "ink": {
+        "x": 631.59375,
+        "y": 105.90625,
+        "width": 106,
+        "height": 25,
+        "top": 105.90625,
+        "right": 737.59375,
+        "bottom": 130.90625,
+        "left": 631.59375
+      },
+      "text": "赛道本T",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "T",
+      "keycaps": [
+        "T"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "trackbook-open",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "trackbook-open",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "trackbook-open",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "trackbook-open",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "pause",
+      "box": {
+        "x": 755.59375,
+        "y": 97.90625,
+        "width": 122.8125,
+        "height": 41,
+        "top": 97.90625,
+        "right": 878.40625,
+        "bottom": 138.90625,
+        "left": 755.59375
+      },
+      "ink": {
+        "x": 765.59375,
+        "y": 105.90625,
+        "width": 102.8125,
+        "height": 25,
+        "top": 105.90625,
+        "right": 868.40625,
+        "bottom": 130.90625,
+        "left": 765.59375
+      },
+      "text": "菜单Esc",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "Escape",
+      "keycaps": [
+        "Esc"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "pause",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "pause",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "pause",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "pause",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "start",
+      "box": {
+        "x": 109.59375,
+        "y": 561.40625,
+        "width": 158.015625,
+        "height": 34,
+        "top": 561.40625,
+        "right": 267.609375,
+        "bottom": 595.40625,
+        "left": 109.59375
+      },
+      "ink": {
+        "x": 119.59375,
+        "y": 567.40625,
+        "width": 138.015625,
+        "height": 22,
+        "top": 567.40625,
+        "right": 257.609375,
+        "bottom": 589.40625,
+        "left": 119.59375
+      },
+      "text": "开始试跑Space",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "Space",
+      "keycaps": [
+        "Space"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "start",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "start",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "button-key",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(255, 246, 228)",
+        "background": "rgb(201, 80, 43)",
+        "color": "rgb(255, 246, 228)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "sound",
+      "box": {
+        "x": 356.40625,
+        "y": 558.40625,
+        "width": 81,
+        "height": 40,
+        "top": 558.40625,
+        "right": 437.40625,
+        "bottom": 598.40625,
+        "left": 356.40625
+      },
+      "ink": {
+        "x": 368.40625,
+        "y": 567.40625,
+        "width": 57,
+        "height": 22,
+        "top": 567.40625,
+        "right": 425.40625,
+        "bottom": 589.40625,
+        "left": 368.40625
+      },
+      "text": "声音",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": null,
+      "keycaps": [],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "sound",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "sound",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "sound",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "sound",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "sound",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "sound",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "sound",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "local-edit",
+      "box": {
+        "x": 447.40625,
+        "y": 558.40625,
+        "width": 137,
+        "height": 40,
+        "top": 558.40625,
+        "right": 584.40625,
+        "bottom": 598.40625,
+        "left": 447.40625
+      },
+      "ink": {
+        "x": 459.40625,
+        "y": 567.40625,
+        "width": 113,
+        "height": 22,
+        "top": 567.40625,
+        "right": 572.40625,
+        "bottom": 589.40625,
+        "left": 459.40625
+      },
+      "text": "局部调整L",
+      "disabled": true,
+      "busy": null,
+      "shortcuts": "L",
+      "keycaps": [
+        "L"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "local-edit",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "local-edit",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "local-edit",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "local-edit",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "local-edit",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "local-edit",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "1",
+        "translate": "0px",
+        "opacity": "0.4",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    },
+    {
+      "id": "edit",
+      "box": {
+        "x": 594.40625,
+        "y": 558.40625,
+        "width": 137,
+        "height": 40,
+        "top": 558.40625,
+        "right": 731.40625,
+        "bottom": 598.40625,
+        "left": 594.40625
+      },
+      "ink": {
+        "x": 606.40625,
+        "y": 567.40625,
+        "width": 113,
+        "height": 22,
+        "top": 567.40625,
+        "right": 719.40625,
+        "bottom": 589.40625,
+        "left": 606.40625
+      },
+      "text": "编辑当前E",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "E",
+      "keycaps": [
+        "E"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "edit",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "edit",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "edit",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "edit",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "edit",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "edit",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(200, 78, 40)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(200, 78, 40)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "\"\"",
+          "background": "rgb(226, 135, 95)",
+          "width": "3px",
+          "height": "15px"
+        }
+      }
+    },
+    {
+      "id": "restart",
+      "box": {
+        "x": 741.40625,
+        "y": 558.40625,
+        "width": 137,
+        "height": 40,
+        "top": 558.40625,
+        "right": 878.40625,
+        "bottom": 598.40625,
+        "left": 741.40625
+      },
+      "ink": {
+        "x": 753.40625,
+        "y": 567.40625,
+        "width": 113,
+        "height": 22,
+        "top": 567.40625,
+        "right": 866.40625,
+        "bottom": 589.40625,
+        "left": 753.40625
+      },
+      "text": "重新开始R",
+      "disabled": false,
+      "busy": null,
+      "shortcuts": "R",
+      "keycaps": [
+        "R"
+      ],
+      "hits": [
+        {
+          "x": 0.15,
+          "y": 0.2,
+          "hit": "restart",
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.5,
+          "hit": {},
+          "own": true
+        },
+        {
+          "x": 0.15,
+          "y": 0.8,
+          "hit": "restart",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.2,
+          "hit": "restart",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.5,
+          "hit": "button-label",
+          "own": true
+        },
+        {
+          "x": 0.5,
+          "y": 0.8,
+          "hit": "restart",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.2,
+          "hit": "restart",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.5,
+          "hit": "button-key",
+          "own": true
+        },
+        {
+          "x": 0.85,
+          "y": 0.8,
+          "hit": "restart",
+          "own": true
+        }
+      ],
+      "focus": false,
+      "style": {
+        "outline": "none",
+        "outlineWidth": "0px",
+        "outlineColor": "rgb(55, 69, 83)",
+        "background": "rgb(249, 241, 226)",
+        "color": "rgb(55, 69, 83)",
+        "transform": "none",
+        "scale": "none",
+        "translate": "none",
+        "opacity": "1",
+        "pencil": {
+          "content": "none",
+          "background": "rgba(0, 0, 0, 0)",
+          "width": "auto",
+          "height": "auto"
+        }
+      }
+    }
+  ],
+  "roadText": [],
+  "focus": "game",
+  "overflow": false,
+  "state": {
+    "mode": "ready",
+    "storage": {
+      "writable": false,
+      "error": "writer-busy",
+      "source": "v3",
+      "persisted": true
+    },
+    "local": {
+      "active": false,
+      "busy": null,
+      "dirty": false,
+      "pending": false
+    },
+    "motion": {
+      "active": 0,
+      "reduced": false
+    }
+  }
+}

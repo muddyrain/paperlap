@@ -1,0 +1,222 @@
+{
+  "exit": 0,
+  "seconds": 11.17,
+  "report": {
+    "phase": "after",
+    "headless": true,
+    "browser": "141.0.7390.37",
+    "checks": [
+      {
+        "name": "900x700 edge: expanded help stays outside the road stroke",
+        "ok": true,
+        "detail": {
+          "help": {
+            "x": 598.40625,
+            "y": 121.234375,
+            "width": 280,
+            "height": 66.390625,
+            "top": 121.234375,
+            "right": 878.40625,
+            "bottom": 187.625,
+            "left": 598.40625
+          },
+          "radii": [
+            4,
+            8,
+            5,
+            6
+          ],
+          "radius": 33.75,
+          "rectangleClearance": -0.6807534760443872,
+          "roundingError": 0.00963635035862076,
+          "roadClearance": 0.9547871950903755,
+          "nearest": {
+            "distance": 34.704787195090375,
+            "center": {
+              "x": 591.0558165935411,
+              "y": 220.07229519803832
+            },
+            "q": {
+              "x": 602.6645419364733,
+              "y": 187.36664201439325
+            }
+          },
+          "start": {
+            "x": 602.2615415214048,
+            "y": 188.50202866699595
+          },
+          "hit": "local-surface",
+          "canvasHit": true,
+          "hits": [
+            {
+              "dx": -0.1,
+              "dy": -0.1,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": -0.1,
+              "dy": 0,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": -0.1,
+              "dy": 0.1,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": 0,
+              "dy": -0.1,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": 0,
+              "dy": 0,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": 0,
+              "dy": 0.1,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": 0.1,
+              "dy": -0.1,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": 0.1,
+              "dy": 0,
+              "canvasHit": true,
+              "target": "local-surface"
+            },
+            {
+              "dx": 0.1,
+              "dy": 0.1,
+              "canvasHit": true,
+              "target": "local-surface"
+            }
+          ]
+        }
+      },
+      {
+        "name": "900x700 edge: nearest road edge receives native drag with help open",
+        "ok": true
+      }
+    ],
+    "failures": [],
+    "errors": [],
+    "screens": [
+      "edge-help-open-900",
+      "edge-help-drag-900"
+    ],
+    "busy": [],
+    "accessibility": [],
+    "help": [
+      {
+        "help": {
+          "x": 598.40625,
+          "y": 121.234375,
+          "width": 280,
+          "height": 66.390625,
+          "top": 121.234375,
+          "right": 878.40625,
+          "bottom": 187.625,
+          "left": 598.40625
+        },
+        "radii": [
+          4,
+          8,
+          5,
+          6
+        ],
+        "radius": 33.75,
+        "rectangleClearance": -0.6807534760443872,
+        "roundingError": 0.00963635035862076,
+        "roadClearance": 0.9547871950903755,
+        "nearest": {
+          "distance": 34.704787195090375,
+          "center": {
+            "x": 591.0558165935411,
+            "y": 220.07229519803832
+          },
+          "q": {
+            "x": 602.6645419364733,
+            "y": 187.36664201439325
+          }
+        },
+        "start": {
+          "x": 602.2615415214048,
+          "y": 188.50202866699595
+        },
+        "hit": "local-surface",
+        "canvasHit": true,
+        "hits": [
+          {
+            "dx": -0.1,
+            "dy": -0.1,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": -0.1,
+            "dy": 0,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": -0.1,
+            "dy": 0.1,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": 0,
+            "dy": -0.1,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": 0,
+            "dy": 0,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": 0,
+            "dy": 0.1,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": 0.1,
+            "dy": -0.1,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": 0.1,
+            "dy": 0,
+            "canvasHit": true,
+            "target": "local-surface"
+          },
+          {
+            "dx": 0.1,
+            "dy": 0.1,
+            "canvasHit": true,
+            "target": "local-surface"
+          }
+        ],
+        "dragging": true,
+        "candidateError": null
+      }
+    ],
+    "fixture": "tests/fixtures/ux-legacy-save-v2.json"
+  }
+}
