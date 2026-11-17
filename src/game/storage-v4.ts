@@ -1,0 +1,10 @@
+import * as model from "./save-v4";
+import { createStorageModel } from "./storage-modern";
+export { acquireWriter, type Store, type StorageError, type WriteResult, type WriterLease } from "./storage-modern";
+export const STORAGE_KEY = "paperlap.save.v4";
+export const OLD_KEYS = { v1: "paperlap.save.v1", v2: "paperlap.save.v2", v3: "paperlap.save.v3" };
+const storage = createStorageModel(4, model);
+export const SaveSession = storage.SaveSession;
+export type SaveSession = InstanceType<typeof SaveSession>;
+export const readV4Identity = storage.readIdentity;
+export const storageMessage = storage.storageMessage;

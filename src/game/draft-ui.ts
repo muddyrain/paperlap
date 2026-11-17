@@ -141,8 +141,9 @@ export class DraftView {
     let loaded: DraftResult;
     try {
       this.legacyHint =
-        this.policy?.version === 2 &&
-        window.localStorage.getItem("paperlap.draft.v1") !== null
+        (this.policy?.version ?? 1) >= 2 &&
+        (window.localStorage.getItem("paperlap.draft.v1") !== null ||
+          (this.policy?.version === 3 && window.localStorage.getItem("paperlap.draft.v2") !== null))
           ? "旧版整笔草稿原文保留，未自动套用；请在旧版备份后恢复。 "
           : "";
       this.storage = new DraftStorage(window.localStorage, this.policy);
@@ -157,7 +158,9 @@ export class DraftView {
     this.historyUI();
     this.status(
       loaded.ok
-        ? "完成一笔后自动备份；R 重画可撤销"
+        ? this.policy?.version === 3
+          ? "每段松手后自动备份；可移动画布、从末端继续"
+          : "完成一笔后自动备份；R 重画可撤销"
         : draftMessage(loaded.error),
       !loaded.ok,
     );
@@ -168,7 +171,11 @@ export class DraftView {
         ? `这是从“${name}”开始的新建草稿。继续只恢复预览，原有赛道会保留。`
         : `这是“${name}”的编辑草稿。继续只恢复预览，正式路线和成绩不会改变。`;
     this.get("draft-range").textContent =
-      loaded.checkpoint.current.phase === "interrupted"
+      loaded.checkpoint.current.spaceVersion === 2
+        ? loaded.checkpoint.current.phase === "empty"
+          ? "上次已清空；恢复后可撤销找回保留的路线。"
+          : "已完成的绘制段会恢复，可从蓝色末端继续；闭合并保存前不会修改正式赛道。"
+        : loaded.checkpoint.current.phase === "interrupted"
         ? loaded.checkpoint.retained?.phase === "complete"
           ? "上次绘制中断：不能接着原手势绘制；已保留上一份完整笔迹，继续后按撤销找回。"
           : "上次绘制中断：可查看保留的笔迹，需要重新画一圈，不能接着原手势绘制。"

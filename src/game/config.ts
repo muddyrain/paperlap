@@ -1,4 +1,6 @@
 export const WORLD = { width: 1440, height: 860 };
+// WORLD is the legacy paper / UI reference size; MAP is independent of viewport.
+export const MAP = { width: 5760, height: 3440 };
 export const RULES_VERSION = 2;
 export const ROAD = {
   width: 108,

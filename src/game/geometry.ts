@@ -1,14 +1,33 @@
-import { ROAD, WORLD } from "./config";
+import { ROAD, WORLD, MAP } from "./config";
 export interface Point {
   x: number;
   y: number;
 }
 export interface Track {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   id: string;
   name: string;
   width: number;
   points: Point[];
+}
+export interface TrackBounds {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+// Driving boundaries preserve the legacy behaviour for schema 1 tracks.
+export function trackBounds(track: Pick<Track, "schemaVersion">): TrackBounds {
+  return track.schemaVersion === 2
+    ? { minX: 24, minY: 24, maxX: MAP.width - 24, maxY: MAP.height - 24 }
+    : { minX: 24, minY: 105, maxX: WORLD.width - 24, maxY: WORLD.height - 90 };
+}
+export function drawingBounds(spaceVersion: 1 | 2 = 1): TrackBounds {
+  return spaceVersion === 2
+    ? { minX: ROAD.margin, minY: ROAD.margin,
+        maxX: MAP.width - ROAD.margin, maxY: MAP.height - ROAD.margin }
+    : { minX: ROAD.margin, minY: ROAD.minY,
+        maxX: WORLD.width - ROAD.margin, maxY: ROAD.maxY };
 }
 export interface TrackData {
   track: Track;
@@ -157,6 +176,7 @@ export function fingerprint(points: Point[], width: number) {
 export function validate(
   points: Point[],
   width = ROAD.width,
+  spaceVersion: 1 | 2 = 1,
 ): { reason: string; point?: Point } | null {
   if (
     points.length < 12 ||
@@ -168,23 +188,26 @@ export function validate(
   const data = derive({ schemaVersion: 1, id: "", name: "", points, width });
   if (data.length < ROAD.minLength)
     return { reason: "这条路线太短了，请画一个大一些的圈" };
+  const bounds = drawingBounds(spaceVersion);
   if (
     points.some(
       (p) =>
-        p.x < ROAD.margin ||
-        p.x > WORLD.width - ROAD.margin ||
-        p.y < ROAD.minY ||
-        p.y > ROAD.maxY,
+        p.x < bounds.minX ||
+        p.x > bounds.maxX ||
+        p.y < bounds.minY ||
+        p.y > bounds.maxY,
     )
   )
     return {
-      reason: "路线太靠边，请给上方计时和下方按钮留些空间",
+      reason: spaceVersion === 2
+        ? "路线超出纸面边界，请把这一段画回纸面内"
+        : "路线太靠边，请给上方计时和下方按钮留些空间",
       point: points.find(
         (p) =>
-          p.x < ROAD.margin ||
-          p.x > WORLD.width - ROAD.margin ||
-          p.y < ROAD.minY ||
-          p.y > ROAD.maxY,
+          p.x < bounds.minX ||
+          p.x > bounds.maxX ||
+          p.y < bounds.minY ||
+          p.y > bounds.maxY,
       ),
     };
   const n = points.length;
@@ -231,7 +254,7 @@ export function validate(
   }
   return null;
 }
-export function fromDrawing(raw: Point[]): Validation {
+export function fromDrawing(raw: Point[], spaceVersion: 1 | 2 = 1): Validation {
   if (
     raw.length > ROAD.maxRaw ||
     raw.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))
@@ -242,12 +265,12 @@ export function fromDrawing(raw: Point[]): Validation {
   if (dist(raw[0], raw.at(-1)!) > ROAD.closeDistance)
     return { ok: false, reason: "请将终点画回起点附近", point: raw.at(-1) };
   const points = smoothDrawing(raw),
-    error = validate(points);
+    error = validate(points, ROAD.width, spaceVersion);
   if (error) return { ok: false, ...error };
   return {
     ok: true,
     track: {
-      schemaVersion: 1,
+      schemaVersion: spaceVersion,
       id: fingerprint(points, ROAD.width),
       name: "我的手绘赛道",
       points,
@@ -305,4 +328,21 @@ export function defaultTrack(): Track {
     points,
     width: ROAD.width,
   };
+}
+
+// A broad circuit with a fast outer section and two alternating infield bends.
+// It is a separate fixture: upgrading existing players never replaces their work.
+export function longTrack(): Track {
+  const points = smooth([
+    { x: 2300, y: 2800 }, { x: 1400, y: 2800 },
+    { x: 700, y: 2500 }, { x: 500, y: 1800 },
+    { x: 700, y: 900 }, { x: 1500, y: 500 },
+    { x: 2500, y: 500 }, { x: 3300, y: 700 },
+    { x: 3600, y: 1300 }, { x: 3100, y: 1650 },
+    { x: 3300, y: 2050 }, { x: 4200, y: 2000 },
+    { x: 4800, y: 2400 }, { x: 4500, y: 2900 },
+    { x: 3500, y: 3000 },
+  ]);
+  return { schemaVersion: 2, id: fingerprint(points, ROAD.width),
+    name: "长纸环游", width: ROAD.width, points };
 }

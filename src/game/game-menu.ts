@@ -64,7 +64,7 @@ export class GameMenu {
       <section id="menu-controls-page" hidden aria-label="操作说明"><dl>
         <dt>驾驶</dt><dd><kbd>↑</kbd> / <kbd>W</kbd> 加速 · <kbd>↓</kbd> / <kbd>S</kbd> 刹车<br><kbd>←</kbd> / <kbd>A</kbd>、<kbd>→</kbd> / <kbd>D</kbd> 转向</dd>
         <dt>游戏区域</dt><dd><kbd>Space</kbd> 开始 / 暂停 / 继续<br><kbd>R</kbd> 重新开始 · <kbd>T</kbd> 赛道本<br><kbd>E</kbd> 整圈重画 · <kbd>L</kbd> 局部调整 · <kbd>Esc</kbd> 游戏菜单</dd>
-        <dt>赛道本与绘图</dt><dd><kbd>N</kbd> 新建 · <kbd>↑</kbd><kbd>↓</kbd> 选择焦点 · <kbd>Enter</kbd> 使用赛道<br>绘图：<kbd>Ctrl / ⌘ Z</kbd> 撤销 · <kbd>Ctrl / ⌘ Shift Z</kbd> 重做<br><kbd>Enter</kbd> 保存 · <kbd>R</kbd> 重画 · <kbd>Esc</kbd> 取消 / 确认放弃</dd>
+        <dt>赛道本与绘图</dt><dd><kbd>N</kbd> 新建 · <kbd>↑</kbd><kbd>↓</kbd> 选择焦点 · <kbd>Enter</kbd> 使用赛道<br>绘图：从末端分段续画，接回起点闭合；滚轮缩放，右键拖动画布<br><kbd>Ctrl / ⌘ Z</kbd> 撤销一段 · <kbd>Ctrl / ⌘ Shift Z</kbd> 重做<br><kbd>Enter</kbd> 保存 · <kbd>R</kbd> 重画 · <kbd>Esc</kbd> 取消 / 确认放弃</dd>
       <dt>局部调整</dt><dd>拖动弯道，松手校验；<kbd>Enter</kbd> 采用到历史<br><kbd>Ctrl / ⌘ Enter</kbd> 正式保存；撤销/重做同绘图<br><kbd>Esc</kbd> 先取消预览，再确认放弃；保存后等待开始</dd></dl><p>按钮上的 Enter / Space 为原生操作。切换赛道等待开始；离开窗口会暂停，恢复焦点不会自动继续。</p><button id="controls-back" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回菜单", "Esc")}</button></section>
       <section id="menu-discard" hidden><p id="discard-description">尚未保存本次绘制。放弃后将恢复原赛道、车辆和圈时。</p><div class="menu-actions"><button id="keep-drawing" class="primary" aria-keyshortcuts="Escape">${buttonContent("edit", "继续绘制", "Esc")}</button><button id="discard-drawing" class="paper">${buttonContent("trash", "放弃修改")}</button></div></section>
       <p id="menu-hint"></p><p id="menu-status" role="status"></p>`;

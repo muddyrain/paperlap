@@ -7,6 +7,7 @@ export interface LocalSource {
   geometryIdentity: string;
   geometryDigest: string;
   algorithmVersion: 1;
+  spaceVersion?: 1 | 2;
 }
 export interface LocalCheckpoint {
   current: Point[];
@@ -18,21 +19,24 @@ export const localSource = (entry: TrackEntry): LocalSource => ({
   geometryIdentity: entry.geometryIdentity,
   geometryDigest: entry.geometryDigest,
   algorithmVersion: LOCAL_ALGORITHM,
+  ...(entry.track.schemaVersion === 2 ? { spaceVersion: 2 as const } : {}),
 });
 export const sameLocalSource = (a: LocalSource, b: LocalSource) =>
   a.uid === b.uid &&
   a.geometryIdentity === b.geometryIdentity &&
   a.geometryDigest === b.geometryDigest &&
-  a.algorithmVersion === b.algorithmVersion;
+  a.algorithmVersion === b.algorithmVersion &&
+  (a.spaceVersion ?? 1) === (b.spaceVersion ?? 1);
 export const samePoints = (a: readonly Point[], b: readonly Point[]) =>
   a.length === b.length && a.every((p, i) => p.x === b[i].x && p.y === b[i].y);
 export function checkLocalPoints(
   base: readonly Point[],
   points: readonly Point[],
+  spaceVersion: 1 | 2 = 1,
 ) {
-  return localGeometryError(base, points)?.reason ?? null;
+  return localGeometryError(base, points, spaceVersion)?.reason ?? null;
 }
-function localGeometryError(base: readonly Point[], points: readonly Point[]) {
+function localGeometryError(base: readonly Point[], points: readonly Point[], spaceVersion: 1 | 2 = 1) {
   if (
     points.length !== base.length ||
     [0, 1, base.length - 1].some(
@@ -41,7 +45,7 @@ function localGeometryError(base: readonly Point[], points: readonly Point[]) {
     )
   )
     return { reason: "局部调整不能改变点数、起点或接头方向" };
-  return validate(points.map((p) => ({ ...p })));
+  return validate(points.map((p) => ({ ...p })), undefined, spaceVersion);
 }
 
 // Evidence is local to one source revision. No caller can insert an unchecked
@@ -75,7 +79,7 @@ export class LocalGeometryProof {
       return null;
     }
     this.strict++;
-    const error = localGeometryError(this.base, points);
+    const error = localGeometryError(this.base, points, this.source.spaceVersion ?? 1);
     if (!error) {
       this.snapshots.push(this.snapshot(points));
       if (this.snapshots.length > 32) this.snapshots.shift();

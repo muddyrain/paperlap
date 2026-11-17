@@ -232,20 +232,9 @@ export class GameMotion {
       sheet.className = "motion-sheet";
       sheet.setAttribute("aria-hidden", "true");
       const c = sheet.getContext("2d")!;
-      const texture = (key: string) =>
-        scene.textures.get(key).getSourceImage() as CanvasImageSource;
-      c.drawImage(texture("paper"), 0, 0, WORLD.width, WORLD.height);
-      if (scene.roadImage.visible)
-        c.drawImage(texture("road"), 0, 0, WORLD.width, WORLD.height);
-      if (scene.scenery.visible)
-        c.drawImage(texture("scenery"), 0, 0, WORLD.width, WORLD.height);
-      if (scene.carSprite.visible) {
-        c.save();
-        c.translate(scene.car.x, scene.car.y);
-        c.rotate(scene.car.angle);
-        c.drawImage(texture("car"), -38.5, -24.5, 77, 49);
-        c.restore();
-      }
+      const view = scene.captureView();
+      if (!view) return null;
+      c.drawImage(view, 0, 0, WORLD.width, WORLD.height);
       if (drawing && !drawing.hidden)
         c.drawImage(drawing, 0, 0, WORLD.width, WORLD.height);
       return sheet;

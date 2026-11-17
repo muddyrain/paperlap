@@ -7,6 +7,7 @@ import {
   validDigest,
 } from "./geometry-identity";
 import { STORAGE_KEY, readV3Identity } from "./storage-v3";
+import { STORAGE_KEY as V4_KEY, readV4Identity } from "./storage-v4";
 import {
   LocalGeometryProof,
   sameLocalSource,
@@ -14,6 +15,7 @@ import {
   type LocalCheckpoint,
 } from "./local-source";
 export const LOCAL_DRAFT_KEY = "paperlap.local-draft.v1";
+export const LOCAL_DRAFT_V2_KEY = "paperlap.local-draft.v2";
 export const LOCAL_DRAFT_LIMITS = { entries: 8, characters: 1_200_000 };
 type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type ErrorKind = "invalid" | "conflict" | "unavailable" | "limit";
@@ -26,7 +28,7 @@ interface Entry {
   updatedAt: number;
 }
 interface Document {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   entries: Entry[];
 }
 const object = (v: unknown): v is Record<string, unknown> =>
@@ -43,14 +45,14 @@ const points = (v: unknown): v is Point[] =>
       typeof p.y === "number" &&
       Number.isFinite(p.y),
   );
-function parse(raw: string | null): Document | null {
-  if (raw === null) return { schemaVersion: 1, entries: [] };
+function parse(raw: string | null, version: 1 | 2 = 1): Document | null {
+  if (raw === null) return { schemaVersion: version, entries: [] };
   if (raw.length > LOCAL_DRAFT_LIMITS.characters) return null;
   try {
     const v = JSON.parse(raw);
     if (
       !object(v) ||
-      v.schemaVersion !== 1 ||
+      v.schemaVersion !== version ||
       !Array.isArray(v.entries) ||
       v.entries.length > LOCAL_DRAFT_LIMITS.entries
     )
@@ -66,6 +68,8 @@ function parse(raw: string | null): Document | null {
         !validIdentity(e.source.geometryIdentity) ||
         !validDigest(e.source.geometryDigest) ||
         e.source.algorithmVersion !== 1 ||
+        (e.source.spaceVersion !== undefined && e.source.spaceVersion !== 1 &&
+          !(version === 2 && e.source.spaceVersion === 2)) ||
         typeof e.updatedAt !== "number" ||
         !Number.isFinite(e.updatedAt) ||
         e.updatedAt < 0
@@ -83,6 +87,7 @@ function parse(raw: string | null): Document | null {
         e.source.geometryIdentity,
         e.source.geometryDigest,
         e.source.algorithmVersion,
+        e.source.spaceVersion ?? 1,
       ]);
       if (seen.has(key)) return null;
       seen.add(key);
@@ -106,7 +111,11 @@ export class LocalDraftStorage {
     private store: Store,
     private allow: () => boolean,
     private sharedProof?: LocalGeometryProof,
+    private storageVersion: 3 | 4 = 3,
   ) {}
+  private get key() { return this.storageVersion === 4 ? LOCAL_DRAFT_V2_KEY : LOCAL_DRAFT_KEY; }
+  private get officialKey() { return this.storageVersion === 4 ? V4_KEY : STORAGE_KEY; }
+  private get documentVersion(): 1 | 2 { return this.storageVersion === 4 ? 2 : 1; }
   private valid(c: LocalCheckpoint, fresh = false) {
     for (const p of [c.current, c.previous, c.next]) {
       if (!p) continue;
@@ -128,22 +137,46 @@ export class LocalDraftStorage {
         this.failure = "conflict";
         return { ok: false, error: "conflict" };
       }
-      this.official = this.store.getItem(STORAGE_KEY);
+      this.official = this.store.getItem(this.officialKey);
       const found = profile("draft.source", () =>
-        readV3Identity(this.store, this.official, source.uid),
+        (this.storageVersion === 4 ? readV4Identity : readV3Identity)(this.store, this.official, source.uid),
       );
       if (
         !found.valid ||
         found.geometryIdentity !== source.geometryIdentity ||
         found.geometryDigest !== source.geometryDigest ||
         geometryDigest(base, ROAD.width) !== source.geometryDigest ||
-        JSON.parse(this.official!).activeTrackUid !== source.uid
+        JSON.parse(this.official!).activeTrackUid !== source.uid ||
+        JSON.parse(this.official!).tracks.find((e: { uid: string }) => e.uid === source.uid)?.track.schemaVersion !== (source.spaceVersion ?? 1)
       ) {
         this.failure = "conflict";
         return { ok: false, error: "conflict" };
       }
-      this.expected = this.store.getItem(LOCAL_DRAFT_KEY);
-      const doc = profile("draft.parse", () => parse(this.expected));
+      this.expected = this.store.getItem(this.key);
+      // Copy compatible legacy drafts once. The old bytes remain untouched;
+      // an empty V2 document records that this import has already happened.
+      if (this.storageVersion === 4 && this.expected === null) {
+        const previousRaw = this.store.getItem(LOCAL_DRAFT_KEY);
+        const old = parse(previousRaw);
+        if (old) {
+          const matching = old.entries.find((e) => sameLocalSource(e.source, source));
+          // Validate the matching bytes before writing an upgraded document.
+          if (matching && !this.valid(matching.checkpoint, true))
+            return { ok: false, error: "invalid" };
+          const migrated = JSON.stringify({ schemaVersion: 2, entries: old.entries });
+          if (!this.allow() || this.store.getItem(this.key) !== null ||
+            this.store.getItem(this.officialKey) !== this.official ||
+            this.store.getItem(LOCAL_DRAFT_KEY) !== previousRaw)
+            return { ok: false, error: "conflict" };
+          this.store.setItem(this.key, migrated);
+          if (this.store.getItem(this.key) !== migrated ||
+            this.store.getItem(LOCAL_DRAFT_KEY) !== previousRaw ||
+            this.store.getItem(this.officialKey) !== this.official || !this.allow())
+            return { ok: false, error: "conflict" };
+          this.expected = migrated;
+        }
+      }
+      const doc = profile("draft.parse", () => parse(this.expected, this.documentVersion));
       if (!doc) return { ok: false, error: "invalid" };
       const matching = doc.entries.find((e) =>
         sameLocalSource(e.source, source),
@@ -170,13 +203,13 @@ export class LocalDraftStorage {
     try {
       if (
         !this.allow() ||
-        this.store.getItem(LOCAL_DRAFT_KEY) !== this.expected ||
-        (!committed && this.store.getItem(STORAGE_KEY) !== this.official)
+        this.store.getItem(this.key) !== this.expected ||
+        (!committed && this.store.getItem(this.officialKey) !== this.official)
       )
         return { ok: false, error: "conflict" };
-      const raw = entries.length
+      const raw = entries.length || this.storageVersion === 4
         ? profile("draft.serialize", () =>
-            JSON.stringify({ schemaVersion: 1, entries }),
+            JSON.stringify({ schemaVersion: this.documentVersion, entries }),
           )
         : null;
       if (
@@ -184,22 +217,22 @@ export class LocalDraftStorage {
         (raw?.length ?? 0) > LOCAL_DRAFT_LIMITS.characters
       )
         return { ok: false, error: "limit" };
-      if (raw !== null && !profile("draft.roundtrip", () => parse(raw)))
+      if (raw !== null && !profile("draft.roundtrip", () => parse(raw, this.documentVersion)))
         return { ok: false, error: "invalid" };
       if (raw !== this.expected) {
-        if (raw === null) this.store.removeItem(LOCAL_DRAFT_KEY);
+        if (raw === null) this.store.removeItem(this.key);
         else
           profile("draft.setItem", () =>
-            this.store.setItem(LOCAL_DRAFT_KEY, raw),
+            this.store.setItem(this.key, raw),
           );
       }
       if (
-        profile("draft.readback", () => this.store.getItem(LOCAL_DRAFT_KEY)) !==
+        profile("draft.readback", () => this.store.getItem(this.key)) !==
         raw
       )
         return { ok: false, error: "conflict" };
       this.expected = raw;
-      this.document = { schemaVersion: 1, entries };
+      this.document = { schemaVersion: this.documentVersion, entries };
       return { ok: true };
     } catch {
       return { ok: false, error: "unavailable" };

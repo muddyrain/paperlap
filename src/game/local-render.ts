@@ -1,6 +1,7 @@
 import { ROAD, WORLD } from "./config";
 import { arcLengths, LOCAL_EDIT, type LocalDrag } from "./local-edit";
 import type { Point } from "./geometry";
+import type { ViewportSnapshot } from "./edit-viewport";
 
 // Canvas-only presentation. No Phaser textures or geometry validation here.
 export function renderLocal(
@@ -12,9 +13,13 @@ export function renderLocal(
   selection: LocalDrag | null,
   error?: Point,
   invalid = false,
+  view: ViewportSnapshot = { x: 0, y: 0, zoom: 1 },
 ) {
   c.clearRect(0, 0, WORLD.width, WORLD.height);
   c.drawImage(paper, 0, 0, WORLD.width, WORLD.height);
+  c.save();
+  c.scale(view.zoom, view.zoom);
+  c.translate(-view.x, -view.y);
   c.lineJoin = "round";
   c.lineCap = "round";
   const path = (p: readonly Point[]) => {
@@ -120,4 +125,5 @@ export function renderLocal(
     c.font = "bold 26px sans-serif";
     c.fillText("!", error.x - 4, error.y + 9);
   }
+  c.restore();
 }

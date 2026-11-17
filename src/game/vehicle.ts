@@ -1,5 +1,5 @@
 import { DRIVE, WORLD } from "./config";
-import type { Point, TrackData } from "./geometry";
+import type { Point, TrackData, TrackBounds } from "./geometry";
 export interface Car extends Point {
   angle: number;
   vx: number;
@@ -30,7 +30,10 @@ export function spawn(data: TrackData): Car {
     steering: 0,
   };
 }
-export function moveCar(car: Car, input: Input, dt: number, onRoad: boolean) {
+export function moveCar(
+  car: Car, input: Input, dt: number, onRoad: boolean,
+  bounds: TrackBounds = { minX: 24, minY: 105, maxX: WORLD.width - 24, maxY: WORLD.height - 90 },
+) {
   const f = { x: Math.cos(car.angle), y: Math.sin(car.angle) },
     r = { x: -f.y, y: f.x };
   let forward = Math.max(0, car.vx * f.x + car.vy * f.y),
@@ -73,13 +76,13 @@ export function moveCar(car: Car, input: Input, dt: number, onRoad: boolean) {
   car.y += car.vy * dt;
   car.speed = Math.hypot(car.vx, car.vy);
   if (
-    car.x < 24 ||
-    car.x > WORLD.width - 24 ||
-    car.y < 105 ||
-    car.y > WORLD.height - 90
+    car.x < bounds.minX ||
+    car.x > bounds.maxX ||
+    car.y < bounds.minY ||
+    car.y > bounds.maxY
   ) {
-    car.x = Math.max(24, Math.min(WORLD.width - 24, car.x));
-    car.y = Math.max(105, Math.min(WORLD.height - 90, car.y));
+    car.x = Math.max(bounds.minX, Math.min(bounds.maxX, car.x));
+    car.y = Math.max(bounds.minY, Math.min(bounds.maxY, car.y));
     car.vx *= 0.4;
     car.vy *= 0.4;
   }
