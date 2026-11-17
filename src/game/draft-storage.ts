@@ -1,5 +1,5 @@
 import { validIdentity, validDigest } from "./geometry-identity";
-import { ROAD, WORLD } from "./config";
+import { MAP, ROAD, WORLD } from "./config";
 import { readTrackFingerprint, STORAGE_KEY } from "./storage";
 import {
   sameSource,
@@ -25,25 +25,35 @@ interface Document {
 }
 const object = (v: unknown): v is Record<string, unknown> =>
   !!v && typeof v === "object" && !Array.isArray(v);
-function snapshot(v: unknown): v is DraftSnapshot {
+function snapshot(v: unknown, version = 1): v is DraftSnapshot {
+  const segmented = version === 3;
   return (
     object(v) &&
-    ["empty", "complete", "interrupted"].includes(v.phase as string) &&
+    (segmented ? ["empty", "open", "complete", "interrupted"] : ["empty", "complete", "interrupted"]).includes(v.phase as string) &&
+    (segmented
+      ? v.spaceVersion === 2 && Array.isArray(v.segmentEnds) &&
+        v.segmentEnds.every((end: unknown, i: number, ends: unknown[]) =>
+          typeof end === "number" && Number.isSafeInteger(end) && end >= 2 &&
+          (i === 0 || end > (ends[i - 1] as number)))
+      : v.spaceVersion === undefined && v.segmentEnds === undefined) &&
     typeof v.overflow === "boolean" &&
     Array.isArray(v.raw) &&
     v.raw.length <= ROAD.maxRaw &&
     (v.phase === "empty"
       ? v.raw.length === 0 && !v.overflow
       : v.raw.length > 0) &&
+    (!segmented || (v.raw.length === 0
+      ? (v.segmentEnds as number[]).length === 0
+      : (v.segmentEnds as number[]).at(-1) === v.raw.length)) &&
     v.raw.every(
       (p) =>
         object(p) &&
         typeof p.x === "number" &&
         Number.isFinite(p.x) &&
-        Math.abs(p.x) <= WORLD.width * 4 &&
+        Math.abs(p.x) <= (segmented ? MAP.width * 2 : WORLD.width * 4) &&
         typeof p.y === "number" &&
         Number.isFinite(p.y) &&
-        Math.abs(p.y) <= WORLD.height * 4,
+        Math.abs(p.y) <= (segmented ? MAP.height * 2 : WORLD.height * 4),
     )
   );
 }
@@ -100,8 +110,8 @@ function parse(raw: string | null, policy = originalPolicy): Document | null {
       if (
         !object(e) ||
         !source(e.source, policy.version) ||
-        !snapshot(e.current) ||
-        !(e.retained === null || snapshot(e.retained)) ||
+        !snapshot(e.current, policy.version) ||
+        !(e.retained === null || snapshot(e.retained, policy.version)) ||
         typeof e.updatedAt !== "number" ||
         !Number.isSafeInteger(e.updatedAt) ||
         e.updatedAt < 0
@@ -151,9 +161,10 @@ export class DraftStorage {
         return { ok: false, error: "invalid" };
       const official = this.policy.read(this.storage, this.official, s.uid);
       if (
+        (this.policy.version === 3 && !official.valid) ||
         official.valid &&
         (official.fingerprint !== s.fingerprint ||
-          (this.policy.version === 2 &&
+          (this.policy.version >= 2 &&
             (official.geometryIdentity !== s.geometryIdentity ||
               official.geometryDigest !== s.geometryDigest)))
       ) {
@@ -204,6 +215,9 @@ export class DraftStorage {
         this.storage.setItem(this.policy.key, raw);
       else if (!entries.length && this.expected !== null)
         this.storage.removeItem(this.policy.key);
+      if (this.policy.version === 3 &&
+        this.storage.getItem(this.policy.key) !== (entries.length ? raw : null))
+        return { ok: false, error: "unavailable" };
       this.expected = entries.length ? raw : null;
       this.document = { schemaVersion: this.policy.version, entries };
       return { ok: true };

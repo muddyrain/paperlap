@@ -6,7 +6,7 @@ import { formatTime } from "./time";
 import { buttonContent } from "./ui";
 import type { GameMotion } from "./game-motion";
 export function legacyTimes(save: Save, uid: string): number[] {
-  return save.schemaVersion === 3
+  return save.schemaVersion !== 2
     ? Object.entries(save.legacy.records)
         .filter(([k]) => k.startsWith(`${uid}:`))
         .map(([, v]) => v)
@@ -28,14 +28,14 @@ export class SaveHistory {
   constructor(
     private board: HTMLElement,
     private save: () => Save,
-    private session: SaveSession,
+    private session: Pick<SaveSession, "backup">,
     private pause: () => void,
     private motion: GameMotion,
   ) {
     this.dialog.id = "save-history";
     this.dialog.className = "game-menu paper save-history";
     this.dialog.setAttribute("aria-labelledby", "save-history-title");
-    this.dialog.innerHTML = `<h2 id="save-history-title">纪录历史与存档</h2><p id="save-state-description" role="status"></p><section id="local-cleanup-notice" class="local-cleanup-notice" hidden><p id="local-cleanup-description" role="status"></p><button id="acknowledge-local-notice" class="paper">${buttonContent("check", "已知晓，保留旧草稿")}</button></section><p>旧纪录（旧几何身份，未验证）已完整保留，不与当前个人最佳比较。不同规则与孤立归档在下方逐项列出。</p><p>V1/V2 是升级前备份，旧版不会看到 V3 新作品。恢复前请导出所有键并关闭其他标签；本游戏不会自动删除或覆盖旧键、损坏原文。</p><div class="history-actions"><button id="history-close" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回", "Esc")}</button><button id="export-save" class="paper">${buttonContent("book", "导出全部存档备份")}</button><button id="retry-save" class="paper">${buttonContent("reset", "重新加载 / 重试升级")}</button></div><p id="backup-error" role="status"></p><ol id="record-history-list"></ol>`;
+    this.dialog.innerHTML = `<h2 id="save-history-title">纪录历史与存档</h2><p id="save-state-description" role="status"></p><section id="local-cleanup-notice" class="local-cleanup-notice" hidden><p id="local-cleanup-description" role="status"></p><button id="acknowledge-local-notice" class="paper">${buttonContent("check", "已知晓，保留旧草稿")}</button></section><p>旧纪录（旧几何身份，未验证）已完整保留，不与当前个人最佳比较。不同规则与孤立归档在下方逐项列出。</p><p>旧版存档作为升级前备份保留；旧版不会看到新建的大地图作品。恢复前请导出所有键并关闭其他标签；本游戏不会自动删除或覆盖旧键、损坏原文。</p><div class="history-actions"><button id="history-close" class="paper" aria-keyshortcuts="Escape">${buttonContent("back", "返回", "Esc")}</button><button id="export-save" class="paper">${buttonContent("book", "导出全部存档备份")}</button><button id="retry-save" class="paper">${buttonContent("reset", "重新加载 / 重试升级")}</button></div><p id="backup-error" role="status"></p><ol id="record-history-list"></ol>`;
     this.board.append(this.dialog);
     this.badge.id = "storage-state";
     this.badge.className = "storage-state";
@@ -135,7 +135,7 @@ export class SaveHistory {
       li.append(label, detail);
       list.append(li);
     };
-    if (save.schemaVersion === 3) {
+    if (save.schemaVersion !== 2) {
       for (const [key, time] of Object.entries(save.legacy.records)) {
         const uid = key.slice(0, key.indexOf(":")),
           name = save.legacy.tracks.find((e) => e.uid === uid)?.name || uid;

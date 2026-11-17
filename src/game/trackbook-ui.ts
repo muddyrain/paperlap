@@ -27,6 +27,7 @@ export class TrackbookView {
     container: HTMLElement,
     private hooks: {
       create: () => CommandResult;
+      sample?: () => CommandResult;
       local: () => CommandResult;
       localReason: () => string | null;
       beforeSelect: () => HTMLCanvasElement | null;
@@ -47,6 +48,18 @@ export class TrackbookView {
       <div id="delete-confirm" hidden><h3 id="delete-question"></h3><p>将删除这条赛道及其全部纪录，其他赛道和旧归档保留。</p><div class="trackbook-actions"><button data-back class="paper" id="delete-cancel" aria-keyshortcuts="Escape">${buttonContent("back", "取消", "Esc")}</button><button id="delete-track-confirm" class="primary">${buttonContent("trash", "确认删除")}</button></div></div>
       <p id="trackbook-status" role="status"></p>`;
     container.append(this.dialog);
+    if (this.hooks.sample) {
+      const button = document.createElement("button");
+      button.id = "sample-track";
+      button.className = "paper sample-track";
+      button.innerHTML = buttonContent("flag", "体验长赛道");
+      this.get("trackbook-local").before(button);
+      button.onclick = () => {
+        const sheet = this.hooks.beforeSelect();
+        const result = this.hooks.sample!();
+        if (this.run(result, "select", sheet)) this.finishClose();
+      };
+    }
     this.get("trackbook-close").onclick = () => this.backOrClose();
     this.dialog.addEventListener("keydown", this.keydown);
     this.dialog.addEventListener("cancel", (event) => {

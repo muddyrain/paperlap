@@ -25,6 +25,7 @@ import { buttonContent } from "./ui";
 import { historyKeys } from "./draft-ui";
 import { historyShortcut, ignoresShortcuts, shortcutTarget } from "./shortcuts";
 import { renderLocal } from "./local-render";
+import { EditViewport } from "./edit-viewport";
 
 export class LocalEditor {
   private root = document.createElement("section");
@@ -37,6 +38,9 @@ export class LocalEditor {
   private base: Point[] = [];
   private backup: LocalDraftStorage | null = null;
   private recovery: LocalCheckpoint | null = null;
+  readonly viewport = new EditViewport();
+  private panning: { pointer: number; screen: Point } | null = null;
+  private panMode = false;
   private unconfirmed = false;
   private accessBlocked = false;
   private wasReady = true;
@@ -88,6 +92,7 @@ export class LocalEditor {
       current: this.model?.current ?? null,
       pending: this.model?.pending ?? null,
       dragging: !!this.drag,
+      viewport: this.viewport.snapshot(),
       dirty: this.model?.dirty ?? false,
       canUndo: this.model?.canUndo ?? false,
       canRedo: this.model?.canRedo ?? false,
@@ -124,6 +129,24 @@ export class LocalEditor {
     this.c = this.canvas.getContext("2d")!;
     this.c.scale(2, 2);
     this.root.prepend(this.canvas);
+    const mapTools = document.createElement("div");
+    mapTools.className = "editor-map-tools local-map-tools paper";
+    mapTools.setAttribute("role", "toolbar");
+    mapTools.setAttribute("aria-label", "局部调整地图视图");
+    mapTools.innerHTML = '<button type="button" id="local-pan" aria-pressed="false">移动画布</button><button type="button" id="local-zoom-out" aria-label="缩小地图">−</button><button type="button" id="local-zoom-in" aria-label="放大地图">＋</button><button type="button" id="local-fit">查看全图</button>';
+    this.root.append(mapTools);
+    this.get("local-pan").onclick = () => {
+      this.panMode = !this.panMode;
+      this.get("local-pan").setAttribute("aria-pressed", String(this.panMode));
+      this.canvas.style.cursor = this.panMode ? "grab" : "crosshair";
+    };
+    this.get("local-zoom-in").onclick = () => this.zoom(1.4);
+    this.get("local-zoom-out").onclick = () => this.zoom(1 / 1.4);
+    this.get("local-fit").onclick = () => {
+      if (this.busy || !this.model) return;
+      this.viewport.fit(this.model.current);
+      this.paint();
+    };
     board.append(this.root);
     this.dialog.id = "local-recovery";
     this.dialog.className = "game-menu paper";
@@ -205,6 +228,8 @@ export class LocalEditor {
     this.canvas.addEventListener("pointerup", this.up);
     this.canvas.addEventListener("pointercancel", this.cancelPointer);
     this.canvas.addEventListener("lostpointercapture", this.cancelPointer);
+    this.canvas.addEventListener("wheel", this.wheel, { passive: false });
+    this.canvas.addEventListener("contextmenu", this.contextMenu);
     window.addEventListener("resize", this.resize);
   }
   private get(id: string) {
@@ -217,6 +242,9 @@ export class LocalEditor {
     this.accessBlocked = false;
     this.source = { ...source };
     this.base = track.points.map((p) => ({ ...p }));
+    this.viewport.fit(track.points);
+    this.panMode = false;
+    this.get("local-pan").setAttribute("aria-pressed", "false");
     this.proof = new LocalGeometryProof(source, this.base);
     this.model = new LocalEditModel(this.base, { source, proof: this.proof });
     this.wasReady = this.scene.mode === "ready";
@@ -246,7 +274,7 @@ export class LocalEditor {
     title.textContent = track.name.trim() || "未命名赛道";
     title.title = title.textContent;
     this.backup = this.store
-      ? new LocalDraftStorage(this.store, this.hooks.check, this.proof)
+      ? new LocalDraftStorage(this.store, this.hooks.check, this.proof, this.book.save.schemaVersion === 4 ? 4 : 3)
       : null;
     const loaded = this.backup?.open(source, this.base) ?? {
       ok: false as const,
@@ -438,18 +466,35 @@ export class LocalEditor {
       this.selection,
       pending?.error?.point,
       !!pending?.error,
+      this.viewport.snapshot(),
     );
   }
-  private position(e: PointerEvent): Point {
+  private screenPosition(e: MouseEvent): Point {
     const r = this.canvas.getBoundingClientRect();
     return {
       x: ((e.clientX - r.left) * WORLD.width) / r.width,
       y: ((e.clientY - r.top) * WORLD.height) / r.height,
     };
   }
+  private position(e: PointerEvent): Point {
+    return this.viewport.screenToWorld(this.screenPosition(e));
+  }
+  private zoom(factor: number) {
+    if (this.busy || this.drag || !this.active) return;
+    this.viewport.zoomAt(factor, { x: WORLD.width / 2, y: WORLD.height / 2 });
+    this.paint();
+  }
+  private wheel = (e: WheelEvent) => {
+    if (!this.active) return;
+    e.preventDefault();
+    if (this.drag || this.busy || this.dialog.open) return;
+    this.viewport.zoomAt(Math.exp(-Math.max(-250, Math.min(250, e.deltaY)) * .002), this.screenPosition(e));
+    this.paint();
+  };
+  private contextMenu = (e: Event) => e.preventDefault();
   private down = (e: PointerEvent) => {
     if (
-      e.button !== 0 ||
+      ![0, 1, 2].includes(e.button) ||
       !this.active ||
       !!this.busy ||
       this.book.reloadRequired ||
@@ -461,6 +506,11 @@ export class LocalEditor {
     e.preventDefault();
     this.focus();
     this.motion.stopSheet();
+    if (this.panMode || e.button !== 0) {
+      this.panning = { pointer: e.pointerId, screen: this.screenPosition(e) };
+      this.canvas.setPointerCapture(e.pointerId);
+      return;
+    }
     this.model.cancelPreview();
     const p = this.position(e),
       result = prepareLocalDrag(this.model.current, p);
@@ -499,6 +549,13 @@ export class LocalEditor {
     if (this.counters.previewMs.length > 120) this.counters.previewMs.shift();
   }
   private move = (e: PointerEvent) => {
+    if (this.panning?.pointer === e.pointerId) {
+      const p = this.screenPosition(e);
+      this.viewport.pan(p.x - this.panning.screen.x, p.y - this.panning.screen.y);
+      this.panning.screen = p;
+      this.paint();
+      return;
+    }
     if (!this.drag || this.drag.pointer !== e.pointerId) return;
     this.drag.latest = this.position(e);
     this.counters.pointerMoves++;
@@ -509,6 +566,7 @@ export class LocalEditor {
       });
   };
   private up = (e: PointerEvent) => {
+    if (this.panning?.pointer === e.pointerId) { this.release(); return; }
     if (!this.drag || this.drag.pointer !== e.pointerId || !this.model) return;
     this.drag.latest = this.position(e);
     this.preview();
@@ -531,15 +589,16 @@ export class LocalEditor {
     });
   };
   private release() {
-    const pointer = this.drag?.pointer;
+    const pointer = this.drag?.pointer ?? this.panning?.pointer;
     this.drag = null;
+    this.panning = null;
     if (this.frame) cancelAnimationFrame(this.frame);
     this.frame = 0;
     if (pointer !== undefined && this.canvas.hasPointerCapture(pointer))
       this.canvas.releasePointerCapture(pointer);
   }
   private cancelPointer = () => {
-    if (this.drag) this.interrupt();
+    if (this.drag || this.panning) this.interrupt();
   };
   private resize = () => {
     if (this.active) this.interrupt();
@@ -797,6 +856,8 @@ export class LocalEditor {
     this.canvas.removeEventListener("pointerup", this.up);
     this.canvas.removeEventListener("pointercancel", this.cancelPointer);
     this.canvas.removeEventListener("lostpointercapture", this.cancelPointer);
+    this.canvas.removeEventListener("wheel", this.wheel);
+    this.canvas.removeEventListener("contextmenu", this.contextMenu);
     window.removeEventListener("resize", this.resize);
   }
 }

@@ -1,6 +1,7 @@
 import { fromDrawing, type Point, type Track } from "./geometry";
 import { activeTrack, type Save } from "./save-model";
 import type { EditIntent } from "./trackbook";
+import { emptySegmentDraft, evaluateSegmentDraft } from "./segmented-draft";
 
 export interface DraftSource {
   intent: EditIntent;
@@ -10,9 +11,11 @@ export interface DraftSource {
   geometryDigest?: string;
 }
 export interface DraftSnapshot {
-  phase: "empty" | "complete" | "interrupted";
+  phase: "empty" | "open" | "complete" | "interrupted";
   raw: Point[];
   overflow: boolean;
+  spaceVersion?: 2;
+  segmentEnds?: number[];
 }
 export interface DraftCheckpoint {
   current: DraftSnapshot;
@@ -26,6 +29,7 @@ export const emptyDraft = (): DraftSnapshot => ({
 const copy = (s: DraftSnapshot): DraftSnapshot => ({
   ...s,
   raw: s.raw.map((p) => ({ ...p })),
+  ...(s.segmentEnds ? { segmentEnds: [...s.segmentEnds] } : {}),
 });
 export function draftSource(save: Save, intent: EditIntent): DraftSource {
   const entry = activeTrack(save);
@@ -55,6 +59,7 @@ export function evaluateDraft(s: DraftSnapshot): {
   kind: "hint" | "error" | "success";
   point?: Point;
 } {
+  if (s.spaceVersion === 2) return evaluateSegmentDraft(s);
   if (s.phase === "empty")
     return {
       valid: false,
@@ -150,6 +155,17 @@ export class DraftHistory {
     this.current = emptyDraft();
     this.lastComplete = null;
     if (checkpoint.retained) this.commit(checkpoint.retained);
+    if (checkpoint.current.spaceVersion === 2 && checkpoint.current.segmentEnds?.length) {
+      this.current = emptySegmentDraft();
+      const ends = checkpoint.current.segmentEnds;
+      for (let i = 0; i < ends.length - 1; i++) this.commit({
+        ...checkpoint.current,
+        phase: "open",
+        raw: checkpoint.current.raw.slice(0, ends[i]),
+        segmentEnds: ends.slice(0, i + 1),
+        overflow: false,
+      });
+    }
     this.commit(checkpoint.current);
   }
 }

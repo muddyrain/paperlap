@@ -12,7 +12,6 @@ import {
   type TrackEntry,
 } from "./save-model";
 import { fingerprint, type Track, type Point } from "./geometry";
-import * as v3 from "./save-v3";
 import {
   localSource,
   sameLocalSource,
@@ -34,7 +33,7 @@ interface Dependencies {
   write: (save: Save) => WriteResult;
   stop: () => void;
   // Prepare without touching the live scene; apply only after write succeeds.
-  prepare: (entry: TrackEntry) => () => void;
+  prepare: (entry: TrackEntry) => (() => void) & { dispose?: () => void };
   recover: () => void;
   check?: () => WriteResult;
 }
@@ -75,14 +74,14 @@ export class Trackbook {
   beginLocal(): CommandResult {
     const blocked = this.available();
     if (blocked) return blocked;
-    if (this.save.schemaVersion !== 3)
+    if (this.save.schemaVersion === 2)
       return { ok: false, error: "invalid-v3" };
     const checked = this.deps.check?.() ?? {
       ok: false as const,
       error: "unavailable" as const,
     };
     if (!checked.ok) return checked;
-    this.local = localSource(v3.activeTrack(this.save));
+    this.local = localSource(activeTrack(this.save) as import("./save-v3").TrackEntry);
     return { ok: true, persisted: false, changed: false };
   }
   cancelLocal() {
@@ -94,9 +93,9 @@ export class Trackbook {
     proof?: LocalGeometryProof,
   ): CommandResult {
     if (this.reloadRequired) return { ok: false, error: "reload-required" };
-    if (this.intent || !this.local || this.save.schemaVersion !== 3)
+    if (this.intent || !this.local || this.save.schemaVersion === 2)
       return { ok: false, error: "editing" };
-    const entry = v3.activeTrack(this.save);
+    const entry = activeTrack(this.save) as import("./save-v3").TrackEntry;
     if (
       !sameLocalSource(source, this.local) ||
       !sameLocalSource(source, localSource(entry))
@@ -111,7 +110,7 @@ export class Trackbook {
       profile("local.commitValidate", () =>
         proof?.matches(source, entry.track.points)
           ? proof.check(points)?.reason
-          : checkLocalPoints(entry.track.points, points),
+          : checkLocalPoints(entry.track.points, points, entry.track.schemaVersion),
       )
     )
       return { ok: false, error: "invalid-track" };
@@ -126,7 +125,7 @@ export class Trackbook {
     };
     const result = this.commit(
       profile("local.candidate", () =>
-        v3.replaceTrack(this.save as v3.Save, entry.uid, track),
+        replaceTrack(this.save, entry.uid, track),
       ),
       true,
       true,
@@ -169,7 +168,7 @@ export class Trackbook {
     const result = this.commit(
       candidate,
       true,
-      create || this.save.schemaVersion === 3,
+      create || this.save.schemaVersion !== 2,
     );
     if (result.ok) this.intent = null;
     return result;
@@ -181,7 +180,7 @@ export class Trackbook {
   ): CommandResult {
     if (this.reloadRequired) return { ok: false, error: "reload-required" };
     if (!candidate.ok) return candidate;
-    let apply: (() => void) | undefined;
+    let apply: ((() => void) & { dispose?: () => void }) | undefined;
     if (sceneChange) {
       this.deps.stop();
       try {
@@ -193,12 +192,17 @@ export class Trackbook {
       }
     }
     const written = profile("storage.write", () => this.write(candidate.save));
-    if (!written.ok && strict) return written;
+    if (!written.ok && strict) {
+      try { apply?.dispose?.(); } catch { /* Keep the original save failure. */ }
+      return written;
+    }
     const previous = this.save;
     this.save = candidate.save;
     try {
       profile("scene.apply", () => apply?.());
     } catch {
+      // Committed renderers make disposal a no-op; pending resources are released.
+      try { apply?.dispose?.(); } catch { /* Reload remains authoritative. */ }
       // Reload the durable state; never operate a half-rendered scene.
       if (!written.ok) this.save = previous;
       this.reloadRequired = true;

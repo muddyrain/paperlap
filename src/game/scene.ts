@@ -4,13 +4,16 @@ import {
   defaultTrack,
   derive,
   nearest,
+  trackBounds,
   type Point,
   type Track,
   type TrackData,
 } from "./geometry";
 import { FixedStepper, moveCar, noInput, spawn, type Car } from "./vehicle";
-import { carArt, paperArt, roadArt, sceneryArt } from "./art";
+import { carArt, paperArt } from "./art";
 import { advanceLap, newLap } from "./laps";
+import { RaceView } from "./race-view";
+import { drawOverview, fitMap, overviewArt, type MapView } from "./overview-art";
 export type Mode = "ready" | "running" | "paused" | "editing";
 export class RaceScene extends Phaser.Scene {
   mode: Mode = "ready";
@@ -35,6 +38,14 @@ export class RaceScene extends Phaser.Scene {
   reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   onChange: () => void = () => {};
   onLap: (time: number, valid: boolean) => void = () => {};
+  onRenderError: (error: unknown) => void = () => {};
+  private drivingView: RaceView | null = null;
+  private overview: HTMLCanvasElement | null = null;
+  private mapView: MapView = { x: 0, y: 0, zoom: 1 };
+  private renderDirty = true;
+  get rendererInfo() {
+    return { kind: "three-webgl", available: !!this.drivingView, view: { ...this.mapView }, ...this.drivingView?.snapshot() };
+  }
   constructor() {
     super("race");
   }
@@ -44,12 +55,16 @@ export class RaceScene extends Phaser.Scene {
       .image(0, 0, "paper")
       .setOrigin(0)
       .setDisplaySize(WORLD.width, WORLD.height);
-    this.textures.addCanvas("road", roadArt(this.trackData));
+    this.mapView = fitMap(this.trackData.track.points);
+    this.overview = overviewArt(this.trackData, this.mapView);
+    this.textures.addCanvas("road", this.overview);
     this.roadImage = this.add
       .image(0, 0, "road")
       .setOrigin(0)
       .setDisplaySize(WORLD.width, WORLD.height);
-    this.textures.addCanvas("scenery", sceneryArt(this.trackData));
+    const blank = document.createElement("canvas");
+    blank.width = blank.height = 1;
+    this.textures.addCanvas("scenery", blank);
     this.scenery = this.add
       .image(0, 0, "scenery")
       .setOrigin(0)
@@ -59,32 +74,61 @@ export class RaceScene extends Phaser.Scene {
     this.carSprite = this.add
       .image(this.car.x, this.car.y, "car")
       .setDisplaySize(77, 49);
+    try {
+      this.drivingView = new RaceView(this.game.canvas.parentElement!);
+      this.drivingView.setTrack(this.trackData);
+    } catch (error) {
+      this.drivingView?.dispose();
+      this.drivingView = null;
+      this.mode = "paused";
+      queueMicrotask(() => this.onRenderError(error));
+    }
+    this.events.once("shutdown", () => this.drivingView?.dispose());
+    this.events.once("destroy", () => this.drivingView?.dispose());
     this.events.emit("ready");
     this.onChange();
   }
   setTrack(track: Track) {
     this.prepareTrack(track)();
   }
-  prepareTrack(track: Track): () => void {
+  prepareTrack(track: Track): (() => void) & { dispose?: () => void } {
     const data = derive(track);
-    const road = this.roadImage ? roadArt(data) : null;
-    const scenery = this.roadImage ? sceneryArt(data) : null;
-    return () => {
+    const view = fitMap(track.points);
+    const road = this.roadImage ? overviewArt(data, view) : null;
+    const apply3d = this.drivingView?.prepareTrack(data);
+    const apply = () => {
+      apply3d?.();
       this.trackData = data;
+      this.mapView = view;
       this.reset();
-      if (road && scenery) {
+      if (road) {
+        this.overview = road;
         this.textures.remove("road");
         this.textures.addCanvas("road", road);
         this.roadImage
           .setTexture("road")
           .setDisplaySize(WORLD.width, WORLD.height);
-        this.textures.remove("scenery");
-        this.textures.addCanvas("scenery", scenery);
-        this.scenery
-          .setTexture("scenery")
-          .setDisplaySize(WORLD.width, WORLD.height);
       }
     };
+    apply.dispose = () => apply3d?.dispose();
+    return apply;
+  }
+  updateEditViewport(view: MapView) {
+    this.mapView = { ...view };
+    if (this.overview) {
+      drawOverview(this.overview, this.trackData, this.mapView);
+      (this.textures.get("road") as Phaser.Textures.CanvasTexture).refresh();
+    }
+  }
+  captureView(): HTMLCanvasElement | null {
+    if (this.mode !== "editing") return this.drivingView?.capture() ?? null;
+    const canvas = document.createElement("canvas");
+    canvas.width = WORLD.width;
+    canvas.height = WORLD.height;
+    const c = canvas.getContext("2d")!;
+    c.drawImage(this.textures.get("paper").getSourceImage() as HTMLCanvasElement, 0, 0, WORLD.width, WORLD.height);
+    if (this.roadImage?.visible && this.overview) c.drawImage(this.overview, 0, 0);
+    return canvas;
   }
   reset() {
     this.car = spawn(this.trackData);
@@ -94,6 +138,7 @@ export class RaceScene extends Phaser.Scene {
     this.offroad = false;
     this.trail = [];
     this.effectClock = 0;
+    this.renderDirty = true;
     this.effects?.clear();
     this.onChange();
   }
@@ -180,7 +225,7 @@ export class RaceScene extends Phaser.Scene {
           nearest(this.car, this.trackData.track.points).distance >
           this.trackData.track.width / 2 + ROAD.tolerance;
         const previous: Point = { x: this.car.x, y: this.car.y };
-        moveCar(this.car, input, dt, !this.offroad);
+        moveCar(this.car, input, dt, !this.offroad, trackBounds(this.trackData.track));
         const onRoad =
           nearest(this.car, this.trackData.track.points).distance <=
           this.trackData.track.width / 2 + ROAD.tolerance;
@@ -194,11 +239,22 @@ export class RaceScene extends Phaser.Scene {
         );
         if (result) this.onLap(result.time, result.valid);
       });
-    if (this.mode === "running") this.drawEffects(Math.min(delta / 1000, 0.1));
-    if (this.carSprite)
-      this.carSprite
-        .setPosition(this.car.x, this.car.y)
-        .setRotation(this.car.angle);
+    if (this.drivingView) {
+      const editing = this.mode === "editing";
+      this.drivingView.setVisible(!editing);
+      this.sys.setVisible(editing);
+      this.game.canvas.style.visibility = editing ? "visible" : "hidden";
+      this.carSprite?.setVisible(false);
+      if (!editing) {
+        try {
+          this.drivingView.render(this.car, this.mode === "running" ? Math.min(delta / 1000, .1) : 0, this.renderDirty);
+        } catch (error) {
+          this.onRenderError(error);
+          return;
+        }
+        this.renderDirty = false;
+      }
+    }
     this.onChange();
   }
 }

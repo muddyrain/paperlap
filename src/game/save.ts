@@ -70,18 +70,19 @@ const checkedGeometry = new WeakMap<
   object,
   {
     width: number;
+    schemaVersion: 1 | 2;
     id: string;
     points: readonly Readonly<Point>[];
   }
 >();
 
-function readTrack(
+export function readTrack(
   value: unknown,
-  { legacy = false, fullGeometry = false } = {},
+  { legacy = false, fullGeometry = false, maxTrackVersion = 1 }: { legacy?: boolean; fullGeometry?: boolean; maxTrackVersion?: 1 | 2 } = {},
 ): Track | null {
   if (
     !object(value) ||
-    value.schemaVersion !== 1 ||
+    (value.schemaVersion !== 1 && !(maxTrackVersion === 2 && value.schemaVersion === 2)) ||
     value.width !== ROAD.width ||
     !Array.isArray(value.points) ||
     value.points.length < 12 ||
@@ -106,17 +107,19 @@ function readTrack(
     fullGeometry ||
     !geometry ||
     geometry.width !== value.width ||
+    geometry.schemaVersion !== value.schemaVersion ||
     geometry.points.length !== points.length ||
     !points.every(
       (p, i) => p.x === geometry!.points[i].x && p.y === geometry!.points[i].y,
     )
   ) {
     if (
-      profile("geometry.strict", () => validate(points, value.width as number))
+      profile("geometry.strict", () => validate(points, value.width as number, value.schemaVersion as 1 | 2))
     )
       return null;
     geometry = {
       width: value.width,
+      schemaVersion: value.schemaVersion,
       id: fingerprint(points, value.width),
       points: points.map((p) => ({ ...p })),
     };
@@ -136,7 +139,7 @@ function readTrack(
     return null;
   checkedGeometry.set(value.points, geometry);
   checkedGeometry.set(points, geometry);
-  return { schemaVersion: 1, id, name, width: value.width, points };
+  return { schemaVersion: value.schemaVersion, id, name, width: value.width, points };
 }
 
 export const freshSave = (): Save => ({
@@ -157,6 +160,11 @@ export function activeTrack(save: Save): TrackEntry {
 }
 
 export function validateSave(value: unknown): SaveResult {
+  return validateSaveForSpace(value, 1);
+}
+
+// Shared envelope validation; legacy public readers always retain schema-1 geometry.
+export function validateSaveForSpace(value: unknown, maxTrackVersion: 1 | 2): SaveResult {
   if (
     !object(value) ||
     value.schemaVersion !== 2 ||
@@ -175,7 +183,7 @@ export function validateSave(value: unknown): SaveResult {
   for (const entry of value.tracks) {
     if (!object(entry) || !validUid(entry.uid) || uids.has(entry.uid))
       return failure("invalid-uid");
-    const track = readTrack(entry.track);
+    const track = readTrack(entry.track, { maxTrackVersion });
     if (!track) return failure("invalid-track");
     tracks.push({ uid: entry.uid, track });
     uids.add(entry.uid);
